@@ -1,5 +1,6 @@
 import { Package, Plus } from 'lucide-react';
 import type { Product } from '../../../services/product';
+import { formatCurrencyKhr, formatCurrencyUsd } from '../../../utils/currency';
 
 interface Props {
   readonly product: Product;
@@ -7,73 +8,75 @@ interface Props {
   readonly onAddToCart: (product: Product) => void;
 }
 
-const formatCurrency = (val: number) =>
-  new Intl.NumberFormat('en-US', {
-    style: 'currency',
-    currency: 'USD',
-  }).format(val);
-
 export function PosProductCard({ product, cartQuantity, onAddToCart }: Props) {
   const isOutOfStock = product.quantity <= 0;
   const remainingStock = product.quantity - cartQuantity;
 
   return (
     <div
-      onClick={() => !isOutOfStock && onAddToCart(product)}
-      className={`group relative flex flex-col justify-between overflow-hidden rounded-3xl border border-slate-200 bg-white p-4 shadow-xs transition-all duration-200 ${
-        isOutOfStock
-          ? 'opacity-60 cursor-not-allowed'
-          : 'hover:-translate-y-1 hover:shadow-lg hover:border-emerald-300 cursor-pointer'
+      onClick={() => !isOutOfStock && remainingStock > 0 && onAddToCart(product)}
+      className={`group relative flex flex-col justify-between overflow-hidden rounded-3xl border border-slate-200/80 bg-white/90 p-3.5 shadow-xs transition-all duration-300 ${
+        isOutOfStock || remainingStock <= 0
+          ? 'opacity-55 cursor-not-allowed grayscale'
+          : 'hover:-translate-y-1.5 hover:shadow-xl hover:border-indigo-400/80 hover:bg-white cursor-pointer active:scale-98'
       }`}
     >
-      {/* Product Image or Icon */}
-      <div className='relative flex h-32 w-full items-center justify-center rounded-2xl bg-slate-100 overflow-hidden'>
+      {/* Product Image & Badges */}
+      <div className='relative flex h-32 w-full items-center justify-center rounded-2xl bg-slate-100/80 overflow-hidden shadow-inner'>
         {product.imageUrl ? (
           <img
             src={product.imageUrl}
             alt={product.name}
-            className='h-full w-full object-cover transition-transform duration-300 group-hover:scale-105'
+            className='h-full w-full object-cover transition-transform duration-500 group-hover:scale-110'
           />
         ) : (
-          <Package size={36} className='text-slate-400' />
+          <Package size={36} className='text-slate-400 group-hover:scale-110 transition-transform duration-300' />
         )}
 
         {/* Stock Badge */}
         <span
-          className={`absolute top-2.5 right-2.5 rounded-full px-2.5 py-0.5 text-xs font-bold ${
-            isOutOfStock
-              ? 'bg-rose-500 text-white'
-              : remainingStock <= product.minStock
-              ? 'bg-amber-500 text-white'
-              : 'bg-slate-900/80 text-white backdrop-blur-xs'
+          className={`absolute top-2 right-2 rounded-full px-2.5 py-0.5 text-[10px] font-black uppercase tracking-wider ${
+            isOutOfStock || remainingStock <= 0
+              ? 'bg-rose-600 text-white shadow-xs'
+              : remainingStock <= (product.minStock || 0)
+              ? 'bg-amber-500 text-white shadow-xs'
+              : 'bg-slate-900/80 text-white backdrop-blur-md'
           }`}
         >
-          {isOutOfStock ? 'Out of Stock' : `${remainingStock} left`}
+          {isOutOfStock || remainingStock <= 0 ? 'Out of Stock' : `${remainingStock} left`}
         </span>
 
-        {/* Cart Count Badge */}
+        {/* Cart Count Pill */}
         {cartQuantity > 0 && (
-          <span className='absolute bottom-2.5 left-2.5 flex h-6 w-6 items-center justify-center rounded-full bg-emerald-600 text-xs font-extrabold text-white shadow-md'>
+          <span className='absolute bottom-2 left-2 flex h-6 w-6 items-center justify-center rounded-full bg-emerald-500 text-xs font-black text-white shadow-lg ring-2 ring-white animate-in zoom-in-75 duration-150'>
             {cartQuantity}
           </span>
         )}
       </div>
 
-      {/* Details */}
+      {/* Product Name & Dual Pricing */}
       <div className='mt-3 space-y-1'>
-        <p className='text-xs font-medium text-slate-400 uppercase tracking-wider'>
+        <p className='text-[10px] font-extrabold text-slate-400 uppercase tracking-widest truncate'>
           {product.category || 'General'}
         </p>
-        <h3 className='font-bold text-slate-900 line-clamp-1 text-sm'>
+        <h3 className='font-extrabold text-slate-900 line-clamp-1 text-xs leading-snug group-hover:text-indigo-600 transition-colors'>
           {product.name}
         </h3>
+
         <div className='flex items-center justify-between pt-1'>
-          <span className='text-base font-extrabold text-emerald-600'>
-            {formatCurrency(product.sellPrice)}
-          </span>
+          <div>
+            <span className='text-sm font-black text-emerald-600 block leading-none'>
+              {formatCurrencyUsd(product.sellPrice)}
+            </span>
+            <span className='text-[10px] font-bold text-indigo-600 block mt-0.5'>
+              {formatCurrencyKhr(product.sellPrice)}
+            </span>
+          </div>
+
           <button
+            type='button'
             disabled={isOutOfStock || remainingStock <= 0}
-            className='flex h-8 w-8 items-center justify-center rounded-xl bg-slate-100 text-slate-700 transition group-hover:bg-emerald-600 group-hover:text-white disabled:opacity-50'
+            className='flex h-8 w-8 items-center justify-center rounded-xl bg-slate-100 text-slate-700 transition group-hover:bg-gradient-to-r group-hover:from-blue-600 group-hover:to-indigo-600 group-hover:text-white shadow-xs disabled:opacity-40 shrink-0'
           >
             <Plus size={16} />
           </button>

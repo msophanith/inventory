@@ -1,13 +1,18 @@
 import { jsPDF } from 'jspdf';
+import QRCode from 'qrcode';
 import type { ReceiptData } from '../types/sell.types';
 import { formatDateTime } from '../../../utils/date';
 import { formatCurrencyKhr, formatCurrencyUsd } from '../../../utils/currency';
 
-export function generatePdfInvoiceBlob(receipt: ReceiptData): Blob {
+export const PAYMENT_QR_CODE_VALUE =
+  '00020101021129450016abaakhppxxx@abaa01090177373060208ABA Bank40600006abaP2P0112083EB929820E020901773730603090176336980404Dual5204000053031165802KH5908SILA SAO6010Phnom Penh630410DF';
+
+export async function generatePdfInvoiceBlob(receipt: ReceiptData): Promise<Blob> {
+  const pageHeight = Math.max(175, 120 + receipt.items.length * 5);
   const doc = new jsPDF({
     orientation: 'portrait',
     unit: 'mm',
-    format: [80, 165],
+    format: [80, pageHeight],
   });
 
   const dateFormatted = formatDateTime(receipt.createdAt);
@@ -91,7 +96,32 @@ export function generatePdfInvoiceBlob(receipt: ReceiptData): Blob {
 
   doc.text('Change:', 45, y, { align: 'right' });
   doc.text(`${formatCurrencyUsd(receipt.change)} (${formatCurrencyKhr(receipt.change)})`, 75, y, { align: 'right' });
-  y += 8;
+  y += 6;
+
+  // KHQR Code Section
+  doc.line(5, y, 75, y);
+  y += 5;
+
+  try {
+    const qrDataUrl = await QRCode.toDataURL(PAYMENT_QR_CODE_VALUE, {
+      margin: 1,
+      width: 250,
+      errorCorrectionLevel: 'M',
+    });
+
+    const qrSize = 32;
+    const qrX = (80 - qrSize) / 2;
+
+    doc.setFont('Helvetica', 'bold');
+    doc.setFontSize(8);
+    doc.text('Scan to Pay (KHQR)', 40, y, { align: 'center' });
+    y += 3;
+
+    doc.addImage(qrDataUrl, 'PNG', qrX, y, qrSize, qrSize);
+    y += qrSize + 5;
+  } catch (err) {
+    console.error('Error generating KHQR code for PDF invoice:', err);
+  }
 
   doc.line(5, y, 75, y);
   y += 4;
@@ -101,3 +131,4 @@ export function generatePdfInvoiceBlob(receipt: ReceiptData): Blob {
 
   return doc.output('blob');
 }
+

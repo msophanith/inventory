@@ -148,8 +148,8 @@ export function exportReportToCsv(
   ];
 
   const rows = productReports.map((p) => [
-    `"${p.productName.replace(/"/g, '""')}"`,
-    `"${p.category.replace(/"/g, '""')}"`,
+    `"${(p.productName || '').replace(/"/g, '""')}"`,
+    `"${(p.category || '').replace(/"/g, '""')}"`,
     p.buyPrice,
     p.sellPrice,
     p.quantitySold,
@@ -162,7 +162,8 @@ export function exportReportToCsv(
   ]);
 
   const csvContent = [headers.join(','), ...rows.map((r) => r.join(','))].join('\n');
-  const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+  // Include UTF-8 BOM (\uFEFF) so Excel and CSV readers display Khmer Unicode (KH) correctly
+  const blob = new Blob(['\uFEFF' + csvContent], { type: 'text/csv;charset=utf-8;' });
   const url = URL.createObjectURL(blob);
   const link = document.createElement('a');
 
@@ -172,4 +173,5 @@ export function exportReportToCsv(
   document.body.appendChild(link);
   link.click();
   document.body.removeChild(link);
+  URL.revokeObjectURL(url);
 }

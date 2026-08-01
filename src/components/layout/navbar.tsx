@@ -3,6 +3,7 @@ import { Loader2, LogOut, ShieldCheck, User, X } from 'lucide-react';
 import { useAuth } from '../../features/auth/use-auth';
 import Logo from './logo';
 import { NotificationBell } from './notification-bell';
+import { KhrRateSelector } from './khr-rate-selector';
 
 export default function Navbar() {
   const { user, signOut, isAdmin, role } = useAuth();
@@ -36,16 +37,25 @@ export default function Navbar() {
           <Logo />
         </div>
 
-        <div className='hidden lg:flex lg:items-center lg:gap-2 rounded-full bg-slate-100/70 border border-slate-200/60 px-3 py-1.5 text-xs text-slate-600 font-medium'>
-          <span className='relative flex h-2 w-2'>
-            <span className='absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75' />
-            <span className='relative inline-flex h-2 w-2 rounded-full bg-emerald-500' />
-          </span>
-          <span>System Online</span>
+        <div className='hidden lg:flex lg:items-center lg:gap-3'>
+          <div className='flex items-center gap-2 rounded-full bg-slate-100/70 border border-slate-200/60 px-3 py-1.5 text-xs text-slate-600 font-medium'>
+            <span className='relative flex h-2 w-2'>
+              <span className='absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75' />
+              <span className='relative inline-flex h-2 w-2 rounded-full bg-emerald-500' />
+            </span>
+            <span>System Online</span>
+          </div>
+
+          {/* KHR Exchange Rate Chip & Selector */}
+          <KhrRateSelector />
         </div>
 
-        <div className='flex items-center gap-3 sm:gap-4'>
-          {/* Low Stock Alert Notification Bell */}
+        <div className='flex items-center gap-2.5 sm:gap-4'>
+          {/* Mobile Exchange Rate Badge */}
+          <div className='lg:hidden'>
+            <KhrRateSelector />
+          </div>
+
           <NotificationBell />
 
           <div className='flex items-center gap-3 rounded-2xl border border-slate-200/60 bg-slate-50/60 p-1.5 pr-3.5 transition-all hover:bg-slate-100/80 shadow-2xs'>
@@ -107,11 +117,7 @@ export default function Navbar() {
                 </div>
               </div>
 
-              <button
-                type='button'
-                onClick={() => setShowConfirmModal(false)}
-                className='rounded-xl p-1.5 text-slate-400 hover:bg-slate-100 hover:text-slate-700 transition cursor-pointer'
-              >
+              <button onClick={() => setShowConfirmModal(false)} className='rounded-xl p-1.5 text-slate-400 hover:bg-slate-100 transition'>
                 <X size={18} />
               </button>
             </div>

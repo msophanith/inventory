@@ -92,7 +92,7 @@ export class TelegramService {
     ].join('\n');
 
     try {
-      const pdfBlob = generatePdfInvoiceBlob(receipt);
+      const pdfBlob = await generatePdfInvoiceBlob(receipt);
       const fileName = `Invoice_${receipt.orderId}.pdf`;
       const sent = await this.sendDocument(pdfBlob, fileName, caption);
       if (sent) return true;

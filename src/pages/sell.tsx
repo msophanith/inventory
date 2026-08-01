@@ -13,6 +13,7 @@ import {
   PosProductGrid,
   PosReceiptModal,
 } from '../features/sell/components';
+import { PosHeaderBanner } from '../features/sell/components/pos-header-banner';
 import Alert from '../components/ui/alert';
 import { PageContainer } from '../components/layout/page-container';
 
@@ -69,33 +70,42 @@ const SellPage = () => {
   };
 
   return (
-    <PageContainer className='flex flex-col gap-6 lg:flex-row relative pb-24 lg:pb-0'>
+    <PageContainer className='space-y-5 pb-24 lg:pb-0'>
       {alert && (
         <div className='fixed top-4 right-4 z-50 max-w-sm'>
           <Alert type={alert.type} message={alert.message} onClose={() => setAlert(null)} />
         </div>
       )}
 
-      <PosProductGrid
-        products={products}
-        cartItems={cart.items}
-        isLoading={productsLoading}
-        onAddToCart={(p) => { playScanSound(); cart.addItem(p); }}
-        onOpenScanModal={() => setIsCameraScanOpen(true)}
-      />
+      {/* POS Header Banner with Real-time Today Sales & Stat Metrics */}
+      <PosHeaderBanner onOpenScanModal={() => setIsCameraScanOpen(true)} />
 
-      <PosCartPanel
-        items={cart.items}
-        subtotal={cart.subtotal}
-        tax={cart.tax}
-        totalAmount={cart.totalAmount}
-        itemCount={cart.itemCount}
-        onUpdateQty={cart.updateQuantity}
-        onUpdatePrice={cart.updateUnitPrice}
-        onRemoveItem={cart.removeItem}
-        onClearCart={cart.clearCart}
-        onCheckout={() => checkout.setIsCheckoutOpen(true)}
-      />
+      {/* Main Terminal View: Product Catalog & Order Cart Panel */}
+      <div className='flex flex-col gap-6 lg:flex-row relative'>
+        <PosProductGrid
+          products={products}
+          cartItems={cart.items}
+          isLoading={productsLoading}
+          onAddToCart={(p) => {
+            playScanSound();
+            cart.addItem(p);
+          }}
+          onOpenScanModal={() => setIsCameraScanOpen(true)}
+        />
+
+        <PosCartPanel
+          items={cart.items}
+          subtotal={cart.subtotal}
+          tax={cart.tax}
+          totalAmount={cart.totalAmount}
+          itemCount={cart.itemCount}
+          onUpdateQty={cart.updateQuantity}
+          onUpdatePrice={cart.updateUnitPrice}
+          onRemoveItem={cart.removeItem}
+          onClearCart={cart.clearCart}
+          onCheckout={() => checkout.setIsCheckoutOpen(true)}
+        />
+      </div>
 
       <PosMobileCartBar
         itemCount={cart.itemCount}
