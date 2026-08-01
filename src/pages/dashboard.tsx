@@ -24,7 +24,7 @@ const DashboardPage = () => {
   const { summary, isGettingSummary } = useMovement();
 
   return (
-    <PageContainer className='space-y-8'>
+    <PageContainer className='space-y-5 sm:space-y-8 pb-24 lg:pb-6'>
       {productSummaryLoading ? (
         <ProductInfoSkeleton />
       ) : (
