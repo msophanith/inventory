@@ -76,7 +76,7 @@ export class ProductService {
 
     // Apply filters
     if (search) {
-      query = query.ilike('name', `%${search}%`);
+      query = query.or(`name.ilike.%${search}%,barcode.ilike.%${search}%`);
     }
 
     if (category) {
@@ -119,6 +119,52 @@ export class ProductService {
     }
 
     return data ? (data as Product) : null;
+  }
+
+  /**
+   * Direct API lookup by barcode, ID, or name across entire 2000+ catalog
+   */
+  async getByBarcodeOrSearch(code: string): Promise<Product | null> {
+    const clean = code.trim();
+    if (!clean) return null;
+
+    const { data: exact } = await supabase
+      .from(this.TABLE_NAME)
+      .select('*')
+      .or(`barcode.eq.${clean},id.eq.${clean}`)
+      .maybeSingle();
+
+    if (exact) return exact as Product;
+
+    const { data: fuzzy } = await supabase
+      .from(this.TABLE_NAME)
+      .select('*')
+      .or(`name.ilike.%${clean}%,barcode.ilike.%${clean}%`)
+      .limit(1)
+      .maybeSingle();
+
+    return fuzzy ? (fuzzy as Product) : null;
+  }
+
+  /**
+   * Fetch all distinct product categories dynamically from database
+   */
+  async getCategories(): Promise<string[]> {
+    const { data, error } = await supabase
+      .from(this.TABLE_NAME)
+      .select('category')
+      .not('category', 'is', null);
+
+    if (error) return [];
+
+    const set = new Set<string>();
+    (data || []).forEach((row) => {
+      if (row.category && row.category.trim()) {
+        set.add(row.category.trim());
+      }
+    });
+
+    return Array.from(set).sort();
   }
 
   /**

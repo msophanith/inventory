@@ -4,6 +4,7 @@ import { usePosCart } from '../features/sell/hooks/use-pos-cart';
 import { useCheckout } from '../features/sell/hooks/use-checkout';
 import { useHardwareScanner } from '../features/sell/hooks/use-hardware-scanner';
 import { playScanSound } from '../features/sell/utils/scan-sound';
+import { productService } from '../services';
 import {
   PosCameraScannerModal,
   PosCartPanel,
@@ -18,33 +19,62 @@ import Alert from '../components/ui/alert';
 import { PageContainer } from '../components/layout/page-container';
 
 const SellPage = () => {
+  const [search, setSearch] = useState('');
+  const [category, setCategory] = useState('ALL');
+
   const { useGetProducts } = useProduct(false);
-  const { data: response, isLoading: productsLoading } = useGetProducts({ limit: 100 });
+  const { data: response, isLoading: productsLoading } = useGetProducts({
+    search,
+    category: category === 'ALL' ? '' : category,
+    limit: 100,
+  });
   const products = useMemo(() => response?.data || [], [response?.data]);
 
   const cart = usePosCart();
   const checkout = useCheckout();
   const [isCameraScanOpen, setIsCameraScanOpen] = useState(false);
   const [isMobileCartOpen, setIsMobileCartOpen] = useState(false);
-  const [alert, setAlert] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
+  const [alert, setAlert] = useState<{
+    type: 'success' | 'error';
+    message: string;
+  } | null>(null);
 
   const handleBarcodeScanned = useCallback(
-    (code: string) => {
+    async (code: string) => {
       const clean = code.trim().toLowerCase();
-      const target = products.find(
-        (p) => p.barcode?.toLowerCase() === clean || p.id.toLowerCase() === clean || p.name.toLowerCase() === clean,
+      if (!clean) return;
+
+      let target = products.find(
+        (p) =>
+          p.barcode?.toLowerCase() === clean ||
+          p.id.toLowerCase() === clean ||
+          p.name.toLowerCase() === clean,
       );
+
+      if (!target) {
+        target =
+          (await productService.getByBarcodeOrSearch(clean)) ?? undefined;
+      }
 
       if (target) {
         if (target.quantity <= 0) {
-          setAlert({ type: 'error', message: `"${target.name}" is out of stock!` });
+          setAlert({
+            type: 'error',
+            message: `"${target.name}" is out of stock!`,
+          });
           return;
         }
         playScanSound();
         cart.addItem(target);
-        setAlert({ type: 'success', message: `Added "${target.name}" to cart` });
+        setAlert({
+          type: 'success',
+          message: `Added "${target.name}" to cart`,
+        });
       } else {
-        setAlert({ type: 'error', message: `No product found for barcode: "${code}"` });
+        setAlert({
+          type: 'error',
+          message: `No product found for barcode: "${code}"`,
+        });
       }
     },
     [products, cart],
@@ -55,7 +85,10 @@ const SellPage = () => {
     onScan: handleBarcodeScanned,
   });
 
-  const handleConfirmPayment = async (params: { paymentMethod: 'CASH' | 'CARD' | 'QR'; amountPaid: number }) => {
+  const handleConfirmPayment = async (params: {
+    paymentMethod: 'CASH' | 'CARD' | 'QR';
+    amountPaid: number;
+  }) => {
     await checkout.processCheckout({
       items: cart.items,
       subtotal: cart.subtotal,
@@ -73,19 +106,25 @@ const SellPage = () => {
     <PageContainer className='space-y-5 pb-24 lg:pb-0'>
       {alert && (
         <div className='fixed top-4 right-4 z-50 max-w-sm'>
-          <Alert type={alert.type} message={alert.message} onClose={() => setAlert(null)} />
+          <Alert
+            type={alert.type}
+            message={alert.message}
+            onClose={() => setAlert(null)}
+          />
         </div>
       )}
 
-      {/* POS Header Banner with Real-time Today Sales & Stat Metrics */}
       <PosHeaderBanner onOpenScanModal={() => setIsCameraScanOpen(true)} />
 
-      {/* Main Terminal View: Product Catalog & Order Cart Panel */}
       <div className='flex flex-col gap-6 lg:flex-row relative'>
         <PosProductGrid
           products={products}
           cartItems={cart.items}
           isLoading={productsLoading}
+          search={search}
+          onSearchChange={setSearch}
+          selectedCategory={category}
+          onCategoryChange={setCategory}
           onAddToCart={(p) => {
             playScanSound();
             cart.addItem(p);
@@ -142,7 +181,10 @@ const SellPage = () => {
         onClose={() => checkout.setIsCheckoutOpen(false)}
         onConfirm={handleConfirmPayment}
       />
-      <PosReceiptModal receipt={checkout.receiptData} onClose={() => checkout.setReceiptData(null)} />
+      <PosReceiptModal
+        receipt={checkout.receiptData}
+        onClose={() => checkout.setReceiptData(null)}
+      />
     </PageContainer>
   );
 };

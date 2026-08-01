@@ -11,6 +11,14 @@ const useProduct = (enableSummary?: boolean) => {
     });
   };
 
+  const useGetCategories = () => {
+    return useQuery({
+      queryKey: ['product-categories'],
+      queryFn: () => productService.getCategories(),
+      staleTime: 5 * 60 * 1000,
+    });
+  };
+
   const { data: productSummary, isLoading: productSummaryLoading } = useQuery({
     queryKey: ['productSummary'],
     queryFn: () => productService.getSummary(),
@@ -49,6 +57,7 @@ const useProduct = (enableSummary?: boolean) => {
 
   return {
     useGetProducts,
+    useGetCategories,
     useGetProductById,
     useGetOutOfStockProducts,
     useGetLowStockProducts,

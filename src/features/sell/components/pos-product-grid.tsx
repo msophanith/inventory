@@ -1,13 +1,18 @@
-import { useMemo, useState } from 'react';
+import { useMemo } from 'react';
 import { Camera, Search, Sparkles } from 'lucide-react';
 import type { Product } from '../../../services/product';
 import type { CartItem } from '../types/sell.types';
 import { PosProductCard } from './pos-product-card';
+import { useProduct } from '../../product/hooks/use-product';
 
 interface Props {
   readonly products: Product[];
   readonly cartItems: CartItem[];
   readonly isLoading?: boolean;
+  readonly search: string;
+  readonly onSearchChange: (val: string) => void;
+  readonly selectedCategory: string;
+  readonly onCategoryChange: (cat: string) => void;
   readonly onAddToCart: (product: Product) => void;
   readonly onOpenScanModal: () => void;
 }
@@ -16,35 +21,19 @@ export function PosProductGrid({
   products,
   cartItems,
   isLoading,
+  search,
+  onSearchChange,
+  selectedCategory,
+  onCategoryChange,
   onAddToCart,
   onOpenScanModal,
 }: Props) {
-  const [search, setSearch] = useState('');
-  const [selectedCategory, setSelectedCategory] = useState('ALL');
+  const { useGetCategories } = useProduct();
+  const { data: dynamicCategories = [] } = useGetCategories();
 
   const categories = useMemo(() => {
-    const map = new Map<string, number>();
-    products.forEach((p) => {
-      if (p.category) {
-        map.set(p.category, (map.get(p.category) || 0) + 1);
-      }
-    });
-    return [
-      { name: 'ALL', count: products.length },
-      ...Array.from(map.entries()).map(([name, count]) => ({ name, count })),
-    ];
-  }, [products]);
-
-  const filteredProducts = useMemo(() => {
-    return products.filter((p) => {
-      const matchCat = selectedCategory === 'ALL' || p.category === selectedCategory;
-      const matchSearch =
-        !search.trim() ||
-        p.name.toLowerCase().includes(search.toLowerCase()) ||
-        p.barcode?.includes(search);
-      return matchCat && matchSearch;
-    });
-  }, [products, selectedCategory, search]);
+    return ['ALL', ...dynamicCategories];
+  }, [dynamicCategories]);
 
   const cartMap = useMemo(() => {
     const map = new Map<string, number>();
@@ -62,8 +51,8 @@ export function PosProductGrid({
             <input
               type='text'
               value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              placeholder='Search by product name or barcode...'
+              onChange={(e) => onSearchChange(e.target.value)}
+              placeholder='Search 2,000+ products by name or barcode...'
               className='w-full rounded-2xl border border-slate-200 bg-white pl-10 pr-4 py-2.5 text-xs sm:text-sm font-semibold text-slate-800 focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 shadow-xs transition-all'
             />
           </div>
@@ -78,24 +67,21 @@ export function PosProductGrid({
           </button>
         </div>
 
-        {/* Category Pills Bar (Horizontal Scrollable with Item Count Badges) */}
+        {/* Dynamic Category Pills Bar */}
         <div className='flex items-center gap-2 overflow-x-auto pb-1.5 pt-0.5 w-full max-w-full scrollbar-hide'>
           {categories.map((cat) => {
-            const active = selectedCategory === cat.name;
+            const active = selectedCategory === cat;
             return (
               <button
-                key={cat.name}
-                onClick={() => setSelectedCategory(cat.name)}
+                key={cat}
+                onClick={() => onCategoryChange(cat)}
                 className={`flex items-center gap-1.5 rounded-xl px-3.5 py-2 text-xs font-extrabold whitespace-nowrap transition cursor-pointer shrink-0 ${
                   active
                     ? 'bg-slate-900 text-white shadow-md ring-2 ring-indigo-500/20'
                     : 'bg-white text-slate-600 border border-slate-200 hover:bg-slate-50'
                 }`}
               >
-                <span>{cat.name}</span>
-                <span className={`rounded-full px-1.5 py-0.2 text-[10px] ${active ? 'bg-indigo-500 text-white' : 'bg-slate-100 text-slate-500'}`}>
-                  {cat.count}
-                </span>
+                <span>{cat}</span>
               </button>
             );
           })}
@@ -109,15 +95,15 @@ export function PosProductGrid({
             <div key={i} className='h-52 animate-pulse rounded-3xl bg-slate-200/70' />
           ))}
         </div>
-      ) : filteredProducts.length === 0 ? (
+      ) : products.length === 0 ? (
         <div className='flex h-64 flex-col items-center justify-center rounded-3xl border border-dashed border-slate-200 bg-white p-8 text-center text-slate-400 space-y-2'>
           <Sparkles size={32} className='text-slate-300' />
           <p className='font-bold text-slate-700 text-sm'>No matching products found</p>
-          <p className='text-xs text-slate-400'>Try adjusting search terms or category selection.</p>
+          <p className='text-xs text-slate-400'>Try adjusting your search query or category selection.</p>
         </div>
       ) : (
         <div className='grid grid-cols-2 gap-3 min-[480px]:grid-cols-3 sm:grid-cols-3 md:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5'>
-          {filteredProducts.map((p) => (
+          {products.map((p) => (
             <PosProductCard
               key={p.id}
               product={p}
