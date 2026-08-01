@@ -8,6 +8,8 @@ import {
   PosCameraScannerModal,
   PosCartPanel,
   PosCheckoutModal,
+  PosMobileCartBar,
+  PosMobileCartDrawer,
   PosProductGrid,
   PosReceiptModal,
 } from '../features/sell/components';
@@ -16,157 +18,121 @@ import { PageContainer } from '../components/layout/page-container';
 
 const SellPage = () => {
   const { useGetProducts } = useProduct(false);
-  const { data: response, isLoading: productsLoading } = useGetProducts({
-    limit: 100,
-  });
+  const { data: response, isLoading: productsLoading } = useGetProducts({ limit: 100 });
   const products = useMemo(() => response?.data || [], [response?.data]);
 
-  const {
-    items,
-    addItem,
-    updateQuantity,
-    updateUnitPrice,
-    removeItem,
-    clearCart,
-    subtotal,
-    tax,
-    totalAmount,
-    itemCount,
-  } = usePosCart();
-
-  const {
-    isCheckoutOpen,
-    setIsCheckoutOpen,
-    receiptData,
-    setReceiptData,
-    processCheckout,
-    isPending,
-  } = useCheckout();
-
+  const cart = usePosCart();
+  const checkout = useCheckout();
   const [isCameraScanOpen, setIsCameraScanOpen] = useState(false);
-  const [alert, setAlert] = useState<{
-    type: 'success' | 'error';
-    message: string;
-  } | null>(null);
+  const [isMobileCartOpen, setIsMobileCartOpen] = useState(false);
+  const [alert, setAlert] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
 
-  // Handle scanned barcode (from hardware USB gun, search box, or camera modal)
   const handleBarcodeScanned = useCallback(
     (code: string) => {
-      const cleanCode = code.trim().toLowerCase();
+      const clean = code.trim().toLowerCase();
       const target = products.find(
-        (p) =>
-          p.barcode?.toLowerCase() === cleanCode ||
-          p.id.toLowerCase() === cleanCode ||
-          p.name.toLowerCase() === cleanCode,
+        (p) => p.barcode?.toLowerCase() === clean || p.id.toLowerCase() === clean || p.name.toLowerCase() === clean,
       );
 
       if (target) {
         if (target.quantity <= 0) {
-          setAlert({
-            type: 'error',
-            message: `"${target.name}" is out of stock!`,
-          });
+          setAlert({ type: 'error', message: `"${target.name}" is out of stock!` });
           return;
         }
         playScanSound();
-        addItem(target);
-        setAlert({
-          type: 'success',
-          message: `Added "${target.name}" to cart`,
-        });
+        cart.addItem(target);
+        setAlert({ type: 'success', message: `Added "${target.name}" to cart` });
       } else {
-        setAlert({
-          type: 'error',
-          message: `No product found for barcode: "${code}"`,
-        });
+        setAlert({ type: 'error', message: `No product found for barcode: "${code}"` });
       }
     },
-    [products, addItem],
+    [products, cart],
   );
 
-  // Global hardware barcode scanner listener
   useHardwareScanner({
-    enabled: !isCheckoutOpen && !isCameraScanOpen,
+    enabled: !checkout.isCheckoutOpen && !isCameraScanOpen && !isMobileCartOpen,
     onScan: handleBarcodeScanned,
   });
 
-  const handleConfirmPayment = async (params: {
-    paymentMethod: 'CASH' | 'CARD' | 'QR';
-    amountPaid: number;
-  }) => {
-    await processCheckout({
-      items,
-      subtotal,
-      tax,
+  const handleConfirmPayment = async (params: { paymentMethod: 'CASH' | 'CARD' | 'QR'; amountPaid: number }) => {
+    await checkout.processCheckout({
+      items: cart.items,
+      subtotal: cart.subtotal,
+      tax: cart.tax,
       discount: 0,
-      total: totalAmount,
+      total: cart.totalAmount,
       amountPaid: params.amountPaid,
       paymentMethod: params.paymentMethod,
     });
-    clearCart();
+    cart.clearCart();
+    setIsMobileCartOpen(false);
   };
 
   return (
-    <PageContainer className='flex flex-col gap-6 lg:flex-row relative'>
-      {/* Toast Alert */}
+    <PageContainer className='flex flex-col gap-6 lg:flex-row relative pb-24 lg:pb-0'>
       {alert && (
         <div className='fixed top-4 right-4 z-50 max-w-sm'>
-          <Alert
-            type={alert.type}
-            message={alert.message}
-            onClose={() => setAlert(null)}
-          />
+          <Alert type={alert.type} message={alert.message} onClose={() => setAlert(null)} />
         </div>
       )}
 
-      {/* Product Catalog Section */}
       <PosProductGrid
         products={products}
-        cartItems={items}
+        cartItems={cart.items}
         isLoading={productsLoading}
-        onAddToCart={(p) => {
-          playScanSound();
-          addItem(p);
-        }}
+        onAddToCart={(p) => { playScanSound(); cart.addItem(p); }}
         onOpenScanModal={() => setIsCameraScanOpen(true)}
       />
 
-      {/* Cart Sidebar Panel */}
       <PosCartPanel
-        items={items}
-        subtotal={subtotal}
-        tax={tax}
-        totalAmount={totalAmount}
-        itemCount={itemCount}
-        onUpdateQty={updateQuantity}
-        onUpdatePrice={updateUnitPrice}
-        onRemoveItem={removeItem}
-        onClearCart={clearCart}
-        onCheckout={() => setIsCheckoutOpen(true)}
+        items={cart.items}
+        subtotal={cart.subtotal}
+        tax={cart.tax}
+        totalAmount={cart.totalAmount}
+        itemCount={cart.itemCount}
+        onUpdateQty={cart.updateQuantity}
+        onUpdatePrice={cart.updateUnitPrice}
+        onRemoveItem={cart.removeItem}
+        onClearCart={cart.clearCart}
+        onCheckout={() => checkout.setIsCheckoutOpen(true)}
       />
 
-      {/* Camera Barcode Scanner Modal */}
+      <PosMobileCartBar
+        itemCount={cart.itemCount}
+        totalAmount={cart.totalAmount}
+        onOpenCartDrawer={() => setIsMobileCartOpen(true)}
+        onOpenScanModal={() => setIsCameraScanOpen(true)}
+      />
+
+      <PosMobileCartDrawer
+        open={isMobileCartOpen}
+        items={cart.items}
+        subtotal={cart.subtotal}
+        tax={cart.tax}
+        totalAmount={cart.totalAmount}
+        itemCount={cart.itemCount}
+        onClose={() => setIsMobileCartOpen(false)}
+        onUpdateQty={cart.updateQuantity}
+        onUpdatePrice={cart.updateUnitPrice}
+        onRemoveItem={cart.removeItem}
+        onClearCart={cart.clearCart}
+        onCheckout={() => checkout.setIsCheckoutOpen(true)}
+      />
+
       <PosCameraScannerModal
         open={isCameraScanOpen}
         onClose={() => setIsCameraScanOpen(false)}
         onDetectedBarcode={handleBarcodeScanned}
       />
-
-      {/* Payment Checkout Modal */}
       <PosCheckoutModal
-        open={isCheckoutOpen}
-        items={items}
-        total={totalAmount}
-        isPending={isPending}
-        onClose={() => setIsCheckoutOpen(false)}
+        open={checkout.isCheckoutOpen}
+        items={cart.items}
+        total={cart.totalAmount}
+        isPending={checkout.isPending}
+        onClose={() => checkout.setIsCheckoutOpen(false)}
         onConfirm={handleConfirmPayment}
       />
-
-      {/* Receipt Modal */}
-      <PosReceiptModal
-        receipt={receiptData}
-        onClose={() => setReceiptData(null)}
-      />
+      <PosReceiptModal receipt={checkout.receiptData} onClose={() => checkout.setReceiptData(null)} />
     </PageContainer>
   );
 };

@@ -1,19 +1,23 @@
 import { Box, Gauge, HistoryIcon, RefreshCcw, ShoppingCart } from 'lucide-react';
 import { NavLink } from 'react-router-dom';
+import { useAuth } from '../../features/auth/use-auth';
 
 const menus = [
-  { icon: Gauge, label: 'Dashboard', to: '/' },
-  { icon: ShoppingCart, label: 'Sell', to: '/sell' },
-  { icon: Box, label: 'Products', to: '/products' },
-  { icon: RefreshCcw, label: 'Movement', to: '/movement' },
-  { icon: HistoryIcon, label: 'Report', to: '/report' },
+  { icon: Gauge, label: 'Dashboard', to: '/', adminOnly: true },
+  { icon: ShoppingCart, label: 'Sell', to: '/sell', adminOnly: false },
+  { icon: Box, label: 'Products', to: '/products', adminOnly: true },
+  { icon: RefreshCcw, label: 'Movement', to: '/movement', adminOnly: true },
+  { icon: HistoryIcon, label: 'Report', to: '/report', adminOnly: true },
 ];
 
 export default function MobileBottomNav() {
+  const { isAdmin } = useAuth();
+  const visibleMenus = menus.filter((m) => isAdmin || !m.adminOnly);
+
   return (
     <nav className='fixed bottom-0 left-0 right-0 z-50 border-t border-slate-200/80 bg-white/90 backdrop-blur-xl px-2 py-1.5 shadow-lg lg:hidden'>
-      <div className='grid grid-cols-5 items-center justify-items-center gap-1'>
-        {menus.map((menu) => {
+      <div className={`grid items-center justify-items-center gap-1 ${visibleMenus.length === 1 ? 'grid-cols-1 max-w-xs mx-auto' : 'grid-cols-5'}`}>
+        {visibleMenus.map((menu) => {
           const Icon = menu.icon;
 
           return (

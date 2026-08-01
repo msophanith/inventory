@@ -1,4 +1,5 @@
 import type { ReceiptData } from '../features/sell/types/sell.types';
+import { generatePdfInvoiceBlob } from '../features/sell/utils/pdf-generator';
 import type { Movement } from './movement';
 import type { Product } from './product';
 import { formatDateTime } from '../utils/date';
@@ -12,10 +13,7 @@ const formatCurrency = (amount: number) =>
   }).format(amount);
 
 function escapeHtml(str: string): string {
-  return str
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;');
+  return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 }
 
 export class TelegramService {
@@ -27,16 +25,8 @@ export class TelegramService {
     return import.meta.env.VITE_TELEGRAM_CHAT_ID || '';
   }
 
-  /**
-   * Helper to send HTML formatted message to Telegram Bot API
-   */
   private async sendMessage(text: string): Promise<boolean> {
-    if (!this.botToken || !this.chatId) {
-      console.warn(
-        '[TelegramService] VITE_TELEGRAM_BOT_TOKEN or VITE_TELEGRAM_CHAT_ID is missing in .env',
-      );
-      return false;
-    }
+    if (!this.botToken || !this.chatId) return false;
 
     try {
       const url = `https://api.telegram.org/bot${this.botToken}/sendMessage`;
@@ -49,23 +39,41 @@ export class TelegramService {
           parse_mode: 'HTML',
         }),
       });
-
-      if (!response.ok) {
-        const errorText = await response.text();
-        console.error('[TelegramService] Telegram API error:', errorText);
-        return false;
-      }
-
-      return true;
+      return response.ok;
     } catch (err) {
-      console.error('[TelegramService] Failed to send Telegram notification:', err);
+      console.error('[TelegramService] Error sending text:', err);
       return false;
     }
   }
 
   /**
-   * Notify Telegram group for a single Stock Movement (IN, OUT, RETURN)
+   * Upload PDF document to Telegram using sendDocument API
    */
+  async sendDocument(
+    fileBlob: Blob,
+    fileName: string,
+    caption?: string,
+  ): Promise<boolean> {
+    if (!this.botToken || !this.chatId) return false;
+
+    try {
+      const url = `https://api.telegram.org/bot${this.botToken}/sendDocument`;
+      const formData = new FormData();
+      formData.append('chat_id', this.chatId);
+      formData.append('document', fileBlob, fileName);
+      if (caption) {
+        formData.append('caption', caption);
+        formData.append('parse_mode', 'HTML');
+      }
+
+      const response = await fetch(url, { method: 'POST', body: formData });
+      return response.ok;
+    } catch (err) {
+      console.error('[TelegramService] Error uploading PDF invoice:', err);
+      return false;
+    }
+  }
+
   async sendMovementNotification(
     movement: Movement,
     product?: Product | null,
@@ -73,71 +81,66 @@ export class TelegramService {
     const isDamaged = Boolean(
       movement.isDamaged || movement.reference?.toLowerCase() === 'damage',
     );
-
     let typeEmoji = '📦';
     if (movement.type === 'IN') typeEmoji = '📥';
     else if (movement.type === 'OUT') typeEmoji = isDamaged ? '⚠️' : '📤';
     else if (movement.type === 'RETURN') typeEmoji = '🔄';
 
-    const productName = product?.name || movement.product?.name || `Product #${movement.productId}`;
-    const category = product?.category || movement.product?.category || 'General';
-    const unitPrice = movement.unitPrice ?? product?.sellPrice ?? movement.product?.sellPrice ?? 0;
+    const productName =
+      product?.name ||
+      movement.product?.name ||
+      `Product #${movement.productId}`;
     const qty = Math.abs(movement.quantity || 0);
-    const totalPrice = qty * unitPrice;
+    const unitPrice = movement.unitPrice ?? product?.sellPrice ?? 0;
     const dateFormatted = formatDateTime(movement.createdAt);
 
-    let conditionText = '';
-    if (isDamaged) {
-      conditionText = '\n<b>Condition:</b> 🚨 Damaged';
-    }
-
     const message = [
-      `${typeEmoji} <b>Stock Movement Alert (${escapeHtml(movement.type)})</b>`,
-      '',
+      `${typeEmoji} <b>Stock Movement (${escapeHtml(movement.type)})</b>`,
       `<b>Product:</b> ${escapeHtml(productName)}`,
-      `<b>Category:</b> ${escapeHtml(category)}`,
       `<b>Quantity:</b> ${qty} ${escapeHtml(product?.unit || 'units')}`,
-      `<b>Unit Price:</b> ${formatCurrency(unitPrice)}`,
-      `<b>Total Value:</b> ${formatCurrency(totalPrice)}${conditionText}`,
-      movement.note ? `<b>Note:</b> ${escapeHtml(movement.note)}` : '',
-      movement.reference ? `<b>Ref:</b> ${escapeHtml(movement.reference)}` : '',
+      `<b>Total:</b> ${formatCurrency(qty * unitPrice)}${isDamaged ? ' (🚨 Damaged)' : ''}`,
       `<b>Date:</b> ${dateFormatted}`,
-    ]
-      .filter(Boolean)
-      .join('\n');
+    ].join('\n');
 
     return this.sendMessage(message);
   }
 
   /**
-   * Notify Telegram group for a completed POS Sale receipt
+   * Generate & attach PDF Invoice when POS sale completes
    */
   async sendSaleNotification(receipt: ReceiptData): Promise<boolean> {
     const dateFormatted = formatDateTime(receipt.createdAt);
 
     const itemsFormatted = receipt.items
-      .map((i) => {
-        const lineTotal = i.quantity * i.unitPrice;
-        return `• <b>${i.quantity}x</b> ${escapeHtml(i.product.name)} @ ${formatCurrency(i.unitPrice)} = <b>${formatCurrency(lineTotal)}</b>`;
-      })
+      .map(
+        (i) =>
+          `• <b>${i.quantity}x</b> ${escapeHtml(i.product.name)} = <b>${formatCurrency(i.quantity * i.unitPrice)}</b>`,
+      )
       .join('\n');
 
-    const message = [
-      `🛍️ <b>POS Sale Completed (#${escapeHtml(receipt.orderId)})</b>`,
+    const caption = [
+      `🛍️ <b>Sale Completed (#${escapeHtml(receipt.orderId)})</b>`,
       '----------------------------------',
       itemsFormatted,
       '----------------------------------',
-      receipt.subtotal !== receipt.total ? `<b>Subtotal:</b> ${formatCurrency(receipt.subtotal)}` : '',
-      receipt.discount > 0 ? `<b>Discount:</b> -${formatCurrency(receipt.discount)}` : '',
-      receipt.tax > 0 ? `<b>Tax:</b> ${formatCurrency(receipt.tax)}` : '',
-      `<b>Grand Total:</b> ${formatCurrency(receipt.total)}`,
-      `<b>Payment Method:</b> ${escapeHtml(receipt.paymentMethod.toUpperCase())}`,
+      `<b>Grand Total:</b> ${formatCurrency(receipt.total)} (${escapeHtml(receipt.paymentMethod.toUpperCase())})`,
       `<b>Date:</b> ${dateFormatted}`,
-    ]
-      .filter(Boolean)
-      .join('\n');
+      '📄 <i>PDF Invoice Attached Below</i>',
+    ].join('\n');
 
-    return this.sendMessage(message);
+    try {
+      const pdfBlob = generatePdfInvoiceBlob(receipt);
+      const fileName = `Invoice_${receipt.orderId}.pdf`;
+      const sent = await this.sendDocument(pdfBlob, fileName, caption);
+      if (sent) return true;
+    } catch (err) {
+      console.error(
+        '[TelegramService] PDF attachment error, falling back to message:',
+        err,
+      );
+    }
+
+    return this.sendMessage(caption);
   }
 }
 

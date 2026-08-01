@@ -31,7 +31,7 @@ export function PosCartPanel({
   onCheckout,
 }: Props) {
   return (
-    <div className='flex flex-col h-full rounded-3xl border border-slate-200 bg-white p-4 sm:p-5 shadow-sm w-full lg:w-96 shrink-0 min-w-0'>
+    <div className='hidden lg:flex flex-col h-full rounded-3xl border border-slate-200 bg-white p-5 shadow-sm w-96 shrink-0 min-w-0'>
       {/* Panel Header */}
       <div className='flex items-center justify-between border-b border-slate-100 pb-4'>
         <div className='flex items-center gap-2'>

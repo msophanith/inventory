@@ -5,3 +5,5 @@ export { PosCartPanel } from './pos-cart-panel';
 export { PosCheckoutModal } from './pos-checkout-modal';
 export { PosReceiptModal } from './pos-receipt-modal';
 export { PosCameraScannerModal } from './pos-camera-scanner-modal';
+export { PosMobileCartBar } from './pos-mobile-cart-bar';
+export { PosMobileCartDrawer } from './pos-mobile-cart-drawer';
