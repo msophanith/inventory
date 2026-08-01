@@ -84,11 +84,11 @@ export default function Navbar() {
       {/* Logout Confirmation Modal */}
       {showConfirmModal && (
         <div
-          className='fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 p-4 backdrop-blur-xs animate-in fade-in duration-200'
+          className='fixed inset-0 z-[100] flex items-end sm:items-center justify-center bg-slate-900/60 p-0 sm:p-4 backdrop-blur-xs animate-in fade-in duration-200'
           onClick={() => setShowConfirmModal(false)}
         >
           <div
-            className='relative w-full max-w-md overflow-hidden rounded-3xl border border-slate-100 bg-white p-6 shadow-2xl space-y-5 animate-in zoom-in-95 duration-200'
+            className='w-full max-w-sm rounded-t-3xl sm:rounded-3xl bg-white p-4 pb-8 sm:p-6 shadow-2xl space-y-4 animate-in slide-in-from-bottom sm:zoom-in-95 duration-200'
             onClick={(e) => e.stopPropagation()}
           >
             {/* Modal Header */}

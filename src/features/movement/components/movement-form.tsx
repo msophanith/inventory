@@ -58,7 +58,7 @@ export default function MovementForm({
   }, [reason, type, product.quantity, quantity]);
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className='space-y-5 p-6'>
+    <form onSubmit={handleSubmit(onSubmit)} className='space-y-4 sm:space-y-5 p-4 pb-8 sm:p-6 sm:pb-6'>
       <StockPreview
         current={product.quantity}
         next={newStock}
@@ -70,39 +70,46 @@ export default function MovementForm({
         onChange={(value) => setValue('quantity', value)}
       />
 
+      {/* Reason Field */}
       <div>
-        <label className='mb-2 block text-sm font-medium'>Reason</label>
+        <label className='mb-1.5 block text-xs sm:text-sm font-bold text-slate-700'>
+          Reason / Category
+        </label>
 
         <select
           {...register('reason')}
-          className='w-full rounded-xl border p-3'
+          className='w-full rounded-2xl border border-slate-200 bg-slate-50/50 p-3 text-xs sm:text-sm font-semibold text-slate-800 focus:border-indigo-500 focus:bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500/20 cursor-pointer'
         >
           {(type === 'IN' ? STOCK_IN_REASONS : STOCK_OUT_REASONS).map(
-            (reason) => (
-              <option key={reason} value={reason}>
-                {reason}
+            (r) => (
+              <option key={r} value={r}>
+                {r}
               </option>
             ),
           )}
         </select>
       </div>
 
+      {/* Note Field */}
       <div>
-        <label className='mb-2 block text-sm font-medium'>Note</label>
+        <label className='mb-1.5 block text-xs sm:text-sm font-bold text-slate-700'>
+          Note / Reference (Optional)
+        </label>
 
         <textarea
-          rows={3}
+          rows={2}
           {...register('note')}
-          className='w-full rounded-xl border p-3'
-          placeholder='Optional note...'
+          className='w-full rounded-2xl border border-slate-200 bg-slate-50/50 p-3 text-xs sm:text-sm text-slate-800 focus:border-indigo-500 focus:bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500/20 placeholder:text-slate-400'
+          placeholder='Add order reference, invoice #, or reason details...'
         />
       </div>
 
-      <div className='flex gap-3 pt-2'>
+      {/* Action Buttons */}
+      <div className='flex gap-3 pt-2 pb-2 sm:pb-0'>
         <button
           type='button'
           onClick={onClose}
-          className='flex-1 rounded-xl border py-3 font-medium hover:bg-gray-50 cursor-pointer'
+          className='flex-1 rounded-2xl border border-slate-200/80 bg-white py-3.5 text-xs sm:text-sm font-bold text-slate-700 hover:bg-slate-50 transition cursor-pointer active:scale-95 shadow-2xs'
         >
           Cancel
         </button>
@@ -112,26 +119,32 @@ export default function MovementForm({
           disabled={loading || newStock < 0}
           className={`
             flex-1
-            rounded-xl
-            py-3
+            rounded-2xl
+            py-3.5
+            text-xs sm:text-sm
+            font-bold
             text-white
-
+            shadow-md
+            transition-all
+            transform
+            active:scale-95
+            cursor-pointer
             ${
               type === 'IN'
-                ? 'bg-green-600'
+                ? 'bg-gradient-to-r from-emerald-600 to-green-600 shadow-emerald-500/20 hover:from-emerald-700 hover:to-green-700'
                 : type === 'OUT'
-                  ? 'bg-red-600'
-                  : 'bg-blue-600'
+                  ? 'bg-gradient-to-r from-rose-600 to-red-600 shadow-rose-500/20 hover:from-rose-700 hover:to-red-700'
+                  : 'bg-gradient-to-r from-blue-600 to-indigo-600 shadow-blue-500/20 hover:from-blue-700 hover:to-indigo-700'
             }
 
-            disabled:opacity-50
+            disabled:opacity-50 disabled:pointer-events-none
           `}
         >
           {loading
             ? 'Saving...'
             : type === 'RETURN'
-              ? 'Return'
-              : `Stock ${type === 'IN' ? 'In' : 'Out'}`}
+              ? 'Record Return'
+              : `Confirm Stock ${type === 'IN' ? 'In' : 'Out'}`}
         </button>
       </div>
     </form>
