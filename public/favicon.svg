@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#1e3a8a"/>
+      <stop offset="100%" stop-color="#0f172a"/>
+    </linearGradient>
+    <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#10b981"/>
+      <stop offset="100%" stop-color="#06b6d4"/>
+    </linearGradient>
+  </defs>
+  <rect x="8" y="8" width="240" height="240" rx="48" fill="url(#bg)"/>
+  <rect x="70" y="52" width="116" height="152" rx="18" fill="#ffffff"/>
+  <rect x="86" y="68" width="84" height="24" rx="6" fill="#1e3a8a"/>
+  <g fill="#1e3a8a">
+    <rect x="86" y="104" width="22" height="22" rx="4"/>
+    <rect x="117" y="104" width="22" height="22" rx="4"/>
+    <rect x="148" y="104" width="22" height="22" rx="4"/>
+    <rect x="86" y="135" width="22" height="22" rx="4"/>
+    <rect x="117" y="135" width="22" height="22" rx="4"/>
+    <rect x="86" y="166" width="22" height="22" rx="4"/>
+    <rect x="117" y="166" width="22" height="22" rx="4"/>
+  </g>
+  <rect x="148" y="135" width="22" height="53" rx="4" fill="url(#g)"/>
+  <circle cx="190" cy="182" r="28" fill="#fbbf24"/>
+  <text x="190" y="191" font-size="28" text-anchor="middle" font-family="Arial" font-weight="700" fill="white">$</text>
+  <path d="M45 140 A90 90 0 0 1 190 40" fill="none" stroke="#34d399" stroke-width="12" stroke-linecap="round"/>
+  <polygon points="190,40 178,48 194,56" fill="#34d399"/>
+</svg>
