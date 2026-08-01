@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { Loader2, LogOut, ShieldCheck, User, X } from 'lucide-react';
 import { useAuth } from '../../features/auth/use-auth';
 import Logo from './logo';
+import { NotificationBell } from './notification-bell';
 
 export default function Navbar() {
   const { user, signOut, isAdmin, role } = useAuth();
@@ -12,13 +13,9 @@ export default function Navbar() {
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Escape' && !isLoggingOut) {
-        setShowConfirmModal(false);
-      }
+      if (e.key === 'Escape' && !isLoggingOut) setShowConfirmModal(false);
     };
-    if (showConfirmModal) {
-      window.addEventListener('keydown', handleKeyDown);
-    }
+    if (showConfirmModal) window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [showConfirmModal, isLoggingOut]);
 
@@ -48,6 +45,9 @@ export default function Navbar() {
         </div>
 
         <div className='flex items-center gap-3 sm:gap-4'>
+          {/* Low Stock Alert Notification Bell */}
+          <NotificationBell />
+
           <div className='flex items-center gap-3 rounded-2xl border border-slate-200/60 bg-slate-50/60 p-1.5 pr-3.5 transition-all hover:bg-slate-100/80 shadow-2xs'>
             <div className='relative flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-indigo-500 via-indigo-600 to-blue-600 text-sm font-extrabold text-white shadow-xs ring-2 ring-indigo-500/20'>
               {initial}

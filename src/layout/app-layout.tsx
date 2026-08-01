@@ -3,6 +3,7 @@ import MobileBottomNav from '../components/layout/mobile-bottom-nav';
 import Navbar from '../components/layout/navbar';
 import Sidebar from '../components/layout/sidebar';
 import { ShortcutsModal } from '../components/layout/shortcuts-modal';
+import { PwaInstallBanner } from '../components/layout/pwa-install-banner';
 import { useKeyboardShortcuts } from '../hooks/use-keyboard-shortcuts';
 
 export default function AppLayout() {
@@ -22,6 +23,7 @@ export default function AppLayout() {
         <MobileBottomNav />
       </div>
 
+      <PwaInstallBanner />
       <ShortcutsModal open={isHelpOpen} onClose={() => setIsHelpOpen(false)} />
     </div>
   );

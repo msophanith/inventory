@@ -1,6 +1,7 @@
 import { CreditCard, ShoppingCart, Trash2 } from 'lucide-react';
 import type { CartItem } from '../types/sell.types';
 import { PosCartItem } from './pos-cart-item';
+import { formatCurrencyKhr, formatCurrencyUsd } from '../../../utils/currency';
 
 interface Props {
   readonly items: CartItem[];
@@ -14,9 +15,6 @@ interface Props {
   readonly onClearCart: () => void;
   readonly onCheckout: () => void;
 }
-
-const formatCurrency = (val: number) =>
-  new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(val);
 
 export function PosCartPanel({
   items,
@@ -32,7 +30,7 @@ export function PosCartPanel({
 }: Props) {
   return (
     <div className='hidden lg:flex flex-col h-full rounded-3xl border border-slate-200 bg-white p-5 shadow-sm w-96 shrink-0 min-w-0'>
-      {/* Panel Header */}
+      {/* Header */}
       <div className='flex items-center justify-between border-b border-slate-100 pb-4'>
         <div className='flex items-center gap-2'>
           <div className='flex h-10 w-10 items-center justify-center rounded-2xl bg-emerald-50 text-emerald-600'>
@@ -63,9 +61,7 @@ export function PosCartPanel({
           <div className='flex h-48 flex-col items-center justify-center text-center text-slate-400'>
             <ShoppingCart size={32} className='text-slate-300 mb-2' />
             <p className='text-xs font-semibold text-slate-500'>Cart is empty</p>
-            <p className='text-[11px] text-slate-400'>
-              Scan barcode or click products on left to add.
-            </p>
+            <p className='text-[11px] text-slate-400'>Scan barcode or click products to add.</p>
           </div>
         ) : (
           items.map((item) => (
@@ -80,29 +76,36 @@ export function PosCartPanel({
         )}
       </div>
 
-      {/* Order Summary & Checkout Button */}
+      {/* Order Summary & Checkout Button with Dual Currency Display */}
       <div className='border-t border-slate-100 pt-4 space-y-3'>
         <div className='space-y-1.5 text-xs text-slate-600 font-medium'>
           <div className='flex justify-between'>
             <span>Subtotal</span>
-            <span>{formatCurrency(subtotal)}</span>
+            <span>{formatCurrencyUsd(subtotal)}</span>
           </div>
           {tax > 0 && (
             <div className='flex justify-between'>
               <span>Tax</span>
-              <span>{formatCurrency(tax)}</span>
+              <span>{formatCurrencyUsd(tax)}</span>
             </div>
           )}
-          <div className='flex justify-between text-base font-extrabold text-slate-900 pt-2 border-t border-slate-100'>
-            <span>Total Payable</span>
-            <span className='text-emerald-600'>{formatCurrency(totalAmount)}</span>
+          <div className='flex justify-between items-baseline pt-2 border-t border-slate-100'>
+            <span className='font-bold text-slate-900 text-sm'>Total Payable</span>
+            <div className='text-right'>
+              <span className='text-lg font-black text-emerald-600 block leading-tight'>
+                {formatCurrencyUsd(totalAmount)}
+              </span>
+              <span className='text-xs font-extrabold text-indigo-600 block'>
+                {formatCurrencyKhr(totalAmount)}
+              </span>
+            </div>
           </div>
         </div>
 
         <button
           disabled={items.length === 0}
           onClick={onCheckout}
-          className='flex w-full items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-emerald-600 to-teal-600 py-3.5 text-sm font-extrabold text-white shadow-lg shadow-emerald-600/20 transition hover:from-emerald-700 hover:to-teal-700 disabled:opacity-50 cursor-pointer'
+          className='flex w-full items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-emerald-600 to-teal-600 py-3.5 text-sm font-extrabold text-white shadow-lg shadow-emerald-600/20 transition hover:from-emerald-700 hover:to-teal-700 disabled:opacity-50 cursor-pointer active:scale-98'
         >
           <CreditCard size={18} />
           <span>Proceed to Checkout</span>

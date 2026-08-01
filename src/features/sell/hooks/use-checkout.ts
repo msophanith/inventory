@@ -28,7 +28,6 @@ export function useCheckout() {
     }) => {
       const orderId = `POS-${Date.now().toString().slice(-6)}`;
 
-      // Submit a stock OUT movement for each item in the cart (skip individual alerts)
       for (const item of items) {
         await movementService.addMovement(
           {
@@ -42,6 +41,15 @@ export function useCheckout() {
           },
           true,
         );
+
+        // Trigger low-stock alert if remaining stock drops below minimum threshold
+        const remainingQty = item.product.quantity - item.quantity;
+        if (remainingQty <= (item.product.minStock || 0)) {
+          telegramService.sendLowStockAlert({
+            ...item.product,
+            quantity: Math.max(0, remainingQty),
+          });
+        }
       }
 
       const receipt: ReceiptData = {
@@ -57,22 +65,21 @@ export function useCheckout() {
         createdAt: new Date().toISOString(),
       };
 
-      // Send complete POS sale Telegram notification
       telegramService.sendSaleNotification(receipt);
-
       return receipt;
     },
     onSuccess: (receipt) => {
       setReceiptData(receipt);
       setIsCheckoutOpen(false);
 
-      // Invalidate all product, movement, and sales queries for real-time update
       queryClient.invalidateQueries({ queryKey: ['products'] });
       queryClient.invalidateQueries({ queryKey: ['product'] });
       queryClient.invalidateQueries({ queryKey: ['productSummary'] });
       queryClient.invalidateQueries({ queryKey: ['movement'] });
       queryClient.invalidateQueries({ queryKey: ['today-sales'] });
       queryClient.invalidateQueries({ queryKey: ['report-movements'] });
+      queryClient.invalidateQueries({ queryKey: ['low-stock-products'] });
+      queryClient.invalidateQueries({ queryKey: ['out-of-stock-products'] });
     },
   });
 

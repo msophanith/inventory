@@ -225,6 +225,7 @@ export class ProductService {
 
     const payload = {
       ...product,
+      quantity: 0,
       createdAt: now,
       updatedAt: now,
     };

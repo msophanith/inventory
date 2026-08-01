@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Banknote, CreditCard, QrCode, X } from 'lucide-react';
 import type { CartItem, PaymentMethod } from '../types/sell.types';
+import { formatCurrencyKhr, formatCurrencyUsd } from '../../../utils/currency';
 
 interface Props {
   readonly open: boolean;
@@ -13,9 +14,6 @@ interface Props {
     amountPaid: number;
   }) => void;
 }
-
-const formatCurrency = (val: number) =>
-  new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(val);
 
 export function PosCheckoutModal({
   open,
@@ -51,13 +49,16 @@ export function PosCheckoutModal({
           </button>
         </div>
 
-        {/* Total Amount Header */}
-        <div className='rounded-2xl bg-emerald-50 p-4 text-center border border-emerald-100'>
-          <p className='text-xs font-semibold text-emerald-800 uppercase tracking-wider'>
+        {/* Total Amount Header (Dual Currency) */}
+        <div className='rounded-2xl bg-gradient-to-br from-emerald-50 to-teal-50 p-4 text-center border border-emerald-100/80 shadow-inner'>
+          <p className='text-xs font-extrabold text-emerald-800 uppercase tracking-wider'>
             Total Due
           </p>
-          <p className='text-3xl font-extrabold text-emerald-600 mt-1'>
-            {formatCurrency(total)}
+          <p className='text-3xl font-black text-emerald-600 mt-0.5 leading-tight'>
+            {formatCurrencyUsd(total)}
+          </p>
+          <p className='text-sm font-extrabold text-indigo-600 mt-0.5'>
+            {formatCurrencyKhr(total)}
           </p>
         </div>
 
@@ -109,11 +110,16 @@ export function PosCheckoutModal({
                 placeholder={total.toFixed(2)}
                 className='w-full rounded-xl border border-slate-200 bg-slate-50 p-3 text-base font-bold text-slate-900 focus:border-emerald-500 focus:bg-white focus:outline-none focus:ring-2 focus:ring-emerald-500/20'
               />
-              <div className='flex justify-between text-xs font-semibold text-slate-600 pt-1'>
+              <div className='flex justify-between items-center text-xs font-semibold text-slate-600 pt-1'>
                 <span>Change to Return:</span>
-                <span className='font-extrabold text-emerald-600'>
-                  {formatCurrency(change)}
-                </span>
+                <div className='text-right'>
+                  <span className='font-extrabold text-emerald-600 block text-sm'>
+                    {formatCurrencyUsd(change)}
+                  </span>
+                  <span className='font-bold text-indigo-600 block text-[11px]'>
+                    {formatCurrencyKhr(change)}
+                  </span>
+                </div>
               </div>
             </div>
           )}

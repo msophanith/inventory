@@ -1,26 +1,19 @@
 import { jsPDF } from 'jspdf';
 import type { ReceiptData } from '../types/sell.types';
 import { formatDateTime } from '../../../utils/date';
-
-const formatCurrency = (amount: number) =>
-  new Intl.NumberFormat('en-US', {
-    style: 'currency',
-    currency: 'USD',
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 2,
-  }).format(amount);
+import { formatCurrencyKhr, formatCurrencyUsd } from '../../../utils/currency';
 
 export function generatePdfInvoiceBlob(receipt: ReceiptData): Blob {
   const doc = new jsPDF({
     orientation: 'portrait',
     unit: 'mm',
-    format: [80, 160], // Thermal receipt format (80mm width)
+    format: [80, 165],
   });
 
   const dateFormatted = formatDateTime(receipt.createdAt);
   let y = 10;
 
-  // Store Header
+  // Header
   doc.setFont('Helvetica', 'bold');
   doc.setFontSize(13);
   doc.text('INVENTORY POS STORE', 40, y, { align: 'center' });
@@ -31,13 +24,11 @@ export function generatePdfInvoiceBlob(receipt: ReceiptData): Blob {
   doc.text('Sales Receipt & Tax Invoice', 40, y, { align: 'center' });
   y += 6;
 
-  // Divider Line
   doc.setLineWidth(0.3);
   doc.setDrawColor(200, 200, 200);
   doc.line(5, y, 75, y);
   y += 5;
 
-  // Metadata
   doc.setFontSize(7.5);
   doc.text(`Order ID: #${receipt.orderId}`, 5, y);
   y += 4;
@@ -63,7 +54,6 @@ export function generatePdfInvoiceBlob(receipt: ReceiptData): Blob {
   receipt.items.forEach((item) => {
     const itemTotal = item.quantity * item.unitPrice;
     const name = item.product.name.length > 20 ? `${item.product.name.slice(0, 18)}..` : item.product.name;
-
     doc.text(name, 5, y);
     doc.text(`${item.quantity}`, 45, y, { align: 'right' });
     doc.text(`$${item.unitPrice.toFixed(2)}`, 58, y, { align: 'right' });
@@ -71,40 +61,38 @@ export function generatePdfInvoiceBlob(receipt: ReceiptData): Blob {
     y += 4.5;
   });
 
-  // Summary Totals
+  // Totals with Dual Currency ($ USD / ៛ KHR)
   doc.line(5, y, 75, y);
   y += 5;
 
   doc.setFont('Helvetica', 'normal');
   if (receipt.subtotal !== receipt.total) {
     doc.text('Subtotal:', 45, y, { align: 'right' });
-    doc.text(formatCurrency(receipt.subtotal), 75, y, { align: 'right' });
-    y += 4;
-  }
-
-  if (receipt.tax > 0) {
-    doc.text('Tax:', 45, y, { align: 'right' });
-    doc.text(formatCurrency(receipt.tax), 75, y, { align: 'right' });
+    doc.text(formatCurrencyUsd(receipt.subtotal), 75, y, { align: 'right' });
     y += 4;
   }
 
   doc.setFont('Helvetica', 'bold');
   doc.setFontSize(9);
-  doc.text('Grand Total:', 45, y, { align: 'right' });
-  doc.text(formatCurrency(receipt.total), 75, y, { align: 'right' });
+  doc.text('Grand Total ($):', 45, y, { align: 'right' });
+  doc.text(formatCurrencyUsd(receipt.total), 75, y, { align: 'right' });
+  y += 4.5;
+
+  doc.setFont('Helvetica', 'bold');
+  doc.text('Grand Total (KHR):', 45, y, { align: 'right' });
+  doc.text(formatCurrencyKhr(receipt.total), 75, y, { align: 'right' });
   y += 5;
 
   doc.setFontSize(7.5);
   doc.setFont('Helvetica', 'normal');
   doc.text('Amount Paid:', 45, y, { align: 'right' });
-  doc.text(formatCurrency(receipt.amountPaid), 75, y, { align: 'right' });
+  doc.text(formatCurrencyUsd(receipt.amountPaid), 75, y, { align: 'right' });
   y += 4;
 
   doc.text('Change:', 45, y, { align: 'right' });
-  doc.text(formatCurrency(receipt.change), 75, y, { align: 'right' });
+  doc.text(`${formatCurrencyUsd(receipt.change)} (${formatCurrencyKhr(receipt.change)})`, 75, y, { align: 'right' });
   y += 8;
 
-  // Footer Thank You
   doc.line(5, y, 75, y);
   y += 4;
   doc.setFont('Helvetica', 'italic');

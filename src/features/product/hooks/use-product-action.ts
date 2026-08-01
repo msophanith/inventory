@@ -23,18 +23,21 @@ const useProductAction = () => {
       mutationFn: (payload: ProductFormValues) =>
         productService.create(payload),
 
-      onSuccess: async (product) => {
+      onSuccess: async (product, variables) => {
         try {
-          await createMovement({
-            id: uuidv4(),
-            productId: product.id,
-            type: 'IN',
-            quantity: product.quantity,
-            note: 'Product created',
-            unitPrice: product.buyPrice,
-            isDamaged: false,
-            reference: '',
-          });
+          const initialQty = variables.quantity || 0;
+          if (initialQty > 0) {
+            await createMovement({
+              id: uuidv4(),
+              productId: product.id,
+              type: 'IN',
+              quantity: initialQty,
+              note: 'Initial stock on product creation',
+              unitPrice: product.buyPrice,
+              isDamaged: false,
+              reference: 'INITIAL_STOCK',
+            });
+          }
         } catch (err: any) {
           setAlert({
             type: 'error',

@@ -5,12 +5,7 @@ import type { Product } from './product';
 import { formatDateTime } from '../utils/date';
 
 const formatCurrency = (amount: number) =>
-  new Intl.NumberFormat('en-US', {
-    style: 'currency',
-    currency: 'USD',
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 2,
-  }).format(amount);
+  new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(amount);
 
 function escapeHtml(str: string): string {
   return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
@@ -27,37 +22,21 @@ export class TelegramService {
 
   private async sendMessage(text: string): Promise<boolean> {
     if (!this.botToken || !this.chatId) return false;
-
     try {
-      const url = `https://api.telegram.org/bot${this.botToken}/sendMessage`;
-      const response = await fetch(url, {
+      const response = await fetch(`https://api.telegram.org/bot${this.botToken}/sendMessage`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          chat_id: this.chatId,
-          text,
-          parse_mode: 'HTML',
-        }),
+        body: JSON.stringify({ chat_id: this.chatId, text, parse_mode: 'HTML' }),
       });
       return response.ok;
-    } catch (err) {
-      console.error('[TelegramService] Error sending text:', err);
+    } catch {
       return false;
     }
   }
 
-  /**
-   * Upload PDF document to Telegram using sendDocument API
-   */
-  async sendDocument(
-    fileBlob: Blob,
-    fileName: string,
-    caption?: string,
-  ): Promise<boolean> {
+  async sendDocument(fileBlob: Blob, fileName: string, caption?: string): Promise<boolean> {
     if (!this.botToken || !this.chatId) return false;
-
     try {
-      const url = `https://api.telegram.org/bot${this.botToken}/sendDocument`;
       const formData = new FormData();
       formData.append('chat_id', this.chatId);
       formData.append('document', fileBlob, fileName);
@@ -65,57 +44,41 @@ export class TelegramService {
         formData.append('caption', caption);
         formData.append('parse_mode', 'HTML');
       }
-
-      const response = await fetch(url, { method: 'POST', body: formData });
+      const response = await fetch(`https://api.telegram.org/bot${this.botToken}/sendDocument`, {
+        method: 'POST',
+        body: formData,
+      });
       return response.ok;
-    } catch (err) {
-      console.error('[TelegramService] Error uploading PDF invoice:', err);
+    } catch {
       return false;
     }
   }
 
-  async sendMovementNotification(
-    movement: Movement,
-    product?: Product | null,
-  ): Promise<boolean> {
-    const isDamaged = Boolean(
-      movement.isDamaged || movement.reference?.toLowerCase() === 'damage',
-    );
+  async sendMovementNotification(movement: Movement, product?: Product | null): Promise<boolean> {
+    const isDamaged = Boolean(movement.isDamaged || movement.reference?.toLowerCase() === 'damage');
     let typeEmoji = '📦';
     if (movement.type === 'IN') typeEmoji = '📥';
     else if (movement.type === 'OUT') typeEmoji = isDamaged ? '⚠️' : '📤';
     else if (movement.type === 'RETURN') typeEmoji = '🔄';
 
-    const productName =
-      product?.name ||
-      movement.product?.name ||
-      `Product #${movement.productId}`;
+    const name = product?.name || movement.product?.name || `Product #${movement.productId}`;
     const qty = Math.abs(movement.quantity || 0);
     const unitPrice = movement.unitPrice ?? product?.sellPrice ?? 0;
-    const dateFormatted = formatDateTime(movement.createdAt);
 
     const message = [
       `${typeEmoji} <b>Stock Movement (${escapeHtml(movement.type)})</b>`,
-      `<b>Product:</b> ${escapeHtml(productName)}`,
-      `<b>Quantity:</b> ${qty} ${escapeHtml(product?.unit || 'units')}`,
-      `<b>Total:</b> ${formatCurrency(qty * unitPrice)}${isDamaged ? ' (🚨 Damaged)' : ''}`,
-      `<b>Date:</b> ${dateFormatted}`,
+      `<b>Product:</b> ${escapeHtml(name)}`,
+      `<b>Qty:</b> ${qty} ${escapeHtml(product?.unit || 'units')}`,
+      `<b>Total Value:</b> ${formatCurrency(qty * unitPrice)}${isDamaged ? ' (🚨 Damaged)' : ''}`,
+      `<b>Date:</b> ${formatDateTime(movement.createdAt)}`,
     ].join('\n');
 
     return this.sendMessage(message);
   }
 
-  /**
-   * Generate & attach PDF Invoice when POS sale completes
-   */
   async sendSaleNotification(receipt: ReceiptData): Promise<boolean> {
-    const dateFormatted = formatDateTime(receipt.createdAt);
-
     const itemsFormatted = receipt.items
-      .map(
-        (i) =>
-          `• <b>${i.quantity}x</b> ${escapeHtml(i.product.name)} = <b>${formatCurrency(i.quantity * i.unitPrice)}</b>`,
-      )
+      .map((i) => `• <b>${i.quantity}x</b> ${escapeHtml(i.product.name)} = <b>${formatCurrency(i.quantity * i.unitPrice)}</b>`)
       .join('\n');
 
     const caption = [
@@ -124,7 +87,7 @@ export class TelegramService {
       itemsFormatted,
       '----------------------------------',
       `<b>Grand Total:</b> ${formatCurrency(receipt.total)} (${escapeHtml(receipt.paymentMethod.toUpperCase())})`,
-      `<b>Date:</b> ${dateFormatted}`,
+      `<b>Date:</b> ${formatDateTime(receipt.createdAt)}`,
       '📄 <i>PDF Invoice Attached Below</i>',
     ].join('\n');
 
@@ -133,14 +96,30 @@ export class TelegramService {
       const fileName = `Invoice_${receipt.orderId}.pdf`;
       const sent = await this.sendDocument(pdfBlob, fileName, caption);
       if (sent) return true;
-    } catch (err) {
-      console.error(
-        '[TelegramService] PDF attachment error, falling back to message:',
-        err,
-      );
+    } catch {
+      /* fallback to text message */
     }
 
     return this.sendMessage(caption);
+  }
+
+  /**
+   * Automated Telegram Low-Stock & Out-of-Stock Alert
+   */
+  async sendLowStockAlert(product: Product): Promise<boolean> {
+    const isOut = product.quantity <= 0;
+    const header = isOut ? '🚨 <b>CRITICAL: OUT OF STOCK ALERT</b>' : '⚠️ <b>WARNING: LOW STOCK ALERT</b>';
+    const message = [
+      header,
+      `<b>Product:</b> ${escapeHtml(product.name)}`,
+      `<b>Category:</b> ${escapeHtml(product.category)}`,
+      `<b>Current Stock:</b> <code>${product.quantity} ${escapeHtml(product.unit)}</code>`,
+      `<b>Min Required Stock:</b> <code>${product.minStock} ${escapeHtml(product.unit)}</code>`,
+      `<b>Status:</b> ${isOut ? '❌ Item is completely out of stock!' : '📉 Stock is running critically low!'}`,
+      '<i>Please restock this product as soon as possible.</i>',
+    ].join('\n');
+
+    return this.sendMessage(message);
   }
 }
 
