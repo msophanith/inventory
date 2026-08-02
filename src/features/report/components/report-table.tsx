@@ -8,6 +8,7 @@ import {
   ListFilter,
   Package,
   Search,
+  X,
 } from 'lucide-react';
 import type { Movement } from '../../../services/movement';
 import type { ProductReportItem } from '../types/report.types';
@@ -274,59 +275,68 @@ export function ReportTable({
   };
 
   return (
-    <div className='space-y-5 rounded-3xl border border-slate-200/80 bg-white p-6 shadow-sm'>
+    <div className='space-y-6 rounded-3xl border border-slate-200/80 bg-white/90 p-6 shadow-xs backdrop-blur-md transition-all hover:border-slate-300'>
       {/* Table Header: Tabs & Search */}
       <div className='flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between'>
         {/* Tabs */}
-        <div className='flex items-center rounded-2xl bg-slate-100 p-1'>
+        <div className='flex items-center rounded-2xl bg-slate-100/90 p-1.5 border border-slate-200/50 shadow-inner'>
           <button
             onClick={() => handleTabChange('PRODUCTS')}
-            className={`flex items-center gap-2 rounded-xl px-4 py-2 text-sm font-semibold transition cursor-pointer ${
+            className={`flex items-center gap-2 rounded-xl px-4 py-2 text-xs sm:text-sm font-bold transition-all cursor-pointer ${
               activeTab === 'PRODUCTS'
-                ? 'bg-white text-slate-900 shadow-sm'
+                ? 'bg-white text-emerald-800 shadow-sm shadow-slate-200'
                 : 'text-slate-600 hover:text-slate-900'
             }`}
           >
-            <Package size={16} />
+            <Package size={16} className={activeTab === 'PRODUCTS' ? 'text-emerald-600' : 'text-slate-400'} />
             <span>Product Breakdown ({productReports.length})</span>
           </button>
 
           <button
             onClick={() => handleTabChange('TRANSACTIONS')}
-            className={`flex items-center gap-2 rounded-xl px-4 py-2 text-sm font-semibold transition cursor-pointer ${
+            className={`flex items-center gap-2 rounded-xl px-4 py-2 text-xs sm:text-sm font-bold transition-all cursor-pointer ${
               activeTab === 'TRANSACTIONS'
-                ? 'bg-white text-slate-900 shadow-sm'
+                ? 'bg-white text-emerald-800 shadow-sm shadow-slate-200'
                 : 'text-slate-600 hover:text-slate-900'
             }`}
           >
-            <ListFilter size={16} />
+            <ListFilter size={16} className={activeTab === 'TRANSACTIONS' ? 'text-emerald-600' : 'text-slate-400'} />
             <span>Transaction Logs ({monthlyMovements.length})</span>
           </button>
         </div>
 
         {/* Search Input */}
-        <div className='relative w-full sm:w-72'>
+        <div className='relative w-full sm:w-80 group'>
           <Search
             size={18}
-            className='absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400'
+            className='absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 group-hover:text-emerald-600 transition-colors pointer-events-none'
           />
           <input
             type='text'
             value={searchQuery}
             onChange={(e) => handleSearchChange(e.target.value)}
             placeholder='Search products or logs...'
-            className='w-full rounded-xl border border-slate-200 bg-slate-50/50 pl-10 pr-4 py-2.5 text-sm text-slate-800 focus:border-emerald-500 focus:bg-white focus:outline-none focus:ring-2 focus:ring-emerald-500/20'
+            className='w-full rounded-2xl border border-slate-200/80 bg-slate-50/60 pl-10 pr-9 py-2.5 text-xs sm:text-sm font-medium text-slate-800 shadow-xs transition-all hover:border-slate-300 focus:border-emerald-500 focus:bg-white focus:outline-none focus:ring-2 focus:ring-emerald-500/20'
           />
+          {searchQuery && (
+            <button
+              onClick={() => handleSearchChange('')}
+              className='absolute right-3 top-1/2 -translate-y-1/2 p-0.5 rounded-full text-slate-400 hover:bg-slate-200 hover:text-slate-700 transition'
+              title='Clear search'
+            >
+              <X size={14} />
+            </button>
+          )}
         </div>
       </div>
 
-      {/* Table View */}
-      <div className='overflow-x-auto rounded-2xl border border-slate-100'>
+      {/* Table View Container */}
+      <div className='overflow-x-auto rounded-2xl border border-slate-200/80 bg-white shadow-xs'>
         {activeTab === 'PRODUCTS' ? (
           /* TAB 1: Product Summary Table */
-          <table className='w-full border-collapse text-left text-sm'>
+          <table className='w-full border-collapse text-left text-xs sm:text-sm'>
             <thead>
-              <tr className='border-b border-slate-200 bg-slate-50/80 text-xs font-bold uppercase tracking-wider text-slate-500'>
+              <tr className='border-b border-slate-200 bg-slate-50/90 text-xs font-black uppercase tracking-wider text-slate-600'>
                 <th className='px-6 py-4'>Product Details</th>
                 <th className='px-6 py-4'>Buy / Sell Price</th>
                 <th className='px-6 py-4 text-center'>Sold / Returned</th>
@@ -341,9 +351,9 @@ export function ReportTable({
           </table>
         ) : (
           /* TAB 2: Movement Transactions Table */
-          <table className='w-full border-collapse text-left text-sm'>
+          <table className='w-full border-collapse text-left text-xs sm:text-sm'>
             <thead>
-              <tr className='border-b border-slate-200 bg-slate-50/80 text-xs font-bold uppercase tracking-wider text-slate-500'>
+              <tr className='border-b border-slate-200 bg-slate-50/90 text-xs font-black uppercase tracking-wider text-slate-600'>
                 <th className='px-6 py-4'>Date & ID</th>
                 <th className='px-6 py-4'>Product</th>
                 <th className='px-6 py-4'>Type & Condition</th>
@@ -361,8 +371,8 @@ export function ReportTable({
 
       {/* Pagination Footer */}
       <div className='flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between pt-2'>
-        <div className='text-sm text-slate-500 font-medium'>
-          Showing {paginatedData.length} of {currentList.length} items
+        <div className='text-xs sm:text-sm text-slate-500 font-semibold'>
+          Showing <span className='text-slate-800 font-bold'>{paginatedData.length}</span> of <span className='text-slate-800 font-bold'>{currentList.length}</span> items
         </div>
 
         <div className='flex items-center gap-3'>
@@ -372,7 +382,7 @@ export function ReportTable({
               setPageSize(Number(e.target.value));
               setPage(1);
             }}
-            className='rounded-xl border border-slate-200 bg-white px-3 py-1.5 text-sm font-semibold text-slate-700 cursor-pointer focus:outline-none'
+            className='rounded-xl border border-slate-200 bg-white px-3 py-1.5 text-xs sm:text-sm font-bold text-slate-700 shadow-xs cursor-pointer hover:border-slate-300 focus:outline-none focus:ring-2 focus:ring-emerald-500/20'
           >
             {PAGE_SIZE_OPTIONS.map((size) => (
               <option key={size} value={size}>
@@ -384,19 +394,19 @@ export function ReportTable({
           <button
             disabled={page <= 1}
             onClick={() => setPage(page - 1)}
-            className='rounded-xl border border-slate-200 bg-white p-2 text-slate-600 hover:bg-slate-50 disabled:opacity-40 cursor-pointer'
+            className='rounded-xl border border-slate-200 bg-white p-2 text-slate-600 shadow-xs hover:bg-slate-50 hover:border-slate-300 active:scale-95 disabled:opacity-40 cursor-pointer transition'
           >
             <ChevronLeft size={18} />
           </button>
 
-          <span className='text-sm font-semibold text-slate-700'>
+          <span className='text-xs sm:text-sm font-bold text-slate-700'>
             Page {page} of {totalPages}
           </span>
 
           <button
             disabled={page >= totalPages}
             onClick={() => setPage(page + 1)}
-            className='rounded-xl border border-slate-200 bg-white p-2 text-slate-600 hover:bg-slate-50 disabled:opacity-40 cursor-pointer'
+            className='rounded-xl border border-slate-200 bg-white p-2 text-slate-600 shadow-xs hover:bg-slate-50 hover:border-slate-300 active:scale-95 disabled:opacity-40 cursor-pointer transition'
           >
             <ChevronRight size={18} />
           </button>

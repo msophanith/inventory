@@ -7,9 +7,6 @@ import type {
 } from '../types/report.types';
 import { formatDate } from '../../../utils/date';
 
-/**
- * Extract unique month options (e.g., "2026-07") from movements, sorted descending.
- */
 export function getAvailableMonths(movements: Movement[]): MonthOption[] {
   const monthMap = new Map<string, string>();
 
@@ -22,22 +19,19 @@ export function getAvailableMonths(movements: Movement[]): MonthOption[] {
     }
   });
 
-  const sortedKeys = Array.from(monthMap.keys()).sort((a, b) => b.localeCompare(a));
+  const sortedKeys = Array.from(monthMap.keys()).sort((a, b) =>
+    b.localeCompare(a),
+  );
 
-  const options: MonthOption[] = [
+  return [
     { value: 'ALL', label: 'All Months' },
     ...sortedKeys.map((key) => ({
       value: key,
       label: monthMap.get(key) || key,
     })),
   ];
-
-  return options;
 }
 
-/**
- * Filter movements by selected month ("yyyy-MM" or "ALL")
- */
 export function filterMovementsByMonth(
   movements: Movement[],
   selectedMonth: string,
@@ -55,15 +49,15 @@ export function filterMovementsByMonth(
 
 /**
  * Compute detailed sale, cost, and margin for a single movement item.
- * 
+ *
  * Rules:
  * 1. Normal Sale (OUT, not damaged):
  *    Sale = qty * unitPrice, Cost = qty * buyPrice, Margin = Sale - Cost
  * 2. Normal Return (RETURN, not damaged):
  *    Sale = - (qty * unitPrice), Cost = - (qty * buyPrice), Margin = Sale - Cost
- * 3. Product Return & Damaged or Damaged Out:
- *    "if product return and damage total sale should - buyPrice of that product"
- *    Sale = - (qty * buyPrice), Cost = qty * buyPrice, Margin = - (qty * buyPrice)
+ * 3. Product Return is Damaged / Damaged Out:
+ *    Total Sell = - (qty * unitPrice) [Deducts total damage amount from total sell]
+ *    Cost = qty * buyPrice [COGS write-off]
  */
 export function calculateMovementItem(item: Movement): CalculatedMovementItem {
   const buyPrice = item.product?.buyPrice ?? 0;
@@ -71,33 +65,33 @@ export function calculateMovementItem(item: Movement): CalculatedMovementItem {
   const unitPrice = item.unitPrice ?? sellPrice;
   const quantity = Math.abs(item.quantity || 0);
 
-  const isDamaged = Boolean(item.isDamaged || item.reference?.toLowerCase() === 'damage');
+  const isDamaged = Boolean(
+    item.isDamaged || item.reference?.toLowerCase() === 'damage',
+  );
   let effectiveSaleAmount = 0;
   let effectiveCostAmount = 0;
   let effectiveMarginAmount = 0;
 
   if (item.type === 'OUT') {
     if (isDamaged) {
-      // Stock written off due to damage
-      effectiveSaleAmount = - (quantity * buyPrice);
+      effectiveSaleAmount = -(quantity * unitPrice);
       effectiveCostAmount = quantity * buyPrice;
-      effectiveMarginAmount = - (quantity * buyPrice);
+      effectiveMarginAmount = effectiveSaleAmount - effectiveCostAmount;
     } else {
-      // Normal sale
       effectiveSaleAmount = quantity * unitPrice;
       effectiveCostAmount = quantity * buyPrice;
       effectiveMarginAmount = effectiveSaleAmount - effectiveCostAmount;
     }
   } else if (item.type === 'RETURN') {
     if (isDamaged) {
-      // Returned item that is damaged -> deduct buyPrice of product from total sale
-      effectiveSaleAmount = - (quantity * buyPrice);
+      // Product return is damaged -> deduct total damage amount (qty * unitPrice) from total sell
+      effectiveSaleAmount = -(quantity * unitPrice);
       effectiveCostAmount = quantity * buyPrice;
-      effectiveMarginAmount = - (quantity * buyPrice);
+      effectiveMarginAmount = effectiveSaleAmount - effectiveCostAmount;
     } else {
-      // Normal return -> deduct sale price from total sale
-      effectiveSaleAmount = - (quantity * unitPrice);
-      effectiveCostAmount = - (quantity * buyPrice);
+      // Normal return -> deduct sale price from total sell, refund cost to inventory
+      effectiveSaleAmount = -(quantity * unitPrice);
+      effectiveCostAmount = -(quantity * buyPrice);
       effectiveMarginAmount = effectiveSaleAmount - effectiveCostAmount;
     }
   }
@@ -110,10 +104,9 @@ export function calculateMovementItem(item: Movement): CalculatedMovementItem {
   };
 }
 
-/**
- * Calculate summary metrics for a list of movements
- */
-export function calculateReportSummary(movements: Movement[]): MonthlyReportSummary {
+export function calculateReportSummary(
+  movements: Movement[],
+): MonthlyReportSummary {
   let totalSales = 0;
   let totalCost = 0;
   let totalItemsSold = 0;
@@ -125,25 +118,29 @@ export function calculateReportSummary(movements: Movement[]): MonthlyReportSumm
   movements.forEach((rawItem) => {
     const calc = calculateMovementItem(rawItem);
     const quantity = Math.abs(rawItem.quantity || 0);
-    const buyPrice = rawItem.product?.buyPrice ?? 0;
-    const isDamaged = Boolean(rawItem.isDamaged || rawItem.reference?.toLowerCase() === 'damage');
+    const isDamaged = Boolean(
+      rawItem.isDamaged || rawItem.reference?.toLowerCase() === 'damage',
+    );
+    const itemDamageValue =
+      quantity * (rawItem.unitPrice ?? rawItem.product?.sellPrice ?? 0);
 
     if (rawItem.type === 'OUT') {
       orderCount++;
       if (isDamaged) {
         totalItemsDamaged += quantity;
-        totalLosses += quantity * buyPrice;
+        totalLosses += itemDamageValue;
       } else {
         totalItemsSold += quantity;
-        totalCost += calc.effectiveCostAmount;
       }
+      totalCost += calc.effectiveCostAmount;
       totalSales += calc.effectiveSaleAmount;
     } else if (rawItem.type === 'RETURN') {
       totalItemsReturned += quantity;
       if (isDamaged) {
         totalItemsDamaged += quantity;
-        totalLosses += quantity * buyPrice;
+        totalLosses += itemDamageValue;
       }
+      totalCost += calc.effectiveCostAmount;
       totalSales += calc.effectiveSaleAmount;
     }
   });
@@ -164,10 +161,9 @@ export function calculateReportSummary(movements: Movement[]): MonthlyReportSumm
   };
 }
 
-/**
- * Group movements by product to compute product-level sales & margin statistics
- */
-export function calculateProductReport(movements: Movement[]): ProductReportItem[] {
+export function calculateProductReport(
+  movements: Movement[],
+): ProductReportItem[] {
   const productMap = new Map<string, ProductReportItem>();
 
   movements.forEach((rawItem) => {
@@ -179,7 +175,9 @@ export function calculateProductReport(movements: Movement[]): ProductReportItem
     const buyPrice = rawItem.product?.buyPrice ?? 0;
     const sellPrice = rawItem.product?.sellPrice ?? 0;
     const quantity = Math.abs(rawItem.quantity || 0);
-    const isDamaged = Boolean(rawItem.isDamaged || rawItem.reference?.toLowerCase() === 'damage');
+    const isDamaged = Boolean(
+      rawItem.isDamaged || rawItem.reference?.toLowerCase() === 'damage',
+    );
 
     if (!productMap.has(productId)) {
       productMap.set(productId, {
@@ -205,24 +203,23 @@ export function calculateProductReport(movements: Movement[]): ProductReportItem
         item.quantityDamaged += quantity;
       } else {
         item.quantitySold += quantity;
-        item.totalCost += calc.effectiveCostAmount;
       }
+      item.totalCost += calc.effectiveCostAmount;
       item.totalSales += calc.effectiveSaleAmount;
     } else if (rawItem.type === 'RETURN') {
       item.quantityReturned += quantity;
       if (isDamaged) {
         item.quantityDamaged += quantity;
-      } else {
-        item.totalCost += calc.effectiveCostAmount;
       }
+      item.totalCost += calc.effectiveCostAmount;
       item.totalSales += calc.effectiveSaleAmount;
     }
   });
 
-  // Calculate final margin & margin % per product
   const results = Array.from(productMap.values()).map((p) => {
     const netMargin = p.totalSales - p.totalCost;
-    const marginPercentage = p.totalSales > 0 ? (netMargin / p.totalSales) * 100 : 0;
+    const marginPercentage =
+      p.totalSales > 0 ? (netMargin / p.totalSales) * 100 : 0;
     return {
       ...p,
       netMargin,

@@ -32,8 +32,8 @@ export default function Navbar() {
 
   return (
     <>
-      <header className='sticky top-0 z-40 flex h-16 items-center justify-between border-b border-slate-200/80 bg-white/80 px-4 backdrop-blur-md transition-all sm:px-6 lg:h-20 lg:px-8 shadow-xs'>
-        <div className='lg:hidden'>
+      <header className='sticky top-0 z-40 flex h-16 items-center justify-between border-b border-slate-200/80 bg-white/80 px-3 sm:px-6 lg:h-20 lg:px-8 backdrop-blur-md transition-all shadow-xs'>
+        <div className='lg:hidden shrink-0'>
           <Logo />
         </div>
 
@@ -50,18 +50,20 @@ export default function Navbar() {
           <KhrRateSelector />
         </div>
 
-        <div className='flex items-center gap-2.5 sm:gap-4'>
+        <div className='flex items-center gap-1.5 sm:gap-3 lg:gap-4 shrink-0'>
           {/* Mobile Exchange Rate Badge */}
-          <div className='lg:hidden'>
+          <div className='lg:hidden shrink-0'>
             <KhrRateSelector />
           </div>
 
-          <NotificationBell />
+          <div className='shrink-0'>
+            <NotificationBell />
+          </div>
 
-          <div className='flex items-center gap-3 rounded-2xl border border-slate-200/60 bg-slate-50/60 p-1.5 pr-3.5 transition-all hover:bg-slate-100/80 shadow-2xs'>
-            <div className='relative flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-indigo-500 via-indigo-600 to-blue-600 text-sm font-extrabold text-white shadow-xs ring-2 ring-indigo-500/20'>
+          <div className='flex items-center gap-2 sm:gap-3 rounded-2xl border border-slate-200/60 bg-slate-50/60 p-1 sm:p-1.5 lg:pr-3.5 transition-all hover:bg-slate-100/80 shadow-2xs shrink-0'>
+            <div className='relative flex h-8 w-8 sm:h-9 sm:w-9 items-center justify-center rounded-xl bg-gradient-to-br from-indigo-500 via-indigo-600 to-blue-600 text-xs sm:text-sm font-extrabold text-white shadow-xs ring-2 ring-indigo-500/20'>
               {initial}
-              <span className='absolute -bottom-0.5 -right-0.5 h-2.5 w-2.5 rounded-full border-2 border-white bg-emerald-500' />
+              <span className='absolute -bottom-0.5 -right-0.5 h-2 w-2 sm:h-2.5 sm:w-2.5 rounded-full border-2 border-white bg-emerald-500' />
             </div>
 
             <div className='hidden flex-col lg:flex'>
@@ -89,7 +91,7 @@ export default function Navbar() {
             type='button'
             onClick={() => setShowConfirmModal(true)}
             title='Sign out'
-            className='group flex items-center gap-2 rounded-xl border border-slate-200/80 bg-white px-3.5 py-2 text-xs font-bold text-slate-700 shadow-2xs transition-all duration-200 hover:border-rose-200 hover:bg-rose-50 hover:text-rose-600 hover:shadow-xs cursor-pointer active:scale-95'
+            className='group flex items-center justify-center gap-1.5 rounded-xl border border-slate-200/80 bg-white p-2 sm:px-3.5 sm:py-2 text-xs font-bold text-slate-700 shadow-2xs transition-all duration-200 hover:border-rose-200 hover:bg-rose-50 hover:text-rose-600 hover:shadow-xs cursor-pointer active:scale-95 shrink-0'
           >
             <LogOut size={16} className='transition-transform duration-200 group-hover:-translate-x-0.5 text-slate-500 group-hover:text-rose-600' />
             <span className='hidden sm:inline'>Sign out</span>

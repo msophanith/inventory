@@ -3,6 +3,7 @@ import { formatDateTime } from '../../../utils/date';
 import type { Movement } from '../../../services/movement';
 import type { MonthlyReportSummary, ProductReportItem } from '../types/report.types';
 import { calculateMovementItem } from './report-calculator';
+import { downloadFileWithOptionalPassword } from './export-helper';
 
 const formatCurrency = (amount: number) => {
   return amount.toLocaleString('en-US', {
@@ -14,13 +15,15 @@ const formatCurrency = (amount: number) => {
 };
 
 /**
- * Download complete Monthly Sales and Margin Report as Excel (.xlsx) file
+ * Download complete Monthly Sales and Margin Report as Excel (.xlsx) file,
+ * with optional password protection.
  */
-export function exportReportToExcel(
+export async function exportReportToExcel(
   summary: MonthlyReportSummary,
   productReports: ProductReportItem[],
   movements: Movement[],
   monthLabel: string,
+  password?: string,
 ) {
   const wb = XLSX.utils.book_new();
   const dateStr = formatDateTime(new Date(), 'yyyy-MM-dd HH:mm');
@@ -123,15 +126,22 @@ export function exportReportToExcel(
   const cleanMonth = monthLabel.replace(/[^a-zA-Z0-9]/g, '_');
   const filename = `Sales_Margin_Report_${cleanMonth}.xlsx`;
 
-  XLSX.writeFile(wb, filename);
+  const excelBuffer = XLSX.write(wb, { bookType: 'xlsx', type: 'array' });
+  await downloadFileWithOptionalPassword(
+    excelBuffer,
+    filename,
+    'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+    password,
+  );
 }
 
 /**
- * Download Product Breakdown Report as CSV file
+ * Download Product Breakdown Report as CSV file with optional password
  */
-export function exportReportToCsv(
+export async function exportReportToCsv(
   productReports: ProductReportItem[],
   monthLabel: string,
+  password?: string,
 ) {
   const headers = [
     'Product Name',
@@ -162,16 +172,13 @@ export function exportReportToCsv(
   ]);
 
   const csvContent = [headers.join(','), ...rows.map((r) => r.join(','))].join('\n');
-  // Include UTF-8 BOM (\uFEFF) so Excel and CSV readers display Khmer Unicode (KH) correctly
-  const blob = new Blob(['\uFEFF' + csvContent], { type: 'text/csv;charset=utf-8;' });
-  const url = URL.createObjectURL(blob);
-  const link = document.createElement('a');
-
   const cleanMonth = monthLabel.replace(/[^a-zA-Z0-9]/g, '_');
-  link.setAttribute('href', url);
-  link.setAttribute('download', `Sales_Margin_Report_${cleanMonth}.csv`);
-  document.body.appendChild(link);
-  link.click();
-  document.body.removeChild(link);
-  URL.revokeObjectURL(url);
+  const filename = `Sales_Margin_Report_${cleanMonth}.csv`;
+
+  await downloadFileWithOptionalPassword(
+    csvContent,
+    filename,
+    'text/csv;charset=utf-8;',
+    password,
+  );
 }
