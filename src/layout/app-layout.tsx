@@ -5,8 +5,10 @@ import Sidebar from '../components/layout/sidebar';
 import { ShortcutsModal } from '../components/layout/shortcuts-modal';
 import { PwaInstallBanner } from '../components/layout/pwa-install-banner';
 import { useKeyboardShortcuts } from '../hooks/use-keyboard-shortcuts';
+import { usePwaAutoUpdate } from '../hooks/use-pwa-auto-update';
 
 export default function AppLayout() {
+  usePwaAutoUpdate();
   const { isHelpOpen, setIsHelpOpen } = useKeyboardShortcuts();
 
   return (
