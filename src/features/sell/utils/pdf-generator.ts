@@ -8,127 +8,165 @@ export const PAYMENT_QR_CODE_VALUE =
   '00020101021129450016abaakhppxxx@abaa01090177373060208ABA Bank40600006abaP2P0112083EB929820E020901773730603090176336980404Dual5204000053031165802KH5908SILA SAO6010Phnom Penh630410DF';
 
 export async function generatePdfInvoiceBlob(receipt: ReceiptData): Promise<Blob> {
-  const pageHeight = Math.max(175, 120 + receipt.items.length * 5);
-  const doc = new jsPDF({
-    orientation: 'portrait',
-    unit: 'mm',
-    format: [80, pageHeight],
-  });
+  const widthPx = 576;
+  const itemHeightPx = receipt.items.length * 36;
+  const heightPx = Math.max(1200, 960 + itemHeightPx);
 
-  const dateFormatted = formatDateTime(receipt.createdAt);
-  let y = 10;
+  const canvas = document.createElement('canvas');
+  canvas.width = widthPx;
+  canvas.height = heightPx;
+  const ctx = canvas.getContext('2d');
 
-  // Header
-  doc.setFont('Helvetica', 'bold');
-  doc.setFontSize(13);
-  doc.text('INVENTORY POS STORE', 40, y, { align: 'center' });
-  y += 5;
+  if (!ctx) {
+    throw new Error('Could not create canvas context for Khmer PDF invoice');
+  }
 
-  doc.setFont('Helvetica', 'normal');
-  doc.setFontSize(8);
-  doc.text('Sales Receipt & Tax Invoice', 40, y, { align: 'center' });
-  y += 6;
+  // White background
+  ctx.fillStyle = '#ffffff';
+  ctx.fillRect(0, 0, widthPx, heightPx);
 
-  doc.setLineWidth(0.3);
-  doc.setDrawColor(200, 200, 200);
-  doc.line(5, y, 75, y);
-  y += 5;
+  ctx.fillStyle = '#0f172a';
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'top';
 
-  doc.setFontSize(7.5);
-  doc.text(`Order ID: #${receipt.orderId}`, 5, y);
-  y += 4;
-  doc.text(`Date: ${dateFormatted}`, 5, y);
-  y += 4;
-  doc.text(`Payment: ${receipt.paymentMethod.toUpperCase()}`, 5, y);
-  y += 6;
+  let y = 30;
+
+  // Header in Khmer & English
+  ctx.font = 'bold 28px "Kantumruy Pro", "Battambang", "Khmer OS", sans-serif';
+  ctx.fillText('ចម្ការដូងលក់គ្រឿងបន្លាស់រថយន្ត', widthPx / 2, y);
+  y += 40;
+
+  ctx.font = '20px "Kantumruy Pro", "Battambang", "Khmer OS", sans-serif';
+  ctx.fillStyle = '#475569';
+  ctx.fillText('វិក្កយបត្រ / Sales Receipt & Tax Invoice', widthPx / 2, y);
+  y += 45;
+
+  ctx.strokeStyle = '#cbd5e1';
+  ctx.lineWidth = 2;
+  ctx.beginPath();
+  ctx.moveTo(30, y);
+  ctx.lineTo(widthPx - 30, y);
+  ctx.stroke();
+  y += 25;
+
+  // Metadata
+  ctx.textAlign = 'left';
+  ctx.font = '18px "Kantumruy Pro", "Battambang", "Khmer OS", sans-serif';
+  ctx.fillStyle = '#1e293b';
+  ctx.fillText(`លេខវិក្កយបត្រ (Order ID): #${receipt.orderId}`, 30, y);
+  y += 30;
+  ctx.fillText(`កាលបរិច្ឆេទ (Date): ${formatDateTime(receipt.createdAt)}`, 30, y);
+  y += 30;
+  ctx.fillText(`វិធីសាស្ត្រទូទាត់ (Payment): ${receipt.paymentMethod.toUpperCase()}`, 30, y);
+  y += 40;
 
   // Table Header
-  doc.line(5, y, 75, y);
-  y += 4;
-  doc.setFont('Helvetica', 'bold');
-  doc.text('Item Description', 5, y);
-  doc.text('Qty', 45, y, { align: 'right' });
-  doc.text('Price', 58, y, { align: 'right' });
-  doc.text('Total', 75, y, { align: 'right' });
-  y += 3;
-  doc.line(5, y, 75, y);
-  y += 4;
+  ctx.beginPath();
+  ctx.moveTo(30, y);
+  ctx.lineTo(widthPx - 30, y);
+  ctx.stroke();
+  y += 15;
 
-  // Items List
-  doc.setFont('Helvetica', 'normal');
+  ctx.font = 'bold 18px "Kantumruy Pro", "Battambang", "Khmer OS", sans-serif';
+  ctx.fillText('មុខទំនិញ (Item)', 30, y);
+  ctx.textAlign = 'right';
+  ctx.fillText('ចំនួន', 360, y);
+  ctx.fillText('តម្លៃ', 450, y);
+  ctx.fillText('សរុប', widthPx - 30, y);
+  y += 30;
+
+  ctx.beginPath();
+  ctx.moveTo(30, y);
+  ctx.lineTo(widthPx - 30, y);
+  ctx.stroke();
+  y += 25;
+
+  // Item Rows
+  ctx.font = '18px "Kantumruy Pro", "Battambang", "Khmer OS", sans-serif';
   receipt.items.forEach((item) => {
     const itemTotal = item.quantity * item.unitPrice;
-    const name = item.product.name.length > 20 ? `${item.product.name.slice(0, 18)}..` : item.product.name;
-    doc.text(name, 5, y);
-    doc.text(`${item.quantity}`, 45, y, { align: 'right' });
-    doc.text(`$${item.unitPrice.toFixed(2)}`, 58, y, { align: 'right' });
-    doc.text(`$${itemTotal.toFixed(2)}`, 75, y, { align: 'right' });
-    y += 4.5;
+    ctx.textAlign = 'left';
+    ctx.fillText(item.product.name, 30, y);
+
+    ctx.textAlign = 'right';
+    ctx.fillText(`${item.quantity}`, 360, y);
+    ctx.fillText(`$${item.unitPrice.toFixed(2)}`, 450, y);
+    ctx.fillText(`$${itemTotal.toFixed(2)}`, widthPx - 30, y);
+    y += 35;
   });
 
-  // Totals with Dual Currency ($ USD / ៛ KHR)
-  doc.line(5, y, 75, y);
-  y += 5;
+  // Totals Section
+  y += 10;
+  ctx.beginPath();
+  ctx.moveTo(30, y);
+  ctx.lineTo(widthPx - 30, y);
+  ctx.stroke();
+  y += 30;
 
-  doc.setFont('Helvetica', 'normal');
+  ctx.textAlign = 'right';
   if (receipt.subtotal !== receipt.total) {
-    doc.text('Subtotal:', 45, y, { align: 'right' });
-    doc.text(formatCurrencyUsd(receipt.subtotal), 75, y, { align: 'right' });
-    y += 4;
+    ctx.fillText(`សរុបបឋម: ${formatCurrencyUsd(receipt.subtotal)}`, widthPx - 30, y);
+    y += 35;
   }
 
-  doc.setFont('Helvetica', 'bold');
-  doc.setFontSize(9);
-  doc.text('Grand Total ($):', 45, y, { align: 'right' });
-  doc.text(formatCurrencyUsd(receipt.total), 75, y, { align: 'right' });
-  y += 4.5;
+  ctx.font = 'bold 22px "Kantumruy Pro", "Battambang", "Khmer OS", sans-serif';
+  ctx.fillStyle = '#0f172a';
+  ctx.fillText(`សរុបត្រូវបង់: ${formatCurrencyUsd(receipt.total)}`, widthPx - 30, y);
+  y += 35;
 
-  doc.setFont('Helvetica', 'bold');
-  doc.text('Grand Total (KHR):', 45, y, { align: 'right' });
-  doc.text(formatCurrencyKhr(receipt.total), 75, y, { align: 'right' });
-  y += 5;
+  ctx.fillStyle = '#2563eb';
+  ctx.fillText(`សរុបជាប្រាក់រៀល: ${formatCurrencyKhr(receipt.total)}`, widthPx - 30, y);
+  y += 40;
 
-  doc.setFontSize(7.5);
-  doc.setFont('Helvetica', 'normal');
-  doc.text('Amount Paid:', 45, y, { align: 'right' });
-  doc.text(formatCurrencyUsd(receipt.amountPaid), 75, y, { align: 'right' });
-  y += 4;
+  ctx.font = '18px "Kantumruy Pro", "Battambang", "Khmer OS", sans-serif';
+  ctx.fillStyle = '#475569';
+  ctx.fillText(`ប្រាក់ទទួលបាន: ${formatCurrencyUsd(receipt.amountPaid)}`, widthPx - 30, y);
+  y += 30;
+  ctx.fillText(`ប្រាក់អាប់: ${formatCurrencyUsd(receipt.change)} (${formatCurrencyKhr(receipt.change)})`, widthPx - 30, y);
+  y += 45;
 
-  doc.text('Change:', 45, y, { align: 'right' });
-  doc.text(`${formatCurrencyUsd(receipt.change)} (${formatCurrencyKhr(receipt.change)})`, 75, y, { align: 'right' });
-  y += 6;
-
-  // KHQR Code Section
-  doc.line(5, y, 75, y);
-  y += 5;
-
+  // KHQR Section
   try {
-    const qrDataUrl = await QRCode.toDataURL(PAYMENT_QR_CODE_VALUE, {
-      margin: 1,
-      width: 250,
-      errorCorrectionLevel: 'M',
-    });
+    const qrDataUrl = await QRCode.toDataURL(PAYMENT_QR_CODE_VALUE, { margin: 1, width: 200 });
+    const img = new Image();
+    img.src = qrDataUrl;
+    await new Promise((res) => { img.onload = res; });
 
-    const qrSize = 32;
-    const qrX = (80 - qrSize) / 2;
+    ctx.textAlign = 'center';
+    ctx.font = 'bold 18px "Kantumruy Pro", "Battambang", "Khmer OS", sans-serif';
+    ctx.fillStyle = '#0f172a';
+    ctx.fillText('ស្កេនដើម្បីទូទាត់ (Scan to Pay KHQR)', widthPx / 2, y);
+    y += 30;
 
-    doc.setFont('Helvetica', 'bold');
-    doc.setFontSize(8);
-    doc.text('Scan to Pay (KHQR)', 40, y, { align: 'center' });
-    y += 3;
-
-    doc.addImage(qrDataUrl, 'PNG', qrX, y, qrSize, qrSize);
-    y += qrSize + 5;
+    const qrSize = 180;
+    ctx.drawImage(img, (widthPx - qrSize) / 2, y, qrSize, qrSize);
+    y += qrSize + 30;
   } catch (err) {
-    console.error('Error generating KHQR code for PDF invoice:', err);
+    console.error('Error rendering KHQR on canvas:', err);
   }
 
-  doc.line(5, y, 75, y);
-  y += 4;
-  doc.setFont('Helvetica', 'italic');
-  doc.setFontSize(7);
-  doc.text('Thank you for your purchase!', 40, y, { align: 'center' });
+  ctx.beginPath();
+  ctx.moveTo(30, y);
+  ctx.lineTo(widthPx - 30, y);
+  ctx.stroke();
+  y += 30;
 
-  return doc.output('blob');
+  ctx.textAlign = 'center';
+  ctx.font = 'italic 18px "Kantumruy Pro", "Battambang", "Khmer OS", sans-serif';
+  ctx.fillStyle = '#64748b';
+  ctx.fillText('សូមអរគុណចំពោះការជាវទំនិញ! Thank you!', widthPx / 2, y);
+
+  // Export to PDF
+  const imgData = canvas.toDataURL('image/png');
+  const mmWidth = 80;
+  const mmHeight = (canvas.height * mmWidth) / canvas.width;
+
+  const pdf = new jsPDF({
+    orientation: 'portrait',
+    unit: 'mm',
+    format: [mmWidth, mmHeight],
+  });
+
+  pdf.addImage(imgData, 'PNG', 0, 0, mmWidth, mmHeight);
+  return pdf.output('blob');
 }
-
