@@ -10,10 +10,12 @@ interface Props {
   readonly totalAmount: number;
   readonly itemCount: number;
   readonly onUpdateQty: (productId: string, delta: number) => void;
+  readonly onSetExactQty?: (productId: string, exactQty: number) => void;
   readonly onUpdatePrice: (productId: string, newPrice: number) => void;
   readonly onRemoveItem: (productId: string) => void;
   readonly onClearCart: () => void;
   readonly onCheckout: () => void;
+  readonly onStockExceeded?: (productName: string, maxStock: number) => void;
 }
 
 export function PosCartPanel({
@@ -23,13 +25,15 @@ export function PosCartPanel({
   totalAmount,
   itemCount,
   onUpdateQty,
+  onSetExactQty,
   onUpdatePrice,
   onRemoveItem,
   onClearCart,
   onCheckout,
+  onStockExceeded,
 }: Props) {
   return (
-    <div className='hidden lg:flex flex-col h-full rounded-3xl border border-slate-200 bg-white p-5 shadow-sm w-96 shrink-0 min-w-0'>
+    <div className='hidden lg:flex flex-col h-full rounded-3xl border border-slate-200 bg-white p-5 shadow-xs w-96 shrink-0 min-w-0'>
       {/* Header */}
       <div className='flex items-center justify-between border-b border-slate-100 pb-4'>
         <div className='flex items-center gap-2'>
@@ -56,7 +60,7 @@ export function PosCartPanel({
       </div>
 
       {/* Cart Items List */}
-      <div className='flex-1 overflow-y-auto py-4 space-y-2.5 max-h-[420px]'>
+      <div className='flex-1 overflow-y-auto py-4 space-y-2.5 max-h-105'>
         {items.length === 0 ? (
           <div className='flex h-48 flex-col items-center justify-center text-center text-slate-400'>
             <ShoppingCart size={32} className='text-slate-300 mb-2' />
@@ -69,14 +73,16 @@ export function PosCartPanel({
               key={item.product.id}
               item={item}
               onUpdateQty={onUpdateQty}
+              onSetExactQty={onSetExactQty || ((id, qty) => onUpdateQty(id, qty - item.quantity))}
               onUpdatePrice={onUpdatePrice}
               onRemove={onRemoveItem}
+              onStockExceeded={onStockExceeded}
             />
           ))
         )}
       </div>
 
-      {/* Order Summary & Checkout Button with Dual Currency Display */}
+      {/* Order Summary & Checkout Button */}
       <div className='border-t border-slate-100 pt-4 space-y-3'>
         <div className='space-y-1.5 text-xs text-slate-600 font-medium'>
           <div className='flex justify-between'>
@@ -105,7 +111,7 @@ export function PosCartPanel({
         <button
           disabled={items.length === 0}
           onClick={onCheckout}
-          className='flex w-full items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-emerald-600 to-teal-600 py-3.5 text-sm font-extrabold text-white shadow-lg shadow-emerald-600/20 transition hover:from-emerald-700 hover:to-teal-700 disabled:opacity-50 cursor-pointer active:scale-98'
+          className='flex w-full items-center justify-center gap-2 rounded-2xl bg-linear-to-r from-emerald-600 to-teal-600 py-3.5 text-sm font-extrabold text-white shadow-lg shadow-emerald-600/20 transition hover:from-emerald-700 hover:to-teal-700 disabled:opacity-50 cursor-pointer active:scale-98'
         >
           <CreditCard size={18} />
           <span>Proceed to Checkout</span>

@@ -17,6 +17,7 @@ export const SHORTCUT_LIST: ShortcutItem[] = [
   { key: 'p', label: 'P', path: '/products', description: 'Go to Products', adminOnly: true },
   { key: 'r', label: 'R', path: '/report', description: 'Go to Sales Report', adminOnly: true },
   { key: 'n', label: 'N', path: '/products/new', description: 'Create New Product', adminOnly: true },
+  { key: 'c', label: 'C', path: '/scan', description: 'Go to Scan Product', adminOnly: true },
 ];
 
 export function useKeyboardShortcuts() {

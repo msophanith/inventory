@@ -8,3 +8,4 @@ export * from './not-found';
 export * from './error';
 export * from './form/create-product';
 export * from './login';
+export * from './scan-page';

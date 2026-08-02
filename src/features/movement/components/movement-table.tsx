@@ -1,9 +1,8 @@
 import { useMemo, useState } from 'react';
-import { formatDateTime } from '../../../utils/date';
 import type { Movement, MovementType } from '../../../services/movement';
-import MovementTypeBadge from './movement-badge';
 import { MovementTableFilter } from './movement-table-filter';
 import { MovementTablePagination } from './movement-table-pagination';
+import { MovementTableRow } from './movement-table-row';
 
 interface Props {
   readonly movements: Movement[];
@@ -50,7 +49,7 @@ const MovementTable = ({ movements, isLoading }: Props) => {
       return (
         <tr>
           <td
-            colSpan={6}
+            colSpan={7}
             className='p-10 text-center text-slate-400 font-medium'
           >
             Loading stock movements...
@@ -63,7 +62,7 @@ const MovementTable = ({ movements, isLoading }: Props) => {
       return (
         <tr>
           <td
-            colSpan={6}
+            colSpan={7}
             className='p-12 text-center text-slate-500 font-medium'
           >
             No movement records found matching criteria.
@@ -72,52 +71,13 @@ const MovementTable = ({ movements, isLoading }: Props) => {
       );
     }
 
-    return paginatedData.map((item) => {
-      const isDamaged = Boolean(
-        item.isDamaged || item.reference?.toLowerCase() === 'damage',
-      );
-      const dateStr = formatDateTime(item.createdAt, 'dd MMM yyyy, HH:mm', '-');
-
-      return (
-        <tr key={item.id} className='hover:bg-slate-50/70 transition-colors'>
-          <td className='px-5 py-3.5'>
-            <p className='font-bold text-slate-900'>
-              {item.product?.name || item.productId}
-            </p>
-            <p className='text-xs text-slate-400 font-mono'>
-              #{item.id.slice(0, 8)}
-            </p>
-          </td>
-          <td className='px-5 py-3.5'>
-            <MovementTypeBadge type={item.type} />
-          </td>
-          <td className='px-5 py-3.5 text-center font-extrabold text-slate-900'>
-            {item.quantity}
-          </td>
-          <td className='px-5 py-3.5'>
-            {isDamaged ? (
-              <span className='inline-block rounded-full bg-rose-100 px-2.5 py-0.5 text-xs font-bold text-rose-700'>
-                Damaged
-              </span>
-            ) : (
-              <span className='inline-block rounded-full bg-emerald-100 px-2.5 py-0.5 text-xs font-bold text-emerald-700'>
-                Good
-              </span>
-            )}
-          </td>
-          <td className='px-5 py-3.5 text-xs text-slate-600 font-medium max-w-xs truncate'>
-            {item.reference || item.note || '-'}
-          </td>
-          <td className='px-5 py-3.5 text-right text-xs text-slate-400 font-mono'>
-            {dateStr}
-          </td>
-        </tr>
-      );
-    });
+    return paginatedData.map((item) => (
+      <MovementTableRow key={item.id} item={item} />
+    ));
   };
 
   return (
-    <div className='space-y-6 rounded-3xl border border-slate-200/80 bg-white p-4 sm:p-6 shadow-sm min-w-0 w-full max-w-full overflow-hidden'>
+    <div className='space-y-6 rounded-3xl border border-slate-200/80 bg-white p-4 sm:p-6 shadow-xs min-w-0 w-full max-w-full overflow-hidden'>
       {/* Header */}
       <div>
         <h1 className='text-2xl font-bold text-slate-900 tracking-tight'>
@@ -156,6 +116,7 @@ const MovementTable = ({ movements, isLoading }: Props) => {
               <th className='px-5 py-3.5'>Product</th>
               <th className='px-5 py-3.5'>Type</th>
               <th className='px-5 py-3.5 text-center'>Quantity</th>
+              <th className='px-5 py-3.5 text-center'>Remaining Stock</th>
               <th className='px-5 py-3.5'>Condition</th>
               <th className='px-5 py-3.5'>Reference / Note</th>
               <th className='px-5 py-3.5 text-right'>Date & Time</th>

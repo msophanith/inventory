@@ -6,7 +6,10 @@ import {
 } from '@tanstack/react-table';
 import type { Product } from '../../../services/product';
 import { productColumns } from './product-table-columns';
-import { ProductTableHeader } from './product-table-header';
+import {
+  ProductTableHeader,
+  type StockFilterType,
+} from './product-table-header';
 import { ProductTablePagination } from './product-table-pagination';
 
 interface Props {
@@ -18,6 +21,8 @@ interface Props {
   >;
   readonly pageCount: number;
   readonly totalRows: number;
+  readonly stockFilter: StockFilterType;
+  readonly onStockFilterChange: (filter: StockFilterType) => void;
   readonly onSearchChange: (value: string) => void;
   readonly onRowClick?: (productId: string) => void;
   readonly onAddProduct: () => void;
@@ -30,6 +35,8 @@ export default function ProductTable({
   onPaginationChange,
   pageCount,
   totalRows,
+  stockFilter,
+  onStockFilterChange,
   onSearchChange,
   onRowClick,
   onAddProduct,
@@ -44,11 +51,55 @@ export default function ProductTable({
     getCoreRowModel: getCoreRowModel(),
   });
 
+  const renderTableContent = () => {
+    if (loading) {
+      return (
+        <tr>
+          <td
+            colSpan={5}
+            className='p-10 text-center text-slate-400 font-medium'
+          >
+            Loading products...
+          </td>
+        </tr>
+      );
+    }
+
+    if (products.length === 0) {
+      return (
+        <tr>
+          <td
+            colSpan={5}
+            className='p-12 text-center text-slate-500 font-medium'
+          >
+            No products found for selected filter.
+          </td>
+        </tr>
+      );
+    }
+
+    return table.getRowModel().rows.map((row) => (
+      <tr
+        key={row.id}
+        onClick={() => onRowClick?.(row.original.id)}
+        className='transition-colors hover:bg-slate-50/70 cursor-pointer'
+      >
+        {row.getVisibleCells().map((cell) => (
+          <td key={cell.id} className='px-5 py-3.5'>
+            {flexRender(cell.column.columnDef.cell, cell.getContext())}
+          </td>
+        ))}
+      </tr>
+    ));
+  };
+
   return (
-    <div className='space-y-6 rounded-3xl border border-slate-200/80 bg-white p-4 sm:p-6 shadow-sm min-w-0 w-full max-w-full overflow-hidden'>
-      {/* Search & Actions Header */}
+    <div className='space-y-6 rounded-3xl border border-slate-200/80 bg-white p-4 sm:p-6 shadow-xs min-w-0 w-full max-w-full overflow-hidden'>
+      {/* Search & Actions Header with Stock Filter */}
       <ProductTableHeader
         onSearchChange={onSearchChange}
+        stockFilter={stockFilter}
+        onStockFilterChange={onStockFilterChange}
         onAddProduct={onAddProduct}
       />
 
@@ -71,36 +122,7 @@ export default function ProductTable({
           </thead>
 
           <tbody className='divide-y divide-slate-100'>
-            {loading ? (
-              <tr>
-                <td colSpan={5} className='p-10 text-center text-slate-400 font-medium'>
-                  Loading products...
-                </td>
-              </tr>
-            ) : products.length === 0 ? (
-              <tr>
-                <td colSpan={5} className='p-12 text-center text-slate-500 font-medium'>
-                  No products found.
-                </td>
-              </tr>
-            ) : (
-              table.getRowModel().rows.map((row) => (
-                <tr
-                  key={row.id}
-                  onClick={() => onRowClick?.(row.original.id)}
-                  className='transition-colors hover:bg-slate-50/70 cursor-pointer'
-                >
-                  {row.getVisibleCells().map((cell) => (
-                    <td key={cell.id} className='px-5 py-3.5'>
-                      {flexRender(
-                        cell.column.columnDef.cell,
-                        cell.getContext(),
-                      )}
-                    </td>
-                  ))}
-                </tr>
-              ))
-            )}
+            {renderTableContent()}
           </tbody>
         </table>
       </div>

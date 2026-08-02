@@ -39,6 +39,13 @@ const SellPage = () => {
     message: string;
   } | null>(null);
 
+  const handleStockExceeded = useCallback((productName: string, maxStock: number) => {
+    setAlert({
+      type: 'error',
+      message: `Stock limit reached! Only ${maxStock} units of "${productName}" available in stock.`,
+    });
+  }, []);
+
   const handleBarcodeScanned = useCallback(
     async (code: string) => {
       const clean = code.trim().toLowerCase();
@@ -52,29 +59,19 @@ const SellPage = () => {
       );
 
       if (!target) {
-        target =
-          (await productService.getByBarcodeOrSearch(clean)) ?? undefined;
+        target = (await productService.getByBarcodeOrSearch(clean)) ?? undefined;
       }
 
       if (target) {
         if (target.quantity <= 0) {
-          setAlert({
-            type: 'error',
-            message: `"${target.name}" is out of stock!`,
-          });
+          setAlert({ type: 'error', message: `"${target.name}" is out of stock!` });
           return;
         }
         playScanSound();
         cart.addItem(target);
-        setAlert({
-          type: 'success',
-          message: `Added "${target.name}" to cart`,
-        });
+        setAlert({ type: 'success', message: `Added "${target.name}" to cart` });
       } else {
-        setAlert({
-          type: 'error',
-          message: `No product found for barcode: "${code}"`,
-        });
+        setAlert({ type: 'error', message: `No product found for barcode: "${code}"` });
       }
     },
     [products, cart],
@@ -106,11 +103,7 @@ const SellPage = () => {
     <PageContainer className='space-y-5 pb-24 lg:pb-0'>
       {alert && (
         <div className='fixed top-4 right-4 z-50 max-w-sm'>
-          <Alert
-            type={alert.type}
-            message={alert.message}
-            onClose={() => setAlert(null)}
-          />
+          <Alert type={alert.type} message={alert.message} onClose={() => setAlert(null)} />
         </div>
       )}
 
@@ -139,10 +132,12 @@ const SellPage = () => {
           totalAmount={cart.totalAmount}
           itemCount={cart.itemCount}
           onUpdateQty={cart.updateQuantity}
+          onSetExactQty={cart.setExactQuantity}
           onUpdatePrice={cart.updateUnitPrice}
           onRemoveItem={cart.removeItem}
           onClearCart={cart.clearCart}
           onCheckout={() => checkout.setIsCheckoutOpen(true)}
+          onStockExceeded={handleStockExceeded}
         />
       </div>
 
@@ -162,10 +157,12 @@ const SellPage = () => {
         itemCount={cart.itemCount}
         onClose={() => setIsMobileCartOpen(false)}
         onUpdateQty={cart.updateQuantity}
+        onSetExactQty={cart.setExactQuantity}
         onUpdatePrice={cart.updateUnitPrice}
         onRemoveItem={cart.removeItem}
         onClearCart={cart.clearCart}
         onCheckout={() => checkout.setIsCheckoutOpen(true)}
+        onStockExceeded={handleStockExceeded}
       />
 
       <PosCameraScannerModal

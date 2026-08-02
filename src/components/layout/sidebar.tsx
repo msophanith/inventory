@@ -6,6 +6,7 @@ import {
   Gauge,
   HistoryIcon,
   Keyboard,
+  QrCode,
   RefreshCcw,
   ShoppingCart,
   UserCheck,
@@ -18,6 +19,7 @@ import { useAuth } from '../../features/auth/use-auth';
 const menus = [
   { icon: Gauge, label: 'Dashboard', to: '/', shortcut: 'D', adminOnly: true },
   { icon: ShoppingCart, label: 'POS / Sell', to: '/sell', shortcut: 'S', adminOnly: false },
+  { icon: QrCode, label: 'Scan Lookup', to: '/scan', shortcut: 'C', adminOnly: false },
   { icon: Box, label: 'Products', to: '/products', shortcut: 'P', adminOnly: true },
   { icon: RefreshCcw, label: 'Movement', to: '/movement', shortcut: 'M', adminOnly: true },
   { icon: HistoryIcon, label: 'Report', to: '/report', shortcut: 'R', adminOnly: true },
@@ -37,7 +39,6 @@ export default function Sidebar() {
           isCollapsed ? 'w-20' : 'w-72'
         }`}
       >
-        {/* Header & Toggle */}
         <div className='flex items-center justify-between p-5 border-b border-slate-100'>
           {!isCollapsed && <Logo />}
           <button
@@ -50,7 +51,6 @@ export default function Sidebar() {
           </button>
         </div>
 
-        {/* Navigation Links */}
         <div className='flex-1 px-3 py-4 overflow-y-auto'>
           <div className='space-y-2'>
             {visibleMenus.map((menu) => {
@@ -91,7 +91,6 @@ export default function Sidebar() {
           </div>
         </div>
 
-        {/* Footer Info Card with Role Badge */}
         {!isCollapsed ? (
           <div className='m-4 space-y-2'>
             <button

@@ -1,5 +1,5 @@
 import { ArrowLeft } from 'lucide-react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { v4 as uuidv4 } from 'uuid';
 
 import Alert from '../../components/ui/alert';
@@ -12,6 +12,9 @@ import { PageContainer } from '../../components/layout/page-container';
 const CreateProductPage = () => {
   const navigate = useNavigate();
   const { productId } = useParams();
+  const [searchParams] = useSearchParams();
+  const barcodeQueryParam = searchParams.get('barcode') || '';
+
   const { useGetProductById } = useProduct(false);
 
   const {
@@ -49,7 +52,7 @@ const CreateProductPage = () => {
       minStock: 1,
       buyPrice: 0,
       sellPrice: 0,
-      barcode: '',
+      barcode: barcodeQueryParam,
       description: '',
       category: '',
       shelf: '',
@@ -99,7 +102,9 @@ const CreateProductPage = () => {
           <p className='text-xs text-slate-500 font-medium mt-0.5'>
             {isEditing
               ? 'Update existing product information, pricing, and stock limits.'
-              : 'Add a new product to your inventory catalog.'}
+              : barcodeQueryParam
+                ? `Creating new product for scanned barcode "${barcodeQueryParam}"`
+                : 'Add a new product to your inventory catalog.'}
           </p>
         </div>
       </div>

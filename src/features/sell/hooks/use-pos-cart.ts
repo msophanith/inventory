@@ -53,6 +53,24 @@ export function usePosCart() {
     );
   };
 
+  const setExactQuantity = (productId: string, exactQty: number) => {
+    setItems((prev) =>
+      prev
+        .map((item) => {
+          if (item.product.id !== productId) return item;
+          const maxStock = item.product.quantity;
+          const newQty = Math.min(maxStock, Math.max(0, exactQty));
+          if (newQty === 0) return null;
+          return {
+            ...item,
+            quantity: newQty,
+            totalPrice: newQty * item.unitPrice,
+          };
+        })
+        .filter(Boolean) as CartItem[],
+    );
+  };
+
   const updateUnitPrice = (productId: string, newUnitPrice: number) => {
     const validPrice = Math.max(0, newUnitPrice);
     setItems((prev) =>
@@ -93,6 +111,7 @@ export function usePosCart() {
     items,
     addItem,
     updateQuantity,
+    setExactQuantity,
     updateUnitPrice,
     removeItem,
     clearCart,

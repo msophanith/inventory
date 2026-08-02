@@ -12,6 +12,7 @@ import {
   ProductMovementPage,
   ProductPage,
   ReportPage,
+  ScanPage,
   SellPage,
 } from '../pages';
 
@@ -35,6 +36,10 @@ export const router = createBrowserRouter([
           {
             path: '/sell',
             element: <SellPage />,
+          },
+          {
+            path: '/scan',
+            element: <ScanPage />,
           },
 
           // Restricted to ADMIN ONLY

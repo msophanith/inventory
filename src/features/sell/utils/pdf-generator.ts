@@ -10,277 +10,194 @@ export const PAYMENT_QR_CODE_VALUE =
 export async function generatePdfInvoiceBlob(
   receipt: ReceiptData,
 ): Promise<Blob> {
-  const widthPx = 1240;
-  const heightPx = 1754;
-
-  const canvas = document.createElement('canvas');
-  canvas.width = widthPx;
-  canvas.height = heightPx;
-  const ctx = canvas.getContext('2d');
-  if (!ctx) throw new Error('Could not create canvas context for A4 invoice');
-
-  // Background
-  ctx.fillStyle = '#ffffff';
-  ctx.fillRect(0, 0, widthPx, heightPx);
-  ctx.textBaseline = 'top';
-
-  const font = (weight = 'normal', size = 18) =>
-    `${weight} ${size}px "Kantumruy Pro", "Suwannaphum", "Battambang", "Khmer OS", "Inter", sans-serif`;
-
-  const primaryColor = '#0f172a';
-  const secondaryColor = '#334155';
-  const textColor = '#0f172a';
-  const borderGray = '#e2e8f0';
-  const darkGray = '#64748b';
-
-  let y = 60;
-
-  // --- Header ---
-  // Shop Name (Left)
-  ctx.fillStyle = secondaryColor;
-  ctx.textAlign = 'left';
-  ctx.font = font('bold', 34);
-  ctx.fillText('លក់គ្រឿងបន្លាស់រថយន្ត ចម្ការដូង', 60, y);
-
-  ctx.fillStyle = darkGray;
-  ctx.font = font('normal', 18);
-  ctx.fillText('Tel: 086-563-535', 60, y + 45);
-
-  // Invoice Label (Right)
-  ctx.fillStyle = primaryColor;
-  ctx.textAlign = 'right';
-  ctx.font = font('bold', 52);
-  ctx.fillText('វិក្កយបត្រ', widthPx - 60, y - 10);
-
-  ctx.fillStyle = secondaryColor;
-  ctx.font = font('normal', 22);
-  ctx.fillText('INVOICE', widthPx - 60, y + 55);
-
-  y += 110;
-
-  // --- Transaction Info Box ---
-  ctx.strokeStyle = borderGray;
-  ctx.lineWidth = 1.5;
-  ctx.beginPath();
-  ctx.moveTo(60, y);
-  ctx.lineTo(widthPx - 60, y);
-  ctx.stroke();
-
-  y += 20;
-
-  // Labels Row (Top)
-  ctx.fillStyle = darkGray;
-  ctx.font = font('bold', 15);
-  ctx.textAlign = 'left';
-  ctx.fillText('កាលបរិច្ឆេទ / DATE', 60, y);
-  ctx.fillText('INVOICE ID', 480, y);
-  ctx.fillText('REFERENCE', 900, y);
-
-  y += 25;
-
-  // Values Row
-  ctx.fillStyle = secondaryColor;
-  ctx.font = font('normal', 18);
-  ctx.fillText(formatDateTime(receipt.createdAt), 60, y);
-  ctx.fillText(`#${receipt.orderId}`, 480, y);
-  ctx.fillText(receipt.paymentMethod.toUpperCase(), 900, y);
-
-  y += 35;
-
-  ctx.beginPath();
-  ctx.moveTo(60, y);
-  ctx.lineTo(widthPx - 60, y);
-  ctx.stroke();
-
-  y += 30;
-
-  // --- Transaction Details Table ---
-  // Header Row
-  ctx.fillStyle = darkGray;
-  ctx.font = font('bold', 16);
-  ctx.textAlign = 'left';
-  ctx.fillText('ITEM DESCRIPTION', 60, y);
-  ctx.textAlign = 'center';
-  ctx.fillText('QTY', 750, y);
-  ctx.textAlign = 'right';
-  ctx.fillText('PRICE', 940, y);
-  ctx.fillText('AMOUNT', widthPx - 60, y);
-
-  y += 30;
-  ctx.beginPath();
-  ctx.moveTo(60, y);
-  ctx.lineTo(widthPx - 60, y);
-  ctx.stroke();
-
-  y += 20;
-
-  // Table Rows
-  receipt.items.forEach((item) => {
-    const total = item.quantity * item.unitPrice;
-
-    // Item Title
-    ctx.fillStyle = textColor;
-    ctx.textAlign = 'left';
-    ctx.font = font('bold', 20);
-    ctx.fillText(item.product.name, 60, y);
-
-    // Item Subtitle
-    ctx.fillStyle = darkGray;
-    ctx.font = font('normal', 15);
-    const itemSub = item.product.barcode || item.product.category || '';
-    ctx.fillText(itemSub, 60, y + 26);
-
-    // QTY
-    ctx.fillStyle = textColor;
-    ctx.textAlign = 'center';
-    ctx.font = font('normal', 18);
-    ctx.fillText(`${item.quantity} ${item.product.unit || 'pcs'}`, 750, y + 10);
-
-    // PRICE
-    ctx.textAlign = 'right';
-    ctx.fillText(formatCurrencyUsd(item.unitPrice), 940, y + 10);
-
-    // AMOUNT
-    ctx.fillText(formatCurrencyUsd(total), widthPx - 60, y + 10);
-
-    y += 55;
-
-    // Underline divider
-    ctx.strokeStyle = borderGray;
-    ctx.lineWidth = 1;
-    ctx.beginPath();
-    ctx.moveTo(60, y);
-    ctx.lineTo(widthPx - 60, y);
-    ctx.stroke();
-
-    y += 15;
-  });
-
-  y += 20;
-
-  // --- Summary & QR Section ---
-  const startSummaryY = y;
-
-  // Payment QR Code logic (Left)
-  try {
-    const qrDataUrl = await QRCode.toDataURL(PAYMENT_QR_CODE_VALUE, {
-      margin: 1,
-      width: 220,
-    });
-    const img = new Image();
-    img.src = qrDataUrl;
-    await new Promise((res) => {
-      img.onload = res;
-    });
-
-    const qrSize = 160;
-    ctx.drawImage(img, 60, startSummaryY, qrSize, qrSize);
-
-    ctx.fillStyle = secondaryColor;
-    ctx.textAlign = 'left';
-    ctx.font = font('bold', 15);
-    ctx.fillText(
-      'SCAN TO PAY / ស្កេនដើម្បីទូទាត់',
-      60 + qrSize + 20,
-      startSummaryY + qrSize / 2 - 10,
-    );
-  } catch (err) {
-    console.error('Error drawing KHQR code on A4 invoice:', err);
-  }
-
-  // Summary Totals (Right)
-  ctx.textAlign = 'right';
-
-  if (receipt.subtotal !== receipt.total) {
-    ctx.font = font('normal', 18);
-    ctx.fillStyle = darkGray;
-    ctx.fillText(
-      `SUBTOTAL: ${formatCurrencyUsd(receipt.subtotal)}`,
-      widthPx - 60,
-      y,
-    );
-    y += 35;
-  }
-
-  ctx.fillStyle = secondaryColor;
-  ctx.font = font('bold', 22);
-  ctx.fillText('TOTAL:', widthPx - 300, y);
-  ctx.font = font('bold', 32);
-  ctx.fillStyle = primaryColor;
-  ctx.fillText(formatCurrencyUsd(receipt.total), widthPx - 60, y - 6);
-  y += 45;
-
-  ctx.fillStyle = '#2563eb';
-  ctx.font = font('bold', 22);
-  ctx.fillText(`( ៛${formatCurrencyKhr(receipt.total)} )`, widthPx - 60, y);
-  y += 40;
-
-  ctx.font = font('normal', 18);
-  ctx.fillStyle = darkGray;
-  ctx.fillText(
-    `PAID (${receipt.paymentMethod.toUpperCase()}): ${formatCurrencyUsd(receipt.amountPaid)}`,
-    widthPx - 60,
-    y,
-  );
-  y += 30;
-
-  if (receipt.change > 0) {
-    ctx.fillText(
-      `CHANGE: ${formatCurrencyUsd(receipt.change)} (${formatCurrencyKhr(receipt.change)})`,
-      widthPx - 60,
-      y,
-    );
-  }
-
-  // --- Footer ---
-  const finalFooterY = heightPx - 110;
-
-  ctx.strokeStyle = borderGray;
-  ctx.lineWidth = 1.5;
-  ctx.beginPath();
-  ctx.moveTo(60, finalFooterY);
-  ctx.lineTo(widthPx - 60, finalFooterY);
-  ctx.stroke();
-
-  ctx.textAlign = 'right';
-  ctx.fillStyle = secondaryColor;
-  ctx.font = font('bold', 20);
-  ctx.fillText('THANK YOU FOR YOUR BUSINESS!', widthPx - 60, finalFooterY + 25);
-
-  ctx.fillStyle = darkGray;
-  ctx.font = font('normal', 15);
-  ctx.fillText(
-    'Please keep this invoice for your records. / សូមរក្សាទុកវិក្កយបត្រនេះជាឯកសារ។',
-    widthPx - 60,
-    finalFooterY + 55,
-  );
-
-  // Export A4 PDF (Optimized to strictly guarantee file size < 1MB)
-  let quality = 0.85;
-  let imgData = canvas.toDataURL('image/jpeg', quality);
-  let pdf = new jsPDF({
+  const doc = new jsPDF({
     orientation: 'portrait',
     unit: 'mm',
     format: 'a4',
-    compress: true,
   });
-  pdf.addImage(imgData, 'JPEG', 0, 0, 210, 297, undefined, 'FAST');
-  let pdfBlob = pdf.output('blob');
 
-  // Safeguard: Ensure PDF size is strictly under 1MB (1,024,000 bytes)
-  const MAX_SIZE_BYTES = 1024 * 1024; // 1 MB
-  while (pdfBlob.size > MAX_SIZE_BYTES && quality > 0.3) {
-    quality -= 0.15;
-    imgData = canvas.toDataURL('image/jpeg', quality);
-    pdf = new jsPDF({
-      orientation: 'portrait',
-      unit: 'mm',
-      format: 'a4',
-      compress: true,
+  const pageWidth = 210;
+  const pageHeight = 297;
+  const margin = 15;
+  const contentWidth = pageWidth - margin * 2;
+
+  let y = 20;
+
+  // Header Banner
+  doc.setFont('Helvetica', 'bold');
+  doc.setFontSize(22);
+  doc.setTextColor(15, 23, 42);
+  doc.text('Auto Spare Parts Store', margin, y);
+
+  doc.setFontSize(24);
+  doc.setTextColor(79, 70, 229);
+  doc.text('TAX INVOICE', pageWidth - margin, y, { align: 'right' });
+  y += 7;
+
+  doc.setFont('Helvetica', 'normal');
+  doc.setFontSize(10);
+  doc.setTextColor(100, 116, 139);
+  doc.text('Sales Receipt & Official Tax Document', margin, y);
+  y += 8;
+
+  // Divider Line
+  doc.setLineWidth(0.5);
+  doc.setDrawColor(226, 232, 240);
+  doc.line(margin, y, pageWidth - margin, y);
+  y += 8;
+
+  // Metadata Grid
+  doc.setFontSize(9.5);
+  doc.setTextColor(30, 41, 59);
+  doc.setFont('Helvetica', 'bold');
+  doc.text('Invoice No:', margin, y);
+  doc.setFont('Helvetica', 'normal');
+  doc.text(`#${receipt.orderId}`, margin + 22, y);
+
+  doc.setFont('Helvetica', 'bold');
+  doc.text('Date:', 90, y);
+  doc.setFont('Helvetica', 'normal');
+  doc.text(formatDateTime(receipt.createdAt), 102, y);
+
+  doc.setFont('Helvetica', 'bold');
+  doc.text('Payment:', 150, y);
+  doc.setFont('Helvetica', 'normal');
+  doc.text(receipt.paymentMethod.toUpperCase(), 168, y);
+  y += 10;
+
+  // Table Header Box
+  doc.setFillColor(248, 250, 252);
+  doc.rect(margin, y, contentWidth, 9, 'F');
+  doc.setLineWidth(0.3);
+  doc.setDrawColor(203, 213, 225);
+  doc.rect(margin, y, contentWidth, 9, 'S');
+
+  doc.setFont('Helvetica', 'bold');
+  doc.setFontSize(9);
+  doc.setTextColor(15, 23, 42);
+  doc.text('#', margin + 3, y + 6);
+  doc.text('Item Description', margin + 12, y + 6);
+  doc.text('Qty', 125, y + 6, { align: 'right' });
+  doc.text('Unit Price', 158, y + 6, { align: 'right' });
+  doc.text('Total Amount', pageWidth - margin - 3, y + 6, { align: 'right' });
+  y += 9;
+
+  // Table Item Rows
+  doc.setFont('Helvetica', 'normal');
+  receipt.items.forEach((item, idx) => {
+    const total = item.quantity * item.unitPrice;
+    if (idx % 2 === 1) {
+      doc.setFillColor(248, 250, 252);
+      doc.rect(margin, y, contentWidth, 8, 'F');
+    }
+    doc.setDrawColor(241, 245, 249);
+    doc.rect(margin, y, contentWidth, 8, 'S');
+
+    doc.setTextColor(51, 65, 85);
+    doc.text(`${idx + 1}`, margin + 3, y + 5.5);
+    // Fixed max width 85mm ensures item description never overlaps Qty column
+    doc.text(item.product.name, margin + 12, y + 5.5, { maxWidth: 85 });
+    doc.text(`${item.quantity} ${item.product.unit || ''}`, 125, y + 5.5, {
+      align: 'right',
     });
-    pdf.addImage(imgData, 'JPEG', 0, 0, 210, 297, undefined, 'FAST');
-    pdfBlob = pdf.output('blob');
+    doc.text(formatCurrencyUsd(item.unitPrice), 158, y + 5.5, {
+      align: 'right',
+    });
+    doc.text(formatCurrencyUsd(total), pageWidth - margin - 3, y + 5.5, {
+      align: 'right',
+    });
+    y += 8;
+  });
+
+  y += 8;
+
+  // KHQR Section (Left)
+  try {
+    const qrDataUrl = await QRCode.toDataURL(PAYMENT_QR_CODE_VALUE, {
+      margin: 1,
+      width: 200,
+    });
+    const qrSize = 35;
+    doc.addImage(qrDataUrl, 'PNG', margin, y, qrSize, qrSize);
+    doc.setFont('Helvetica', 'bold');
+    doc.setFontSize(8);
+    doc.setTextColor(15, 23, 42);
+    doc.text('Scan to Pay (KHQR)', margin + qrSize / 2, y + qrSize + 4, {
+      align: 'center',
+    });
+  } catch (err) {
+    console.error('Error adding KHQR image to PDF:', err);
   }
 
-  return pdfBlob;
+  // Summary Totals (Right)
+  const summaryX = pageWidth - margin;
+  if (receipt.subtotal !== receipt.total) {
+    doc.setFont('Helvetica', 'normal');
+    doc.setFontSize(9.5);
+    doc.setTextColor(71, 85, 105);
+    doc.text(
+      `Subtotal: ${formatCurrencyUsd(receipt.subtotal)}`,
+      summaryX,
+      y + 5,
+      { align: 'right' },
+    );
+    y += 6;
+  }
+
+  doc.setFont('Helvetica', 'bold');
+  doc.setFontSize(12);
+  doc.setTextColor(15, 23, 42);
+  doc.text(
+    `Grand Total: ${formatCurrencyUsd(receipt.total)}`,
+    summaryX,
+    y + 7,
+    { align: 'right' },
+  );
+  y += 7;
+
+  doc.setFontSize(10);
+  doc.setTextColor(37, 99, 235);
+  doc.text(`( ${formatCurrencyKhr(receipt.total)} )`, summaryX, y + 6, {
+    align: 'right',
+  });
+  y += 8;
+
+  doc.setFont('Helvetica', 'normal');
+  doc.setFontSize(9);
+  doc.setTextColor(71, 85, 105);
+  doc.text(
+    `Amount Paid (${receipt.paymentMethod}): ${formatCurrencyUsd(receipt.amountPaid)}`,
+    summaryX,
+    y + 5,
+    { align: 'right' },
+  );
+  y += 5;
+
+  if (receipt.change > 0) {
+    doc.text(
+      `Change: ${formatCurrencyUsd(receipt.change)} (${formatCurrencyKhr(receipt.change)})`,
+      summaryX,
+      y + 5,
+      { align: 'right' },
+    );
+  }
+
+  // Footer Message
+  y = pageHeight - 20;
+  doc.setLineWidth(0.4);
+  doc.setDrawColor(226, 232, 240);
+  doc.line(margin, y, pageWidth - margin, y);
+  y += 6;
+
+  doc.setFont('Helvetica', 'italic');
+  doc.setFontSize(9);
+  doc.setTextColor(100, 116, 139);
+  doc.text(
+    'Thank you for your purchase! Please keep this receipt for your records.',
+    pageWidth / 2,
+    y,
+    { align: 'center' },
+  );
+
+  return doc.output('blob');
 }
