@@ -12,11 +12,23 @@ export function PosProductCard({ product, cartQuantity, onAddToCart }: Props) {
   const isOutOfStock = product.quantity <= 0;
   const remainingStock = product.quantity - cartQuantity;
 
+  const isDisabled = isOutOfStock || remainingStock <= 0;
+  const isLowStock = remainingStock <= (product.minStock || 0);
+
+  let stockBadgeStyle = 'bg-slate-900/80 text-white backdrop-blur-md';
+  if (isDisabled) {
+    stockBadgeStyle = 'bg-rose-600 text-white shadow-xs';
+  } else if (isLowStock) {
+    stockBadgeStyle = 'bg-amber-500 text-white shadow-xs';
+  }
+
   return (
-    <div
-      onClick={() => !isOutOfStock && remainingStock > 0 && onAddToCart(product)}
-      className={`group relative flex flex-col justify-between overflow-hidden rounded-3xl border border-slate-200/80 bg-white/90 p-3.5 shadow-xs transition-all duration-300 ${
-        isOutOfStock || remainingStock <= 0
+    <button
+      type='button'
+      disabled={isDisabled}
+      onClick={() => onAddToCart(product)}
+      className={`group relative flex flex-col justify-between overflow-hidden rounded-3xl border border-slate-200/80 bg-white/90 p-3.5 shadow-xs transition-all duration-300 text-left w-full ${
+        isDisabled
           ? 'opacity-55 cursor-not-allowed grayscale'
           : 'hover:-translate-y-1.5 hover:shadow-xl hover:border-indigo-400/80 hover:bg-white cursor-pointer active:scale-98'
       }`}
@@ -30,20 +42,17 @@ export function PosProductCard({ product, cartQuantity, onAddToCart }: Props) {
             className='h-full w-full object-cover transition-transform duration-500 group-hover:scale-110'
           />
         ) : (
-          <Package size={36} className='text-slate-400 group-hover:scale-110 transition-transform duration-300' />
+          <Package
+            size={36}
+            className='text-slate-400 group-hover:scale-110 transition-transform duration-300'
+          />
         )}
 
         {/* Stock Badge */}
         <span
-          className={`absolute top-2 right-2 rounded-full px-2.5 py-0.5 text-[10px] font-black uppercase tracking-wider ${
-            isOutOfStock || remainingStock <= 0
-              ? 'bg-rose-600 text-white shadow-xs'
-              : remainingStock <= (product.minStock || 0)
-              ? 'bg-amber-500 text-white shadow-xs'
-              : 'bg-slate-900/80 text-white backdrop-blur-md'
-          }`}
+          className={`absolute top-2 right-2 rounded-full px-2.5 py-0.5 text-[10px] font-black uppercase tracking-wider ${stockBadgeStyle}`}
         >
-          {isOutOfStock || remainingStock <= 0 ? 'Out of Stock' : `${remainingStock} left`}
+          {isDisabled ? 'Out of Stock' : `${remainingStock} left`}
         </span>
 
         {/* Cart Count Pill */}
@@ -73,15 +82,16 @@ export function PosProductCard({ product, cartQuantity, onAddToCart }: Props) {
             </span>
           </div>
 
-          <button
-            type='button'
-            disabled={isOutOfStock || remainingStock <= 0}
-            className='flex h-8 w-8 items-center justify-center rounded-xl bg-slate-100 text-slate-700 transition group-hover:bg-gradient-to-r group-hover:from-blue-600 group-hover:to-indigo-600 group-hover:text-white shadow-xs disabled:opacity-40 shrink-0'
+          <span
+            aria-hidden='true'
+            className={`flex h-8 w-8 items-center justify-center rounded-xl bg-slate-100 text-slate-700 transition group-hover:bg-linear-to-r group-hover:from-blue-600 group-hover:to-indigo-600 group-hover:text-white shadow-xs shrink-0 ${
+              isDisabled ? 'opacity-40' : ''
+            }`}
           >
             <Plus size={16} />
-          </button>
+          </span>
         </div>
       </div>
-    </div>
+    </button>
   );
 }

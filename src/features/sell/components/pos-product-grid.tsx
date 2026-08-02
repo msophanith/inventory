@@ -41,13 +41,58 @@ export function PosProductGrid({
     return map;
   }, [cartItems]);
 
+  const renderContent = () => {
+    if (isLoading) {
+      return (
+        <div className='grid grid-cols-2 gap-3 min-[480px]:grid-cols-3 sm:grid-cols-3 md:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5'>
+          {[1, 2, 3, 4, 5, 6, 7, 8].map((i) => (
+            <div
+              key={i}
+              className='h-52 animate-pulse rounded-3xl bg-slate-200/70'
+            />
+          ))}
+        </div>
+      );
+    }
+
+    if (products.length === 0) {
+      return (
+        <div className='flex h-64 flex-col items-center justify-center rounded-3xl border border-dashed border-slate-200 bg-white p-8 text-center text-slate-400 space-y-2'>
+          <Sparkles size={32} className='text-slate-300' />
+          <p className='font-bold text-slate-700 text-sm'>
+            No matching products found
+          </p>
+          <p className='text-xs text-slate-400'>
+            Try adjusting your search query or category selection.
+          </p>
+        </div>
+      );
+    }
+
+    return (
+      <div className='grid grid-cols-2 gap-3 min-[480px]:grid-cols-3 sm:grid-cols-3 md:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5'>
+        {products.map((p) => (
+          <PosProductCard
+            key={p.id}
+            product={p}
+            cartQuantity={cartMap.get(p.id) || 0}
+            onAddToCart={onAddToCart}
+          />
+        ))}
+      </div>
+    );
+  };
+
   return (
     <div className='space-y-4 flex-1 min-w-0 w-full max-w-full'>
       {/* Controls: Search Bar & Camera Button */}
       <div className='space-y-3 w-full min-w-0'>
         <div className='flex items-center gap-2 w-full min-w-0'>
           <div className='relative flex-1 min-w-0'>
-            <Search size={18} className='absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400' />
+            <Search
+              size={18}
+              className='absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400'
+            />
             <input
               type='text'
               value={search}
@@ -60,7 +105,7 @@ export function PosProductGrid({
           <button
             onClick={onOpenScanModal}
             title='Scan with Camera'
-            className='flex items-center gap-1.5 rounded-2xl bg-gradient-to-r from-emerald-600 to-teal-600 px-4 py-2.5 text-xs font-black text-white shadow-md hover:from-emerald-700 hover:to-teal-700 transition cursor-pointer shrink-0 active:scale-95'
+            className='flex items-center gap-1.5 rounded-2xl bg-linear-to-r from-emerald-600 to-teal-600 px-4 py-2.5 text-xs font-black text-white shadow-md hover:from-emerald-700 hover:to-teal-700 transition cursor-pointer shrink-0 active:scale-95'
           >
             <Camera size={16} />
             <span className='hidden sm:inline'>Scan Camera</span>
@@ -89,30 +134,7 @@ export function PosProductGrid({
       </div>
 
       {/* Grid View */}
-      {isLoading ? (
-        <div className='grid grid-cols-2 gap-3 min-[480px]:grid-cols-3 sm:grid-cols-3 md:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5'>
-          {[1, 2, 3, 4, 5, 6, 7, 8].map((i) => (
-            <div key={i} className='h-52 animate-pulse rounded-3xl bg-slate-200/70' />
-          ))}
-        </div>
-      ) : products.length === 0 ? (
-        <div className='flex h-64 flex-col items-center justify-center rounded-3xl border border-dashed border-slate-200 bg-white p-8 text-center text-slate-400 space-y-2'>
-          <Sparkles size={32} className='text-slate-300' />
-          <p className='font-bold text-slate-700 text-sm'>No matching products found</p>
-          <p className='text-xs text-slate-400'>Try adjusting your search query or category selection.</p>
-        </div>
-      ) : (
-        <div className='grid grid-cols-2 gap-3 min-[480px]:grid-cols-3 sm:grid-cols-3 md:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5'>
-          {products.map((p) => (
-            <PosProductCard
-              key={p.id}
-              product={p}
-              cartQuantity={cartMap.get(p.id) || 0}
-              onAddToCart={onAddToCart}
-            />
-          ))}
-        </div>
-      )}
+      {renderContent()}
     </div>
   );
 }

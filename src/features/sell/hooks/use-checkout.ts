@@ -42,13 +42,16 @@ export function useCheckout() {
           true,
         );
 
-        // Trigger low-stock alert if remaining stock drops below minimum threshold
         const remainingQty = item.product.quantity - item.quantity;
         if (remainingQty <= (item.product.minStock || 0)) {
-          telegramService.sendLowStockAlert({
-            ...item.product,
-            quantity: Math.max(0, remainingQty),
-          });
+          try {
+            await telegramService.sendLowStockAlert({
+              ...item.product,
+              quantity: Math.max(0, remainingQty),
+            });
+          } catch (err) {
+            console.error('[useCheckout] Low stock alert failed:', err);
+          }
         }
       }
 
@@ -65,7 +68,12 @@ export function useCheckout() {
         createdAt: new Date().toISOString(),
       };
 
-      telegramService.sendSaleNotification(receipt);
+      try {
+        await telegramService.sendSaleNotification(receipt);
+      } catch (err) {
+        console.error('[useCheckout] Telegram notification failed:', err);
+      }
+
       return receipt;
     },
     onSuccess: (receipt) => {
