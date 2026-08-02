@@ -20,6 +20,7 @@ export interface ReceiptData {
   change: number;
   paymentMethod: PaymentMethod;
   createdAt: string;
+  soldBy?: string;
 }
 
 export interface CheckoutFormValues {

@@ -1,7 +1,9 @@
-import { CreditCard, ShoppingCart, Trash2 } from 'lucide-react';
-import type { CartItem } from '../types/sell.types';
+import { useState } from 'react';
+import { CreditCard, FileText, ShoppingCart, Trash2 } from 'lucide-react';
+import type { CartItem, ReceiptData } from '../types/sell.types';
 import { PosCartItem } from './pos-cart-item';
 import { formatCurrencyKhr, formatCurrencyUsd } from '../../../utils/currency';
+import { generatePdfInvoiceBlob } from '../utils/pdf-generator';
 
 interface Props {
   readonly items: CartItem[];
@@ -32,6 +34,40 @@ export function PosCartPanel({
   onCheckout,
   onStockExceeded,
 }: Props) {
+  const [isGeneratingPdf, setIsGeneratingPdf] = useState(false);
+
+  const handlePreviewPdf = async () => {
+    if (items.length === 0) return;
+    try {
+      setIsGeneratingPdf(true);
+      const mockReceipt: ReceiptData = {
+        orderId: `PREVIEW-${Math.floor(100000 + Math.random() * 900000)}`,
+        createdAt: new Date().toISOString(),
+        paymentMethod: 'CASH',
+        items: items.map((i) => ({
+          product: i.product,
+          quantity: i.quantity,
+          unitPrice: i.unitPrice,
+          totalPrice: i.quantity * i.unitPrice,
+        })),
+        subtotal,
+        tax,
+        discount: 0,
+        total: totalAmount,
+        amountPaid: totalAmount,
+        change: 0,
+      };
+
+      const blob = await generatePdfInvoiceBlob(mockReceipt);
+      const url = URL.createObjectURL(blob);
+      window.open(url, '_blank');
+    } catch (err) {
+      console.error('Error generating preview PDF:', err);
+    } finally {
+      setIsGeneratingPdf(false);
+    }
+  };
+
   return (
     <div className='hidden lg:flex flex-col h-full rounded-3xl border border-slate-200 bg-white p-5 shadow-xs w-96 shrink-0 min-w-0'>
       {/* Header */}
@@ -108,15 +144,28 @@ export function PosCartPanel({
           </div>
         </div>
 
-        <button
-          disabled={items.length === 0}
-          onClick={onCheckout}
-          className='flex w-full items-center justify-center gap-2 rounded-2xl bg-linear-to-r from-emerald-600 to-teal-600 py-3.5 text-sm font-extrabold text-white shadow-lg shadow-emerald-600/20 transition hover:from-emerald-700 hover:to-teal-700 disabled:opacity-50 cursor-pointer active:scale-98'
-        >
-          <CreditCard size={18} />
-          <span>Proceed to Checkout</span>
-        </button>
+        <div className='flex gap-2'>
+          <button
+            disabled={items.length === 0 || isGeneratingPdf}
+            onClick={handlePreviewPdf}
+            title='Preview PDF Invoice'
+            className='flex items-center justify-center gap-1.5 rounded-2xl border border-indigo-200 bg-indigo-50 px-3 py-3 text-xs font-bold text-indigo-700 hover:bg-indigo-100 disabled:opacity-40 transition cursor-pointer'
+          >
+            <FileText size={16} />
+            <span>PDF</span>
+          </button>
+
+          <button
+            disabled={items.length === 0}
+            onClick={onCheckout}
+            className='flex-1 flex items-center justify-center gap-2 rounded-2xl bg-linear-to-r from-emerald-600 to-teal-600 py-3.5 text-sm font-extrabold text-white shadow-lg shadow-emerald-600/20 transition hover:from-emerald-700 hover:to-teal-700 disabled:opacity-50 cursor-pointer active:scale-98'
+          >
+            <CreditCard size={18} />
+            <span>Proceed to Checkout</span>
+          </button>
+        </div>
       </div>
     </div>
   );
 }
+

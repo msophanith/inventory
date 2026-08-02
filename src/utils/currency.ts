@@ -4,8 +4,8 @@ export const getCurrentKhrRate = (): number => {
   if (typeof window !== 'undefined') {
     const saved = localStorage.getItem('pos_khr_exchange_rate');
     if (saved) {
-      const parsed = parseInt(saved, 10);
-      if (!isNaN(parsed) && parsed > 0) return parsed;
+      const parsed = Number.parseInt(saved, 10);
+      if (!Number.isNaN(parsed) && parsed > 0) return parsed;
     }
   }
   return DEFAULT_KHR_RATE;

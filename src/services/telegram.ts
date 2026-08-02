@@ -122,6 +122,7 @@ export class TelegramService {
       itemsFormatted,
       '----------------------------------',
       `<b>Grand Total:</b> ${formatCurrency(receipt.total)} (${escapeHtml(receipt.paymentMethod.toUpperCase())})`,
+      `<b>Cashier:</b> ${escapeHtml(receipt.soldBy || 'Admin')}`,
       `<b>Date:</b> ${formatDateTime(receipt.createdAt)}`,
       '📄 <i>PDF Invoice Attached Below</i>',
     ].join('\n');

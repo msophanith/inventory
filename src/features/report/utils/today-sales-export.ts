@@ -1,5 +1,6 @@
+import { format } from 'date-fns';
 import type { Movement } from '../../../services/movement';
-import { formatDate } from '../../../utils/date';
+import { parseDate } from '../../../utils/date';
 import { calculateMovementItem } from './report-calculator';
 import { downloadFileWithOptionalPassword } from './export-helper';
 
@@ -7,11 +8,34 @@ export async function exportTodaySalesToCsv(
   movements: Movement[],
   password?: string,
 ) {
-  const todayStr = formatDate(new Date(), 'yyyy-MM-dd');
+  const now = new Date();
+  const todayStr = format(now, 'yyyy-MM-dd');
+
+  const startOfToday = new Date(
+    now.getFullYear(),
+    now.getMonth(),
+    now.getDate(),
+    0,
+    0,
+    0,
+    0,
+  ).getTime();
+  const endOfToday = new Date(
+    now.getFullYear(),
+    now.getMonth(),
+    now.getDate(),
+    23,
+    59,
+    59,
+    999,
+  ).getTime();
 
   const todayMovements = movements.filter((m) => {
-    const mDateStr = formatDate(m.createdAt, 'yyyy-MM-dd');
-    return mDateStr === todayStr;
+    if (!m.createdAt) return false;
+    const parsed = parseDate(m.createdAt);
+    if (!parsed) return false;
+    const time = parsed.getTime();
+    return time >= startOfToday && time <= endOfToday;
   });
 
   const productMap = new Map<
@@ -96,8 +120,10 @@ export async function exportTodaySalesToCsv(
     ],
   ];
 
+  let hasProductRows = false;
   Array.from(productMap.values()).forEach((p) => {
     if (p.unitsSold > 0 || p.totalSales !== 0) {
+      hasProductRows = true;
       const margin =
         p.totalSales > 0
           ? ((p.netProfit / p.totalSales) * 100).toFixed(2)
@@ -115,6 +141,10 @@ export async function exportTodaySalesToCsv(
       ]);
     }
   });
+
+  if (!hasProductRows) {
+    rows.push(['No sales recorded for today', '', '', '', '', '', '', '', '']);
+  }
 
   const csvContent = rows.map((r) => r.join(',')).join('\n');
   const filename = `Today_Sales_NetProfit_${todayStr}.csv`;

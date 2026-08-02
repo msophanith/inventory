@@ -1,9 +1,14 @@
 import { jsPDF } from 'jspdf';
 import QRCode from 'qrcode';
-import { format } from 'date-fns';
 
 import type { ReceiptData } from '../types/sell.types';
+// import { formatDateTime } from '../../../utils/date';
 import { formatCurrencyKhr, formatCurrencyUsd } from '../../../utils/currency';
+import {
+  KHMER_FONT_REGULAR_BASE64,
+  KHMER_FONT_BOLD_BASE64,
+} from './khmer-fonts';
+import { formatDate } from '../../../utils/date';
 
 export const PAYMENT_QR_CODE_VALUE =
   '00020101021129450016abaakhppxxx@abaa01090177373060208ABA Bank40600006abaP2P0112083EB929820E020901773730603090176336980404Dual5204000053031165802KH5908SILA SAO6010Phnom Penh630410DF';
@@ -12,6 +17,58 @@ const KHMER_REGEX = /[\u1780-\u17FF\u19E0-\u19FF]/;
 
 export function hasKhmerText(text: string): boolean {
   return KHMER_REGEX.test(text);
+}
+
+let fontFaceInjected = false;
+
+function ensureFontFaceInjected() {
+  if (fontFaceInjected || typeof document === 'undefined') return;
+  try {
+    const styleId = 'khmer-suwannaphum-font';
+    if (!document.getElementById(styleId)) {
+      const style = document.createElement('style');
+      style.id = styleId;
+      style.textContent = `
+        @font-face {
+          font-family: 'Suwannaphum';
+          src: url(data:font/ttf;charset=utf-8;base64,${KHMER_FONT_REGULAR_BASE64}) format('truetype');
+          font-weight: normal;
+          font-style: normal;
+        }
+        @font-face {
+          font-family: 'Suwannaphum';
+          src: url(data:font/ttf;charset=utf-8;base64,${KHMER_FONT_BOLD_BASE64}) format('truetype');
+          font-weight: bold;
+          font-style: normal;
+        }
+      `;
+      document.head.appendChild(style);
+    }
+
+    if ('FontFace' in window && 'fonts' in document) {
+      const reg = new FontFace(
+        'Suwannaphum',
+        `url(data:font/ttf;charset=utf-8;base64,${KHMER_FONT_REGULAR_BASE64})`,
+      );
+      const bold = new FontFace(
+        'Suwannaphum',
+        `url(data:font/ttf;charset=utf-8;base64,${KHMER_FONT_BOLD_BASE64})`,
+        { weight: 'bold' },
+      );
+      const fontsSet = document.fonts as unknown as Set<FontFace>;
+      reg
+        .load()
+        .then((f) => fontsSet.add(f))
+        .catch(() => {});
+      bold
+        .load()
+        .then((f) => fontsSet.add(f))
+        .catch(() => {});
+    }
+    fontFaceInjected = true;
+  } catch (e) {
+    console.warn('Could not inject FontFace:', e);
+  }
 }
 
 interface DrawTextOptions {
@@ -29,6 +86,8 @@ function drawText(
 ) {
   if (!text) return;
 
+  ensureFontFaceInjected();
+
   if (!hasKhmerText(text)) {
     doc.text(text, x, y, {
       align: options?.align,
@@ -37,13 +96,21 @@ function drawText(
     return;
   }
 
-  const fontSizePt = doc.getFontSize() || 10;
+  const fontSizePt = doc.getFontSize() || 8;
   const fontStyle = doc.getFont()?.fontStyle || 'normal';
   const fontWeight = fontStyle.includes('bold') ? 'bold' : 'normal';
 
   const scale = 4;
   const pxPerMm = (96 / 25.4) * scale;
   const fontSizePx = fontSizePt * 1.3333 * scale;
+
+  if (typeof document === 'undefined') {
+    doc.text(text, x, y, {
+      align: options?.align,
+      maxWidth: options?.maxWidth,
+    });
+    return;
+  }
 
   const canvas = document.createElement('canvas');
   const ctx = canvas.getContext('2d');
@@ -56,7 +123,7 @@ function drawText(
   }
 
   const fontFamily =
-    '"Kantumruy Pro", "Noto Sans Khmer", "Khmer OS Siemreap", "Khmer OS Battambang", "Khmer MN", "Leelawadee UI", sans-serif';
+    '"Suwannaphum", "Noto Sans Khmer", "Kantumruy Pro", "Khmer OS Siemreap", sans-serif';
   ctx.font = `${fontWeight} ${fontSizePx}px ${fontFamily}`;
 
   let textToRender = text;
@@ -90,7 +157,7 @@ function drawText(
   let textColor = options?.color;
   if (!textColor) {
     const rawColor = doc.getTextColor();
-    textColor = typeof rawColor === 'string' ? rawColor : '#334155';
+    textColor = typeof rawColor === 'string' ? rawColor : '#000000';
   }
   ctx.fillStyle = textColor;
 
@@ -116,201 +183,146 @@ function drawText(
 export async function generatePdfInvoiceBlob(
   receipt: ReceiptData,
 ): Promise<Blob> {
+  const pageHeight = Math.max(175, 120 + receipt.items.length * 5);
   const doc = new jsPDF({
     orientation: 'portrait',
     unit: 'mm',
-    format: 'a4',
+    format: [80, pageHeight],
   });
 
-  const pageWidth = 210;
-  const pageHeight = 297;
-  const margin = 15;
-  const contentWidth = pageWidth - margin * 2;
+  // Always register Suwannaphum fonts directly into jsPDF VFS synchronously
+  doc.addFileToVFS('Suwannaphum-Regular.ttf', KHMER_FONT_REGULAR_BASE64);
+  doc.addFont('Suwannaphum-Regular.ttf', 'Suwannaphum', 'normal');
 
-  let y = 20;
+  doc.addFileToVFS('Suwannaphum-Bold.ttf', KHMER_FONT_BOLD_BASE64);
+  doc.addFont('Suwannaphum-Bold.ttf', 'Suwannaphum', 'bold');
 
-  // Header Banner
-  doc.setFont('Helvetica', 'bold');
-  doc.setFontSize(22);
-  doc.setTextColor(15, 23, 42);
-  drawText(doc, 'Chomkar Doung - Auto Spare Parts', margin, y);
+  const fontName = 'Suwannaphum';
 
-  doc.setFontSize(24);
-  doc.setTextColor(79, 70, 229);
-  drawText(doc, 'INVOICE', pageWidth - margin, y, { align: 'right' });
-  y += 7;
+  const dateFormatted = formatDate(receipt.createdAt);
+  let y = 10;
 
-  doc.setFont('Helvetica', 'normal');
-  doc.setFontSize(10);
-  doc.setTextColor(100, 116, 139);
-  drawText(doc, 'Sales Receipt & Official Tax Document', margin, y);
-  y += 8;
+  // Header
+  doc.setFont(fontName, 'bold');
+  doc.setFontSize(13);
+  drawText(doc, 'វិក្កយបត្រ', 40, y, { align: 'center' });
+  y += 5;
 
-  // Divider Line
-  doc.setLineWidth(0.5);
-  doc.setDrawColor(226, 232, 240);
-  doc.line(margin, y, pageWidth - margin, y);
-  y += 8;
+  doc.setFont(fontName, 'normal');
+  doc.setFontSize(8);
+  drawText(doc, 'Invoice', 40, y, { align: 'center' });
+  y += 6;
 
-  // Metadata Grid
-  doc.setFontSize(9.5);
-  doc.setTextColor(30, 41, 59);
-  doc.setFont('Helvetica', 'bold');
-  drawText(doc, 'Invoice No:', margin, y);
-  doc.setFont('Helvetica', 'normal');
-  drawText(doc, `#${receipt.orderId}`, margin + 22, y);
-
-  doc.setFont('Helvetica', 'bold');
-  drawText(doc, 'Date:', 90, y);
-  doc.setFont('Helvetica', 'normal');
-  drawText(doc, format(new Date(receipt.createdAt), 'dd MMM yyyy'), 102, y);
-
-  doc.setFont('Helvetica', 'bold');
-  drawText(doc, 'Payment:', 150, y);
-  doc.setFont('Helvetica', 'normal');
-  drawText(doc, receipt.paymentMethod.toUpperCase(), 168, y);
-  y += 10;
-
-  // Table Header Box
-  doc.setFillColor(248, 250, 252);
-  doc.rect(margin, y, contentWidth, 9, 'F');
   doc.setLineWidth(0.3);
-  doc.setDrawColor(203, 213, 225);
-  doc.rect(margin, y, contentWidth, 9, 'S');
+  doc.setDrawColor(200, 200, 200);
+  doc.line(5, y, 75, y);
+  y += 5;
 
-  doc.setFont('Helvetica', 'bold');
+  doc.setFontSize(7.5);
+  drawText(doc, `Order ID: #${receipt.orderId}`, 5, y);
+  y += 4;
+  drawText(doc, `Date: ${dateFormatted}`, 5, y);
+  y += 4;
+  drawText(doc, `Payment: ${receipt.paymentMethod.toUpperCase()}`, 5, y);
+  y += 4;
+  drawText(doc, `Cashier: ${receipt.soldBy || 'Admin'}`, 5, y);
+  y += 6;
+
+  // Table Header
+  doc.line(5, y, 75, y);
+  y += 4;
+  doc.setFont(fontName, 'bold');
+  drawText(doc, 'Item Description', 5, y);
+  drawText(doc, 'Qty', 45, y, { align: 'right' });
+  drawText(doc, 'Price', 58, y, { align: 'right' });
+  drawText(doc, 'Total', 75, y, { align: 'right' });
+  y += 3;
+  doc.line(5, y, 75, y);
+  y += 4;
+
+  // Items List
+  doc.setFont(fontName, 'normal');
+  receipt.items.forEach((item) => {
+    const itemTotal = item.quantity * item.unitPrice;
+    drawText(doc, item.product.name, 5, y, { maxWidth: 37 });
+    drawText(doc, `${item.quantity}`, 45, y, { align: 'right' });
+    drawText(doc, `$${item.unitPrice.toFixed(2)}`, 58, y, { align: 'right' });
+    drawText(doc, `$${itemTotal.toFixed(2)}`, 75, y, { align: 'right' });
+    y += 4.5;
+  });
+
+  // Totals with Dual Currency ($ USD / ៛ KHR)
+  doc.line(5, y, 75, y);
+  y += 5;
+
+  doc.setFont(fontName, 'normal');
+  if (receipt.subtotal !== receipt.total) {
+    drawText(doc, 'Subtotal:', 45, y, { align: 'right' });
+    drawText(doc, formatCurrencyUsd(receipt.subtotal), 75, y, {
+      align: 'right',
+    });
+    y += 4;
+  }
+
+  doc.setFont(fontName, 'bold');
   doc.setFontSize(9);
-  doc.setTextColor(15, 23, 42);
-  drawText(doc, '#', margin + 3, y + 6);
-  drawText(doc, 'Item Description', margin + 12, y + 6);
-  drawText(doc, 'Qty', 125, y + 6, { align: 'right' });
-  drawText(doc, 'Unit Price', 158, y + 6, { align: 'right' });
-  drawText(doc, 'Total Amount', pageWidth - margin - 3, y + 6, {
+  drawText(doc, 'Grand Total ($):', 45, y, { align: 'right' });
+  drawText(doc, formatCurrencyUsd(receipt.total), 75, y, { align: 'right' });
+  y += 4.5;
+
+  doc.setFont(fontName, 'bold');
+  drawText(doc, 'Grand Total (KHR):', 45, y, { align: 'right' });
+  drawText(doc, formatCurrencyKhr(receipt.total), 75, y, { align: 'right' });
+  y += 5;
+
+  doc.setFontSize(7.5);
+  doc.setFont(fontName, 'normal');
+  drawText(doc, 'Amount Paid:', 45, y, { align: 'right' });
+  drawText(doc, formatCurrencyUsd(receipt.amountPaid), 75, y, {
     align: 'right',
   });
-  y += 9;
+  y += 4;
 
-  // Table Item Rows
-  doc.setFont('Helvetica', 'normal');
-  receipt.items.forEach((item, idx) => {
-    const total = item.quantity * item.unitPrice;
-    if (idx % 2 === 1) {
-      doc.setFillColor(248, 250, 252);
-      doc.rect(margin, y, contentWidth, 8, 'F');
-    }
-    doc.setDrawColor(241, 245, 249);
-    doc.rect(margin, y, contentWidth, 8, 'S');
+  drawText(doc, 'Change:', 45, y, { align: 'right' });
+  drawText(
+    doc,
+    `${formatCurrencyUsd(receipt.change)} (${formatCurrencyKhr(receipt.change)})`,
+    75,
+    y,
+    { align: 'right' },
+  );
+  y += 6;
 
-    doc.setTextColor(51, 65, 85);
-    drawText(doc, `${idx + 1}`, margin + 3, y + 5.5);
-    // Fixed max width 85mm ensures item description never overlaps Qty column
-    drawText(doc, item.product.name, margin + 12, y + 5.5, { maxWidth: 85 });
-    drawText(doc, `${item.quantity} ${item.product.unit || ''}`, 125, y + 5.5, {
-      align: 'right',
-    });
-    drawText(doc, formatCurrencyUsd(item.unitPrice), 158, y + 5.5, {
-      align: 'right',
-    });
-    drawText(doc, formatCurrencyUsd(total), pageWidth - margin - 3, y + 5.5, {
-      align: 'right',
-    });
-    y += 8;
-  });
+  // KHQR Code Section
+  doc.line(5, y, 75, y);
+  y += 5;
 
-  y += 8;
-
-  // KHQR Section (Left)
   try {
     const qrDataUrl = await QRCode.toDataURL(PAYMENT_QR_CODE_VALUE, {
       margin: 1,
-      width: 200,
+      width: 250,
+      errorCorrectionLevel: 'M',
     });
-    const qrSize = 35;
-    doc.addImage(qrDataUrl, 'PNG', margin, y, qrSize, qrSize);
-    doc.setFont('Helvetica', 'bold');
+
+    const qrSize = 32;
+    const qrX = (80 - qrSize) / 2;
+
+    doc.setFont(fontName, 'bold');
     doc.setFontSize(8);
-    doc.setTextColor(15, 23, 42);
-    drawText(doc, 'Scan to Pay (KHQR)', margin + qrSize / 2, y + qrSize + 4, {
-      align: 'center',
-    });
+    drawText(doc, 'Scan to Pay (KHQR)', 40, y, { align: 'center' });
+    y += 3;
+
+    doc.addImage(qrDataUrl, 'PNG', qrX, y, qrSize, qrSize);
+    y += qrSize + 5;
   } catch (err) {
-    console.error('Error adding KHQR image to PDF:', err);
+    console.error('Error generating KHQR code for PDF invoice:', err);
   }
 
-  // Summary Totals (Right)
-  const summaryX = pageWidth - margin;
-  if (receipt.subtotal !== receipt.total) {
-    doc.setFont('Helvetica', 'normal');
-    doc.setFontSize(9.5);
-    doc.setTextColor(71, 85, 105);
-    drawText(
-      doc,
-      `Subtotal: ${formatCurrencyUsd(receipt.subtotal)}`,
-      summaryX,
-      y + 5,
-      { align: 'right' },
-    );
-    y += 6;
-  }
-
-  doc.setFont('Helvetica', 'bold');
-  doc.setFontSize(12);
-  doc.setTextColor(15, 23, 42);
-  drawText(
-    doc,
-    `Grand Total: ${formatCurrencyUsd(receipt.total)}`,
-    summaryX,
-    y + 7,
-    { align: 'right' },
-  );
-  y += 7;
-
-  // doc.setFontSize(10);
-  // doc.setTextColor(37, 99, 235);
-  // drawText(doc, `( ${formatCurrencyKhr(receipt.total)} )`, summaryX, y + 6, {
-  //   align: 'right',
-  // });
-  // y += 8;
-
-  doc.setFont('Helvetica', 'normal');
-  doc.setFontSize(9);
-  doc.setTextColor(71, 85, 105);
-  drawText(
-    doc,
-    `Amount Paid (${receipt.paymentMethod}): ${formatCurrencyUsd(receipt.amountPaid)}`,
-    summaryX,
-    y + 5,
-    { align: 'right' },
-  );
-  y += 5;
-
-  if (receipt.change > 0) {
-    drawText(
-      doc,
-      `Change: ${formatCurrencyUsd(receipt.change)} (${formatCurrencyKhr(receipt.change)})`,
-      summaryX,
-      y + 5,
-      { align: 'right' },
-    );
-  }
-
-  // Footer Message
-  y = pageHeight - 20;
-  doc.setLineWidth(0.4);
-  doc.setDrawColor(226, 232, 240);
-  doc.line(margin, y, pageWidth - margin, y);
-  y += 6;
-
-  doc.setFont('Helvetica', 'italic');
-  doc.setFontSize(9);
-  doc.setTextColor(100, 116, 139);
-  drawText(
-    doc,
-    'Thank you for your purchase! Please keep this receipt for your records.',
-    pageWidth / 2,
-    y,
-    { align: 'center' },
-  );
+  doc.line(5, y, 75, y);
+  y += 4;
+  doc.setFont(fontName, 'normal');
+  doc.setFontSize(7);
+  drawText(doc, 'Thank you for your purchase!', 40, y, { align: 'center' });
 
   return doc.output('blob');
 }

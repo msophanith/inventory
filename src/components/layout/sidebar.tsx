@@ -3,6 +3,7 @@ import {
   Box,
   ChevronLeft,
   ChevronRight,
+  Code,
   Gauge,
   HistoryIcon,
   Keyboard,
@@ -105,9 +106,8 @@ export default function Sidebar() {
               <span className='font-mono text-[10px] text-slate-400'>Press ?</span>
             </button>
 
-            <div className='rounded-3xl bg-gradient-to-r from-slate-900 to-indigo-950 p-4 text-white shadow-md space-y-1'>
+            <div className='rounded-3xl bg-linear-to-r from-slate-900 to-indigo-950 p-4 text-white shadow-md space-y-1'>
               <div className='flex items-center justify-between'>
-                <p className='text-sm font-black tracking-wide'>Inventory POS</p>
                 <span className={`rounded-full px-2 py-0.5 text-[10px] font-extrabold uppercase ${isAdmin ? 'bg-amber-400 text-slate-950' : 'bg-emerald-400 text-slate-950'}`}>
                   {role}
                 </span>
@@ -115,6 +115,10 @@ export default function Sidebar() {
               <p className='text-xs text-slate-300 flex items-center gap-1 font-medium'>
                 <UserCheck size={12} className='text-indigo-400' />
                 {isAdmin ? 'Full Admin Access' : 'POS Cashier Access'}
+              </p>
+              <p className='text-xs text-slate-300 flex items-center gap-1 font-medium'>
+                <Code size={12} className='text-indigo-400' />
+                <span>Version: 1.0.0</span>
               </p>
             </div>
           </div>

@@ -2,9 +2,11 @@ import { useState } from 'react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { movementService, telegramService } from '../../../services';
 import type { CartItem, PaymentMethod, ReceiptData } from '../types/sell.types';
+import { useAuth } from '../../auth/use-auth';
 
 export function useCheckout() {
   const queryClient = useQueryClient();
+  const { user, role } = useAuth();
   const [isCheckoutOpen, setIsCheckoutOpen] = useState(false);
   const [receiptData, setReceiptData] = useState<ReceiptData | null>(null);
 
@@ -17,6 +19,7 @@ export function useCheckout() {
       total,
       amountPaid,
       paymentMethod,
+      soldBy,
     }: {
       items: CartItem[];
       subtotal: number;
@@ -25,8 +28,13 @@ export function useCheckout() {
       total: number;
       amountPaid: number;
       paymentMethod: PaymentMethod;
+      soldBy?: string;
     }) => {
       const orderId = `POS-${Date.now().toString().slice(-6)}`;
+      const cashierName =
+        soldBy ||
+        user?.fullName ||
+        (role ? role.charAt(0).toUpperCase() + role.slice(1) : 'Admin');
 
       for (const item of items) {
         await movementService.addMovement(
@@ -65,6 +73,7 @@ export function useCheckout() {
         amountPaid,
         change: Math.max(0, amountPaid - total),
         paymentMethod,
+        soldBy: cashierName,
         createdAt: new Date().toISOString(),
       };
 
