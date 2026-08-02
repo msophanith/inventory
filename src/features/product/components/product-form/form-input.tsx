@@ -8,6 +8,7 @@ interface Props {
   readonly isHidden?: boolean;
   readonly prefix?: string;
   readonly rightElement?: React.ReactNode;
+  readonly step?: string | number;
 }
 
 const FormInput = ({
@@ -20,6 +21,7 @@ const FormInput = ({
   isHidden = false,
   prefix,
   rightElement,
+  step,
 }: Props) => {
   if (isHidden) {
     return <input {...register(name)} type='hidden' />;
@@ -44,6 +46,7 @@ const FormInput = ({
         <input
           {...register(name)}
           type={type}
+          step={step}
           className={`h-11 w-full rounded-2xl border text-sm font-semibold text-slate-900 transition focus:outline-none focus:ring-2 ${
             prefix ? 'pl-8' : 'pl-4'
           } ${rightElement ? 'pr-12' : 'pr-4'} ${

@@ -1,25 +1,48 @@
 import { useEffect, useRef, useState } from 'react';
-import { Box, Gauge, HistoryIcon, RefreshCcw, ShoppingCart } from 'lucide-react';
-import { NavLink } from 'react-router-dom';
+import { Grid } from 'lucide-react';
+import { NavLink, useLocation } from 'react-router-dom';
 import { useAuth } from '../../features/auth/use-auth';
-
-const menus = [
-  { icon: Gauge, label: 'Dashboard', to: '/', adminOnly: true },
-  { icon: ShoppingCart, label: 'Sell', to: '/sell', adminOnly: false },
-  { icon: Box, label: 'Products', to: '/products', adminOnly: true },
-  { icon: RefreshCcw, label: 'Movement', to: '/movement', adminOnly: true },
-  { icon: HistoryIcon, label: 'Report', to: '/report', adminOnly: true },
-];
+import { ShortcutsModal } from './shortcuts-modal';
+import { MobileNavDrawer } from './mobile-nav-drawer';
+import { bottomBarMenus, drawerMenus } from './mobile-nav-items';
 
 export default function MobileBottomNav() {
   const { isAdmin } = useAuth();
+  const location = useLocation();
   const [isVisible, setIsVisible] = useState(true);
+  const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+  const [isShortcutsModalOpen, setIsShortcutsModalOpen] = useState(false);
   const lastScrollY = useRef(0);
 
-  const visibleMenus = menus.filter((m) => isAdmin || !m.adminOnly);
+  const visibleBottomMenus = bottomBarMenus.filter(
+    (m) => isAdmin || !m.adminOnly,
+  );
+  const visibleDrawerMenus = drawerMenus.filter((m) => isAdmin || !m.adminOnly);
+
+  const [prevPathname, setPrevPathname] = useState(location.pathname);
+  if (prevPathname !== location.pathname) {
+    setPrevPathname(location.pathname);
+    setIsDrawerOpen(false);
+  }
+
+  useEffect(() => {
+    document.body.style.overflow = isDrawerOpen ? 'hidden' : '';
+    return () => {
+      document.body.style.overflow = '';
+    };
+  }, [isDrawerOpen]);
+
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape' && isDrawerOpen) setIsDrawerOpen(false);
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [isDrawerOpen]);
 
   useEffect(() => {
     const handleScroll = (currentScrollY: number) => {
+      if (isDrawerOpen) return;
       if (currentScrollY > lastScrollY.current && currentScrollY > 30) {
         setIsVisible(false);
       } else if (currentScrollY < lastScrollY.current) {
@@ -39,53 +62,106 @@ export default function MobileBottomNav() {
       mainEl?.removeEventListener('scroll', onMainScroll);
       window.removeEventListener('scroll', onWinScroll);
     };
-  }, []);
+  }, [isDrawerOpen]);
 
   return (
-    <div
-      className={`fixed bottom-3 left-3 right-3 z-50 transition-all duration-300 ease-out lg:hidden ${
-        isVisible ? 'translate-y-0 opacity-100' : 'translate-y-24 opacity-0 pointer-events-none'
-      }`}
-    >
-      <nav className='mx-auto max-w-md rounded-3xl border border-white/70 bg-white/80 p-1.5 shadow-2xl shadow-slate-900/15 backdrop-blur-2xl ring-1 ring-slate-900/5'>
-        <div className={`grid items-center justify-items-center gap-1 ${visibleMenus.length === 1 ? 'grid-cols-1 max-w-xs mx-auto' : 'grid-cols-5'}`}>
-          {visibleMenus.map((menu) => {
-            const Icon = menu.icon;
+    <>
+      <MobileNavDrawer
+        isOpen={isDrawerOpen}
+        onClose={() => setIsDrawerOpen(false)}
+        menus={visibleDrawerMenus}
+        onOpenShortcuts={() => setIsShortcutsModalOpen(true)}
+      />
 
-            return (
-              <NavLink
-                key={menu.to}
-                to={menu.to}
-                className={({ isActive }) =>
-                  `group relative flex w-full flex-col items-center justify-center rounded-2xl py-2 transition-all duration-200 active:scale-95 cursor-pointer ${
-                    isActive
-                      ? 'bg-gradient-to-br from-indigo-500 via-indigo-600 to-blue-600 text-white font-extrabold shadow-md shadow-indigo-500/25 scale-102'
-                      : 'text-slate-500 font-semibold hover:text-slate-900 hover:bg-slate-100/60'
-                  }`
-                }
+      <div
+        className={`fixed bottom-3 left-3 right-3 z-40 transition-all duration-300 ease-out lg:hidden ${
+          isVisible || isDrawerOpen
+            ? 'translate-y-0 opacity-100'
+            : 'translate-y-24 opacity-0 pointer-events-none'
+        }`}
+      >
+        <nav className='mx-auto max-w-md rounded-3xl border border-white/70 bg-white/85 p-1.5 shadow-2xl shadow-slate-900/15 backdrop-blur-2xl ring-1 ring-slate-900/5'>
+          <div
+            className='grid items-center justify-items-center gap-1'
+            style={{
+              gridTemplateColumns: `repeat(${visibleBottomMenus.length + 1}, minmax(0, 1fr))`,
+            }}
+          >
+            {visibleBottomMenus.map((menu) => {
+              const Icon = menu.icon;
+
+              return (
+                <NavLink
+                  key={menu.to}
+                  to={menu.to}
+                  className={({ isActive }) =>
+                    `group relative flex w-full flex-col items-center justify-center rounded-2xl py-2 transition-all duration-200 active:scale-95 cursor-pointer ${
+                      isActive
+                        ? 'bg-gradient-to-br from-indigo-500 via-indigo-600 to-blue-600 text-white font-extrabold shadow-md shadow-indigo-500/25 scale-102'
+                        : 'text-slate-500 font-semibold hover:text-slate-900 hover:bg-slate-100/60'
+                    }`
+                  }
+                >
+                  {({ isActive }) => (
+                    <>
+                      <Icon
+                        size={18}
+                        className={`transition-transform duration-200 ${
+                          isActive
+                            ? 'scale-110 text-white'
+                            : 'text-slate-500 group-hover:scale-105'
+                        }`}
+                      />
+                      <span
+                        className={`mt-1 text-[10px] tracking-tight whitespace-nowrap ${
+                          isActive
+                            ? 'font-black text-white'
+                            : 'font-semibold text-slate-500'
+                        }`}
+                      >
+                        {menu.label}
+                      </span>
+                    </>
+                  )}
+                </NavLink>
+              );
+            })}
+
+            <button
+              type='button'
+              onClick={() => setIsDrawerOpen((prev) => !prev)}
+              className={`group relative flex w-full flex-col items-center justify-center rounded-2xl py-2 transition-all duration-200 active:scale-95 cursor-pointer ${
+                isDrawerOpen
+                  ? 'bg-slate-900 text-white font-extrabold shadow-md scale-102'
+                  : 'text-slate-500 font-semibold hover:text-slate-900 hover:bg-slate-100/60'
+              }`}
+            >
+              <Grid
+                size={18}
+                className={`transition-transform duration-200 ${
+                  isDrawerOpen
+                    ? 'scale-110 text-white'
+                    : 'text-slate-500 group-hover:scale-105'
+                }`}
+              />
+              <span
+                className={`mt-1 text-[10px] tracking-tight whitespace-nowrap ${
+                  isDrawerOpen
+                    ? 'font-black text-white'
+                    : 'font-semibold text-slate-500'
+                }`}
               >
-                {({ isActive }) => (
-                  <>
-                    <Icon
-                      size={18}
-                      className={`transition-transform duration-200 ${
-                        isActive ? 'scale-110 text-white' : 'text-slate-500 group-hover:scale-105'
-                      }`}
-                    />
-                    <span
-                      className={`mt-1 text-[10px] tracking-tight whitespace-nowrap ${
-                        isActive ? 'font-black text-white' : 'font-semibold text-slate-500'
-                      }`}
-                    >
-                      {menu.label}
-                    </span>
-                  </>
-                )}
-              </NavLink>
-            );
-          })}
-        </div>
-      </nav>
-    </div>
+                Menu
+              </span>
+            </button>
+          </div>
+        </nav>
+      </div>
+
+      <ShortcutsModal
+        open={isShortcutsModalOpen}
+        onClose={() => setIsShortcutsModalOpen(false)}
+      />
+    </>
   );
 }

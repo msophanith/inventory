@@ -21,6 +21,7 @@ const ProductPricing = ({ register, errors }: Props) => {
           label='Buy Price (Cost)'
           name='buyPrice'
           type='number'
+          step='any'
           prefix='$'
           register={register}
           error={errors.buyPrice?.message}
@@ -31,6 +32,7 @@ const ProductPricing = ({ register, errors }: Props) => {
           label='Sell Price (Revenue)'
           name='sellPrice'
           type='number'
+          step='any'
           prefix='$'
           register={register}
           error={errors.sellPrice?.message}
