@@ -44,6 +44,7 @@ export function useKeyboardShortcuts() {
       }
 
       if (isInputFocused && !e.altKey) return;
+      if (e.ctrlKey || e.metaKey || e.altKey) return;
 
       const key = e.key.toLowerCase();
       const match = SHORTCUT_LIST.find((item) => item.key === key && (isAdmin || !item.adminOnly));
