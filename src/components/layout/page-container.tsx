@@ -9,7 +9,7 @@ interface PageContainerProps {
 export function PageContainer({
   children,
   className = '',
-  maxWidth = 'max-w-7xl',
+  maxWidth = 'max-w-full',
 }: PageContainerProps) {
   return (
     <div

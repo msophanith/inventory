@@ -68,9 +68,8 @@ export class ProductService {
     const search = params?.search || '';
     const category = params?.category || '';
 
-    // Always start at offset 0 and return up to limit items
-    const from = 0;
-    const to = limit - 1;
+    const from = (page - 1) * limit;
+    const to = from + limit - 1;
 
     let query = supabase.from(this.TABLE_NAME).select('*', { count: 'exact' });
 
