@@ -68,12 +68,49 @@ export class ProductService {
     const search = params?.search || '';
     const category = params?.category || '';
 
+    // If requesting a large limit (e.g. for filtering all stock status items), batch fetch all pages
+    if (limit >= 1000) {
+      let allData: Product[] = [];
+      let from = 0;
+      const chunkSize = 1000;
+      let totalCount: number;
+
+      while (true) {
+        let query = supabase
+          .from(this.TABLE_NAME)
+          .select('*', { count: 'exact' });
+        if (search)
+          query = query.or(`name.ilike.%${search}%,barcode.ilike.%${search}%`);
+        if (category) query = query.eq('category', category);
+
+        const { data, error, count } = await query
+          .order('createdAt', { ascending: false })
+          .range(from, from + chunkSize - 1);
+
+        if (error) throw new Error(error.message);
+
+        const chunk = (data || []) as Product[];
+        allData = allData.concat(chunk);
+        totalCount = count || allData.length;
+
+        if (chunk.length < chunkSize) break;
+        from += chunkSize;
+      }
+
+      return {
+        data: allData,
+        count: totalCount,
+        page: 1,
+        limit: allData.length,
+        totalPages: 1,
+      };
+    }
+
     const from = (page - 1) * limit;
     const to = from + limit - 1;
 
     let query = supabase.from(this.TABLE_NAME).select('*', { count: 'exact' });
 
-    // Apply filters
     if (search) {
       query = query.or(`name.ilike.%${search}%,barcode.ilike.%${search}%`);
     }
@@ -82,7 +119,6 @@ export class ProductService {
       query = query.eq('category', category);
     }
 
-    // Apply pagination and ordering
     const { data, error, count } = await query
       .order('createdAt', { ascending: false })
       .range(from, to);

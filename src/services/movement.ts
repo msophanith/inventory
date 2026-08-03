@@ -36,32 +36,49 @@ export class MovementService {
   private readonly tableName = 'StockMovement';
 
   async getAll(filters?: MovementFilter): Promise<Movement[]> {
-    let query = supabase
-      .from(this.tableName)
-      .select('*, product:Product(*)')
-      .order('createdAt', {
-        ascending: false,
-      });
+    const PAGE_SIZE = 1000;
+    let allMovements: Movement[] = [];
+    let from = 0;
+    let hasMore = true;
 
-    if (filters?.type) {
-      query = query.eq('type', filters.type);
+    while (hasMore) {
+      let query = supabase
+        .from(this.tableName)
+        .select('*, product:Product(*)')
+        .order('createdAt', { ascending: false })
+        .range(from, from + PAGE_SIZE - 1);
+
+      if (filters?.type) {
+        query = query.eq('type', filters.type);
+      }
+
+      if (filters?.isDamaged !== undefined) {
+        query = query.eq('isDamaged', filters.isDamaged);
+      }
+
+      if (filters?.productId) {
+        query = query.eq('productId', filters.productId);
+      }
+
+      const { data, error } = await query;
+
+      if (error) {
+        throw new Error(error.message);
+      }
+
+      if (data && data.length > 0) {
+        allMovements = allMovements.concat(data as Movement[]);
+        if (data.length < PAGE_SIZE) {
+          hasMore = false;
+        } else {
+          from += PAGE_SIZE;
+        }
+      } else {
+        hasMore = false;
+      }
     }
 
-    if (filters?.isDamaged !== undefined) {
-      query = query.eq('isDamaged', filters.isDamaged);
-    }
-
-    if (filters?.productId) {
-      query = query.eq('productId', filters.productId);
-    }
-
-    const { data, error } = await query;
-
-    if (error) {
-      throw new Error(error.message);
-    }
-
-    return data as Movement[];
+    return allMovements;
   }
 
   /**
@@ -166,9 +183,10 @@ export class MovementService {
 
     const { data, error } = await supabase
       .from('StockMovement')
-      .select('quantity, unitPrice')
-      .eq('type', 'OUT')
-      .eq('isDamaged', false)
+      .select(
+        'quantity, unitPrice, type, isDamaged, reference, product:Product(buyPrice, sellPrice)',
+      )
+      .in('type', ['OUT', 'RETURN'])
       .gte('createdAt', start.toISOString())
       .lte('createdAt', end.toISOString());
 
@@ -176,22 +194,54 @@ export class MovementService {
       throw new Error(error.message);
     }
 
-    const movements = data ?? [];
+    interface TodayMovementItem {
+      quantity: number;
+      unitPrice?: number | null;
+      type: string;
+      isDamaged?: boolean | null;
+      reference?: string | null;
+      product?: {
+        buyPrice?: number | null;
+        sellPrice?: number | null;
+      } | null;
+    }
 
-    const totalSales = movements.reduce(
-      (sum, item) => sum + item.quantity * (item.unitPrice ?? 0),
-      0,
-    );
+    const movements = (data ?? []) as unknown as TodayMovementItem[];
 
-    const totalItemsSold = movements.reduce(
-      (sum, item) => sum + item.quantity,
-      0,
-    );
+    let totalSales = 0;
+    let totalItemsSold = 0;
+    let totalOrders = 0;
+
+    for (const item of movements) {
+      const isDamaged = Boolean(
+        item.isDamaged || item.reference?.toLowerCase() === 'damage',
+      );
+      const qty = Math.abs(item.quantity || 0);
+      const buyPrice = item.product?.buyPrice ?? 0;
+      const sellPrice = item.unitPrice ?? item.product?.sellPrice ?? 0;
+
+      if (item.type === 'OUT') {
+        if (!isDamaged) {
+          totalSales += qty * sellPrice;
+          totalItemsSold += qty;
+          totalOrders += 1;
+        }
+      } else if (item.type === 'RETURN') {
+        if (isDamaged) {
+          // Returned in damaged condition -> subtract total item damage buyPrice
+          totalSales -= qty * buyPrice;
+        } else {
+          // Returned in good condition -> subtract total return sale price
+          totalSales -= qty * sellPrice;
+        }
+        totalItemsSold -= qty;
+      }
+    }
 
     return {
-      totalSales,
-      totalOrders: movements.length,
-      totalItemsSold,
+      totalSales: Math.round(totalSales * 100) / 100,
+      totalOrders,
+      totalItemsSold: Math.max(0, totalItemsSold),
     };
   }
 }
