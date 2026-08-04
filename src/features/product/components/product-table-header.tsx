@@ -1,4 +1,4 @@
-import { Filter, Plus, Search } from 'lucide-react';
+import { Download, Filter, Loader2, Plus, Search } from 'lucide-react';
 
 export type StockFilterType = 'ALL' | 'IN_STOCK' | 'LOW_STOCK' | 'OUT_OF_STOCK';
 
@@ -7,6 +7,8 @@ interface Props {
   readonly stockFilter: StockFilterType;
   readonly onStockFilterChange: (filter: StockFilterType) => void;
   readonly onAddProduct: () => void;
+  readonly onExportCsv?: () => void;
+  readonly isExporting?: boolean;
 }
 
 export function ProductTableHeader({
@@ -14,6 +16,8 @@ export function ProductTableHeader({
   stockFilter,
   onStockFilterChange,
   onAddProduct,
+  onExportCsv,
+  isExporting = false,
 }: Props) {
   return (
     <div className='flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between min-w-0 w-full'>
@@ -25,9 +29,9 @@ export function ProductTableHeader({
         </p>
       </div>
 
-      {/* Actions: Stock Filter Pills, Search Bar, & Add Product */}
+      {/* Actions: Stock Filter, Search, Export CSV, & Add Product */}
       <div className='flex flex-wrap items-center gap-2.5 w-full sm:w-auto'>
-        {/* Stock Filter Dropdown / Pills */}
+        {/* Stock Filter Dropdown */}
         <div className='relative flex items-center min-w-36'>
           <Filter size={16} className='absolute left-3 text-slate-400 pointer-events-none' />
           <select
@@ -44,7 +48,7 @@ export function ProductTableHeader({
         </div>
 
         {/* Search Bar */}
-        <div className='relative flex-1 sm:w-56 min-w-0'>
+        <div className='relative flex-1 sm:w-48 min-w-0'>
           <Search size={17} className='absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400' />
           <input
             type='text'
@@ -53,6 +57,19 @@ export function ProductTableHeader({
             className='w-full rounded-2xl border border-slate-200 bg-white pl-10 pr-4 py-2 text-xs sm:text-sm text-slate-800 focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 shadow-2xs'
           />
         </div>
+
+        {/* Export CSV Button */}
+        {onExportCsv && (
+          <button
+            type='button'
+            disabled={isExporting}
+            onClick={onExportCsv}
+            className='flex items-center justify-center gap-1.5 rounded-2xl border border-emerald-300 bg-emerald-50 px-3.5 py-2 text-xs sm:text-sm font-extrabold text-emerald-700 shadow-2xs transition hover:bg-emerald-100 disabled:opacity-50 cursor-pointer shrink-0'
+          >
+            {isExporting ? <Loader2 size={16} className='animate-spin' /> : <Download size={16} />}
+            <span>Export CSV</span>
+          </button>
+        )}
 
         {/* Add Product Button */}
         <button

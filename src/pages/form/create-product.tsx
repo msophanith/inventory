@@ -2,7 +2,7 @@ import { ArrowLeft } from 'lucide-react';
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { v4 as uuidv4 } from 'uuid';
 
-import Alert from '../../components/ui/alert';
+import Toast from '../../components/ui/alert';
 import ProductForm from '../../features/product/components/product-form';
 import { useProductAction } from '../../features/product/hooks/use-product-action';
 import { useProduct } from '../../features/product/hooks/use-product';
@@ -116,9 +116,9 @@ const CreateProductPage = () => {
         defaultValues={getDefaultValue()}
       />
 
-      {/* Toast Alert */}
+      {/* Top Right Floating Toast */}
       {alert && (
-        <Alert
+        <Toast
           type={alert.type}
           message={alert.message}
           onClose={() => setAlert(null)}

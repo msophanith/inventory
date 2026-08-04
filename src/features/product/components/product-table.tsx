@@ -26,6 +26,8 @@ interface Props {
   readonly onSearchChange: (value: string) => void;
   readonly onRowClick?: (productId: string) => void;
   readonly onAddProduct: () => void;
+  readonly onExportCsv?: () => void;
+  readonly isExporting?: boolean;
 }
 
 export default function ProductTable({
@@ -40,6 +42,8 @@ export default function ProductTable({
   onSearchChange,
   onRowClick,
   onAddProduct,
+  onExportCsv,
+  isExporting,
 }: Props) {
   const table = useReactTable({
     data: products,
@@ -95,12 +99,14 @@ export default function ProductTable({
 
   return (
     <div className='space-y-6 rounded-3xl border border-slate-200/80 bg-white p-4 sm:p-6 shadow-xs min-w-0 w-full max-w-full overflow-hidden'>
-      {/* Search & Actions Header with Stock Filter */}
+      {/* Search, Actions & Export Header */}
       <ProductTableHeader
         onSearchChange={onSearchChange}
         stockFilter={stockFilter}
         onStockFilterChange={onStockFilterChange}
         onAddProduct={onAddProduct}
+        onExportCsv={onExportCsv}
+        isExporting={isExporting}
       />
 
       {/* Responsive Table Container */}

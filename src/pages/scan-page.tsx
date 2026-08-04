@@ -4,7 +4,7 @@ import { productService } from '../services';
 import { useHardwareScanner } from '../features/sell/hooks/use-hardware-scanner';
 import { playScanSound } from '../features/sell/utils/scan-sound';
 import { PosCameraScannerModal } from '../features/sell/components/pos-camera-scanner-modal';
-import Alert from '../components/ui/alert';
+import Toast from '../components/ui/alert';
 import { PageContainer } from '../components/layout/page-container';
 
 import { ScanStatusHeader } from '../features/scan/components/scan-status-header';
@@ -97,19 +97,17 @@ const ScanPage = () => {
   return (
     <PageContainer className='space-y-5 max-w-3xl mx-auto py-4 pb-24 lg:pb-6'>
       {alert && (
-        <div className='fixed top-4 right-4 z-50 max-w-sm'>
-          <Alert
-            type={alert.type === 'info' ? 'success' : alert.type}
-            message={alert.message}
-            onClose={() => setAlert(null)}
-          />
-        </div>
+        <Toast
+          type={alert.type === 'info' ? 'info' : alert.type}
+          message={alert.message}
+          onClose={() => setAlert(null)}
+        />
       )}
 
-      {/* 1. Header Banner & Live Hardware Scanner Status Badge */}
+      {/* Header Banner & Live Hardware Scanner Status Badge */}
       <ScanStatusHeader isListening={isHardwareListening} />
 
-      {/* 2. Embedded Viewfinder & Manual Barcode Input Card */}
+      {/* Embedded Viewfinder & Manual Barcode Input Card */}
       <ScanViewfinder
         manualCode={manualCode}
         onManualCodeChange={setManualCode}
@@ -118,13 +116,13 @@ const ScanPage = () => {
         isSearching={isSearching}
       />
 
-      {/* 3. Recent Scanned Barcode Audit Feed */}
+      {/* Recent Scanned Barcode Audit Feed */}
       <ScanHistoryFeed
         history={history}
         onClearHistory={() => setHistory([])}
       />
 
-      {/* 4. Phone Camera Scanner Modal */}
+      {/* Phone Camera Scanner Modal */}
       <PosCameraScannerModal
         open={isCameraOpen}
         onClose={() => setIsCameraOpen(false)}

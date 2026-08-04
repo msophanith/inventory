@@ -1,6 +1,7 @@
 import { useCallback, useState } from 'react';
 import { Camera, FileText } from 'lucide-react';
 import FormInput from './form-input';
+import { ProductNameInput } from './product-name-input';
 import { useHardwareScanner } from '../../../sell/hooks/use-hardware-scanner';
 import { PosCameraScannerModal } from '../../../sell/components/pos-camera-scanner-modal';
 import { playScanSound } from '../../../sell/utils/scan-sound';
@@ -10,10 +11,11 @@ import type { ProductFormValues } from '../../schema/product.schema';
 interface Props {
   readonly register: any;
   readonly setValue?: UseFormSetValue<ProductFormValues>;
+  readonly watchName?: string;
   readonly errors: any;
 }
 
-const ProductBasicInfo = ({ register, setValue, errors }: Props) => {
+const ProductBasicInfo = ({ register, setValue, watchName, errors }: Props) => {
   const [isCameraScanOpen, setIsCameraScanOpen] = useState(false);
 
   const handleBarcodeScanned = useCallback(
@@ -41,7 +43,9 @@ const ProductBasicInfo = ({ register, setValue, errors }: Props) => {
         <div className='flex h-8 w-8 items-center justify-center rounded-xl bg-indigo-50 text-indigo-600'>
           <FileText size={18} />
         </div>
-        <h2 className='font-bold text-slate-900 text-base'>Basic Information</h2>
+        <h2 className='font-bold text-slate-900 text-base'>
+          Basic Information
+        </h2>
       </div>
 
       <FormInput
@@ -69,13 +73,15 @@ const ProductBasicInfo = ({ register, setValue, errors }: Props) => {
             </button>
           }
         />
-        <FormInput
-          label='Product Name'
-          name='name'
+
+        {/* Product Name with Live Auto-Suggestions */}
+        <ProductNameInput
           register={register}
+          setValue={setValue}
+          watchName={watchName}
           error={errors.name?.message}
-          required
         />
+
         <FormInput
           label='Category'
           name='category'

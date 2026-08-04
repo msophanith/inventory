@@ -2,8 +2,10 @@ import { useMemo, useState } from 'react';
 import ProductTable from '../features/product/components/product-table';
 import type { StockFilterType } from '../features/product/components/product-table-header';
 import { useProduct } from '../features/product/hooks/use-product';
+import { exportAllProductsToCsv } from '../features/product/utils/product-csv-export';
 import { useDebounce } from '../hooks/use-debounce';
 import { useNavigate } from 'react-router-dom';
+import Toast from '../components/ui/alert';
 import { PageContainer } from '../components/layout/page-container';
 
 const ProductPage = () => {
@@ -11,6 +13,12 @@ const ProductPage = () => {
   const navigate = useNavigate();
 
   const [stockFilter, setStockFilter] = useState<StockFilterType>('ALL');
+  const [isExporting, setIsExporting] = useState(false);
+  const [toast, setToast] = useState<{
+    type: 'success' | 'error';
+    message: string;
+  } | null>(null);
+
   const [pagination, setPagination] = useState({
     pageIndex: 0,
     pageSize: 20,
@@ -18,7 +26,6 @@ const ProductPage = () => {
 
   const debouncedSearch = useDebounce(search);
 
-  // Reset to Page 1 whenever stock filter or search query changes via event handlers
   const handleStockFilterChange = (filter: StockFilterType) => {
     setStockFilter(filter);
     setPagination((prev) => ({ ...prev, pageIndex: 0 }));
@@ -61,8 +68,35 @@ const ProductPage = () => {
     return filteredProducts.slice(start, start + pagination.pageSize);
   }, [filteredProducts, stockFilter, pagination]);
 
+  const handleExportCsv = async () => {
+    try {
+      setIsExporting(true);
+      await exportAllProductsToCsv();
+      setToast({
+        type: 'success',
+        message: 'Product catalog CSV exported successfully!',
+      });
+    } catch (err) {
+      console.error('Export error:', err);
+      setToast({
+        type: 'error',
+        message: 'Failed to export products CSV',
+      });
+    } finally {
+      setIsExporting(false);
+    }
+  };
+
   return (
     <PageContainer>
+      {toast && (
+        <Toast
+          type={toast.type}
+          message={toast.message}
+          onClose={() => setToast(null)}
+        />
+      )}
+
       <ProductTable
         products={pagedProducts}
         loading={isLoading}
@@ -75,6 +109,8 @@ const ProductPage = () => {
         onSearchChange={handleSearch}
         onRowClick={(productId) => navigate(`/products/${productId}`)}
         onAddProduct={() => navigate('/products/create')}
+        onExportCsv={handleExportCsv}
+        isExporting={isExporting}
       />
     </PageContainer>
   );

@@ -15,7 +15,7 @@ import {
   PosReceiptModal,
 } from '../features/sell/components';
 import { PosHeaderBanner } from '../features/sell/components/pos-header-banner';
-import Alert from '../components/ui/alert';
+import Toast from '../components/ui/alert';
 import { PageContainer } from '../components/layout/page-container';
 
 const SellPage = () => {
@@ -102,9 +102,7 @@ const SellPage = () => {
   return (
     <PageContainer className='space-y-5 pb-24 lg:pb-0'>
       {alert && (
-        <div className='fixed top-4 right-4 z-50 max-w-sm'>
-          <Alert type={alert.type} message={alert.message} onClose={() => setAlert(null)} />
-        </div>
+        <Toast type={alert.type} message={alert.message} onClose={() => setAlert(null)} />
       )}
 
       <PosHeaderBanner onOpenScanModal={() => setIsCameraScanOpen(true)} />

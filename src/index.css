@@ -1,5 +1,32 @@
 @import "tailwindcss";
 
+@font-face {
+  font-family: 'Suwannaphum';
+  src: url('/fonts/Suwannaphum-Regular.ttf') format('truetype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Suwannaphum';
+  src: url('/fonts/Suwannaphum-Bold.ttf') format('truetype');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+@layer base {
+  :root,
+  body,
+  button,
+  input,
+  select,
+  textarea {
+    font-family: 'Inter', 'Suwannaphum', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  }
+}
+
 @keyframes shimmer {
   100% {
     transform: translateX(100%);

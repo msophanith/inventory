@@ -23,6 +23,7 @@ const ProductForm = ({ defaultValues, onSubmit, loading }: Props) => {
     register,
     handleSubmit,
     setValue,
+    watch,
     formState: { errors },
     reset,
   } = useForm<ProductFormValues>({
@@ -37,6 +38,8 @@ const ProductForm = ({ defaultValues, onSubmit, loading }: Props) => {
     },
   });
 
+  const watchName = watch('name');
+
   useEffect(() => {
     if (defaultValues) {
       reset(defaultValues);
@@ -44,10 +47,14 @@ const ProductForm = ({ defaultValues, onSubmit, loading }: Props) => {
   }, [defaultValues, reset]);
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className='space-y-6 min-w-0 w-full'>
+    <form
+      onSubmit={handleSubmit(onSubmit)}
+      className='space-y-6 min-w-0 w-full'
+    >
       <ProductBasicInfo
         register={register}
         setValue={setValue}
+        watchName={watchName}
         errors={errors}
       />
 

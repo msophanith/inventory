@@ -15,7 +15,7 @@ import {
   StockMovementModal,
   type FormValues,
 } from '../features/movement/components';
-import Alert from '../components/ui/alert';
+import { Toast } from '../components/ui/alert';
 import { PageContainer } from '../components/layout/page-container';
 
 const ProductDetailsPage = () => {
@@ -137,7 +137,7 @@ const ProductDetailsPage = () => {
 
       {/* Toast Alert */}
       {alert && (
-        <Alert
+        <Toast
           type={alert.type}
           message={alert.message}
           onClose={() => setAlert(null)}
