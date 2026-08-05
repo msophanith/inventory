@@ -10,25 +10,8 @@ export async function exportTodaySalesToCsv(
 ) {
   const now = new Date();
   const todayStr = format(now, 'yyyy-MM-dd');
-
-  const startOfToday = new Date(
-    now.getFullYear(),
-    now.getMonth(),
-    now.getDate(),
-    0,
-    0,
-    0,
-    0,
-  ).getTime();
-  const endOfToday = new Date(
-    now.getFullYear(),
-    now.getMonth(),
-    now.getDate(),
-    23,
-    59,
-    59,
-    999,
-  ).getTime();
+  const startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 0, 0, 0, 0).getTime();
+  const endOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 23, 59, 59, 999).getTime();
 
   const todayMovements = movements.filter((m) => {
     if (!m.createdAt) return false;
@@ -38,19 +21,16 @@ export async function exportTodaySalesToCsv(
     return time >= startOfToday && time <= endOfToday;
   });
 
-  const productMap = new Map<
-    string,
-    {
-      productName: string;
-      category: string;
-      buyPrice: number;
-      sellPrice: number;
-      unitsSold: number;
-      totalSales: number;
-      totalCost: number;
-      netProfit: number;
-    }
-  >();
+  const productMap = new Map<string, {
+    productName: string;
+    category: string;
+    buyPrice: number;
+    sellPrice: number;
+    unitsSold: number;
+    totalSales: number;
+    totalCost: number;
+    netProfit: number;
+  }>();
 
   let totalSales = 0;
   let totalCost = 0;
@@ -74,10 +54,7 @@ export async function exportTodaySalesToCsv(
       netProfit: 0,
     };
 
-    if (
-      m.type === 'OUT' &&
-      !(m.isDamaged || m.reference?.toLowerCase() === 'damage')
-    ) {
+    if (m.type === 'OUT' && !(m.isDamaged || m.reference?.toLowerCase() === 'damage')) {
       existing.unitsSold += Math.abs(m.quantity || 0);
     }
     existing.totalSales += calc.effectiveSaleAmount;
@@ -107,27 +84,14 @@ export async function exportTodaySalesToCsv(
     ['Today Transactions', orderCount],
     [''],
     ['TODAY PRODUCT SALES BREAKDOWN'],
-    [
-      'Product Name',
-      'Category',
-      'Buy Price ($)',
-      'Sell Price ($)',
-      'Units Sold',
-      'Total Sales ($)',
-      'Total Cost ($)',
-      'Net Profit ($)',
-      'Margin %',
-    ],
+    ['Product Name', 'Category', 'Buy Price ($)', 'Sell Price ($)', 'Units Sold', 'Total Sales ($)', 'Total Cost ($)', 'Net Profit ($)', 'Margin %'],
   ];
 
   let hasProductRows = false;
   Array.from(productMap.values()).forEach((p) => {
     if (p.unitsSold > 0 || p.totalSales !== 0) {
       hasProductRows = true;
-      const margin =
-        p.totalSales > 0
-          ? ((p.netProfit / p.totalSales) * 100).toFixed(2)
-          : '0.00';
+      const margin = p.totalSales > 0 ? ((p.netProfit / p.totalSales) * 100).toFixed(2) : '0.00';
       rows.push([
         `"${(p.productName || '').replace(/"/g, '""')}"`,
         `"${(p.category || '').replace(/"/g, '""')}"`,
@@ -149,10 +113,5 @@ export async function exportTodaySalesToCsv(
   const csvContent = rows.map((r) => r.join(',')).join('\n');
   const filename = `Today_Sales_NetProfit_${todayStr}.csv`;
 
-  await downloadFileWithOptionalPassword(
-    csvContent,
-    filename,
-    'text/csv;charset=utf-8;',
-    password,
-  );
+  await downloadFileWithOptionalPassword(csvContent, filename, 'text/csv;charset=utf-8;', password);
 }

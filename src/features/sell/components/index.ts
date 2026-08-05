@@ -7,3 +7,5 @@ export { PosReceiptModal } from './pos-receipt-modal';
 export { PosCameraScannerModal } from './pos-camera-scanner-modal';
 export { PosMobileCartBar } from './pos-mobile-cart-bar';
 export { PosMobileCartDrawer } from './pos-mobile-cart-drawer';
+export { PosCashPresets } from './pos-cash-presets';
+export { PosOrderHistoryModal } from './pos-order-history-modal';

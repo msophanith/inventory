@@ -1,13 +1,17 @@
 import { useQuery } from '@tanstack/react-query';
-import { DollarSign, Scan, ShoppingBag, Sparkles } from 'lucide-react';
+import { DollarSign, History, Scan, ShoppingBag, Sparkles } from 'lucide-react';
 import { movementService } from '../../../services';
 import { formatCurrencyKhr, formatCurrencyUsd } from '../../../utils/currency';
 
 interface PosHeaderBannerProps {
   onOpenScanModal?: () => void;
+  onOpenReceiptHistory?: () => void;
 }
 
-export function PosHeaderBanner({ onOpenScanModal }: PosHeaderBannerProps = {}) {
+export function PosHeaderBanner({
+  onOpenScanModal,
+  onOpenReceiptHistory,
+}: PosHeaderBannerProps = {}) {
   const { data: todaySummary } = useQuery({
     queryKey: ['today-sales'],
     queryFn: () => movementService.getTodaySale(),
@@ -18,14 +22,13 @@ export function PosHeaderBanner({ onOpenScanModal }: PosHeaderBannerProps = {}) 
   const ordersCount = todaySummary?.totalOrders || 0;
 
   return (
-    <div className='flex flex-wrap items-center justify-between gap-4 rounded-3xl bg-gradient-to-r from-slate-900 via-indigo-950 to-slate-900 p-4 sm:p-5 text-white shadow-xl border border-indigo-500/20'>
-      {/* Title & Live Status */}
+    <div className='flex flex-wrap items-center justify-between gap-4 rounded-3xl bg-linear-to-r from-slate-900 via-indigo-950 to-slate-900 p-4 sm:p-5 text-white shadow-xl border border-indigo-500/20'>
       <div className='flex items-center gap-3'>
         <div className='flex h-11 w-11 items-center justify-center rounded-2xl bg-indigo-500/20 text-indigo-400 border border-indigo-500/30 shadow-inner'>
           <Sparkles size={22} className='animate-pulse' />
         </div>
         <div>
-          <div className='flex items-center gap-2'>
+          <div className='flex flex-wrap items-center gap-2'>
             <h2 className='text-base sm:text-lg font-black tracking-wide'>
               POS Terminal
             </h2>
@@ -41,14 +44,22 @@ export function PosHeaderBanner({ onOpenScanModal }: PosHeaderBannerProps = {}) 
                 <Scan size={12} /> Camera Scan
               </button>
             )}
+            {onOpenReceiptHistory && (
+              <button
+                type='button'
+                onClick={onOpenReceiptHistory}
+                className='flex items-center gap-1 rounded-lg bg-emerald-600/80 hover:bg-emerald-600 border border-emerald-400/30 px-2 py-0.5 text-[11px] font-bold text-white transition cursor-pointer'
+              >
+                <History size={12} /> Receipt History
+              </button>
+            )}
           </div>
-          <p className='text-xs text-slate-300 font-medium'>
+          <p className='text-xs text-slate-300 font-medium mt-0.5'>
             Scan or click products to ring up sales
           </p>
         </div>
       </div>
 
-      {/* Today Sales Stat Pill */}
       <div className='flex items-center gap-4 sm:gap-6 rounded-2xl bg-white/10 px-4 py-2.5 backdrop-blur-md border border-white/10 shadow-inner'>
         <div className='flex items-center gap-2.5'>
           <div className='flex h-8 w-8 items-center justify-center rounded-xl bg-emerald-500/20 text-emerald-400'>

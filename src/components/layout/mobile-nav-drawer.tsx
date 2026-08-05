@@ -1,8 +1,8 @@
-import { ChevronRight, Keyboard, LogOut, X } from 'lucide-react';
-import { NavLink } from 'react-router-dom';
+import { Keyboard, LogOut, X } from 'lucide-react';
 import { useAuth } from '../../features/auth/use-auth';
 import Logo from './logo';
 import type { MenuItem } from './mobile-nav-items';
+import { MobileNavGrid } from './mobile-nav-grid';
 
 interface Props {
   readonly isOpen: boolean;
@@ -21,7 +21,6 @@ export function MobileNavDrawer({
 
   return (
     <>
-      {/* Backdrop Overlay */}
       {isOpen && (
         <div
           className='fixed inset-0 z-40 bg-slate-900/60 backdrop-blur-xs transition-opacity duration-300 lg:hidden'
@@ -29,19 +28,16 @@ export function MobileNavDrawer({
         />
       )}
 
-      {/* Slide-Up Bottom Drawer Sheet */}
       <div
         className={`fixed inset-x-0 bottom-0 z-50 max-h-[88vh] overflow-y-auto rounded-t-3xl border-t border-slate-200/80 bg-white/95 p-5 pb-8 backdrop-blur-2xl shadow-2xl transition-transform duration-300 ease-out lg:hidden space-y-4 ${
           isOpen ? 'translate-y-0' : 'translate-y-full pointer-events-none'
         }`}
       >
-        {/* Pull Handle */}
         <div
           className='w-12 h-1.5 rounded-full bg-slate-300 mx-auto cursor-pointer hover:bg-slate-400 transition'
           onClick={onClose}
         />
 
-        {/* Drawer Header */}
         <div className='flex items-center justify-between border-b border-slate-100 pb-3.5'>
           <div className='flex items-center gap-2.5'>
             <Logo />
@@ -64,55 +60,14 @@ export function MobileNavDrawer({
           </button>
         </div>
 
-        {/* Section Label */}
         <div className='px-0.5'>
           <p className='text-xs font-extrabold uppercase tracking-wider text-slate-400'>
             Navigation Menu
           </p>
         </div>
 
-        {/* Navigation Grid */}
-        <div className='grid grid-cols-2 gap-2.5'>
-          {menus.map((menu) => {
-            const Icon = menu.icon;
-            return (
-              <NavLink
-                key={menu.to}
-                to={menu.to}
-                onClick={onClose}
-                className={({ isActive }) =>
-                  `group relative flex flex-col justify-between rounded-2xl p-3.5 border transition-all duration-200 active:scale-97 ${
-                    isActive
-                      ? 'border-indigo-500/40 bg-indigo-50/70 text-indigo-950 shadow-xs ring-1 ring-indigo-500/20'
-                      : 'border-slate-200/70 bg-slate-50/60 hover:bg-slate-100/80 text-slate-700'
-                  }`
-                }
-              >
-                <div className='flex items-center justify-between mb-2'>
-                  <div
-                    className={`flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br ${menu.badgeColor} text-white shadow-xs`}
-                  >
-                    <Icon size={18} />
-                  </div>
-                  <ChevronRight
-                    size={15}
-                    className='text-slate-300 group-hover:text-slate-500 transition-transform group-hover:translate-x-0.5'
-                  />
-                </div>
-                <div>
-                  <h4 className='font-bold text-xs text-slate-900 leading-snug'>
-                    {menu.label}
-                  </h4>
-                  <p className='text-[10px] text-slate-500 font-medium line-clamp-1 mt-0.5'>
-                    {menu.description}
-                  </p>
-                </div>
-              </NavLink>
-            );
-          })}
-        </div>
+        <MobileNavGrid menus={menus} onClose={onClose} />
 
-        {/* Action Controls & User Card */}
         <div className='pt-1 space-y-2.5'>
           <button
             type='button'

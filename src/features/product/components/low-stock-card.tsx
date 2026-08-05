@@ -1,18 +1,11 @@
 import { AlertTriangle, ArrowUpRight, ChevronRight, Package } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import type { Product } from '../../../services/product';
+import { formatCurrencyKhr, formatCurrencyUsd } from '../../../utils/currency';
 
 interface Props {
   readonly products: Product[];
 }
-
-const formatCurrency = (val: number) =>
-  new Intl.NumberFormat('en-US', {
-    style: 'currency',
-    currency: 'USD',
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 2,
-  }).format(val);
 
 export function LowStockCard({ products }: Props) {
   return (
@@ -79,8 +72,9 @@ export function LowStockCard({ products }: Props) {
                     </span>
                   </td>
 
-                  <td className='px-3 py-2.5 sm:px-4 sm:py-3.5 text-right font-bold text-slate-800 text-xs'>
-                    {formatCurrency(product.sellPrice)}
+                  <td className='px-3 py-2.5 sm:px-4 sm:py-3.5 text-right'>
+                    <span className='block font-black text-slate-900 text-xs'>{formatCurrencyUsd(product.sellPrice)}</span>
+                    <span className='block font-bold text-indigo-600 text-[10px]'>{formatCurrencyKhr(product.sellPrice)}</span>
                   </td>
 
                   <td className='px-3 py-2.5 sm:px-4 sm:py-3.5 text-center'>

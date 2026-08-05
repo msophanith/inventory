@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Edit2, Minus, Plus, Trash2 } from 'lucide-react';
 import type { CartItem } from '../types/sell.types';
+import { formatCurrencyUsd } from '../../../utils/currency';
 
 interface Props {
   readonly item: CartItem;
@@ -10,11 +11,6 @@ interface Props {
   readonly onRemove: (productId: string) => void;
   readonly onStockExceeded?: (productName: string, maxStock: number) => void;
 }
-
-const formatCurrency = (val: number) =>
-  new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(
-    val,
-  );
 
 export function PosCartItem({
   item,
@@ -68,9 +64,7 @@ export function PosCartItem({
   return (
     <div className='flex items-center justify-between gap-2 rounded-2xl border border-slate-100 bg-slate-50/60 p-2.5 transition hover:bg-slate-100/80'>
       <div className='flex-1 min-w-0'>
-        <h4 className='font-bold text-slate-900 text-xs truncate'>
-          {item.product.name}
-        </h4>
+        <h4 className='font-bold text-slate-900 text-xs truncate'>{item.product.name}</h4>
 
         {isEditingPrice ? (
           <div className='flex items-center gap-1 mt-1'>
@@ -85,16 +79,13 @@ export function PosCartItem({
               onKeyDown={(e) => e.key === 'Enter' && handlePriceSubmit()}
               className='w-16 rounded-md border border-emerald-500 bg-white px-1.5 py-0.5 text-xs font-bold text-slate-900 focus:outline-none'
             />
-            <button
-              onClick={handlePriceSubmit}
-              className='text-[10px] font-bold text-emerald-600 cursor-pointer'
-            >
+            <button onClick={handlePriceSubmit} className='text-[10px] font-bold text-emerald-600 cursor-pointer'>
               Save
             </button>
           </div>
         ) : (
           <div className='flex items-center gap-1 text-xs text-slate-500 font-medium'>
-            <span>{formatCurrency(item.unitPrice)} each</span>
+            <span>{formatCurrencyUsd(item.unitPrice)} each</span>
             <button
               onClick={() => setIsEditingPrice(true)}
               title='Custom Price'
@@ -106,7 +97,6 @@ export function PosCartItem({
         )}
       </div>
 
-      {/* Editable Quantity Field with Stepper Buttons */}
       <div className='flex items-center gap-1 rounded-xl bg-white border border-slate-200 p-1 shadow-2xs'>
         <button
           type='button'
@@ -128,19 +118,16 @@ export function PosCartItem({
           type='button'
           onClick={handleIncrement}
           className={`flex h-6 w-6 items-center justify-center rounded-lg transition cursor-pointer ${
-            item.quantity >= maxStock
-              ? 'text-slate-300 hover:bg-rose-50 hover:text-rose-500'
-              : 'text-slate-600 hover:bg-slate-100'
+            item.quantity >= maxStock ? 'text-slate-300 hover:bg-rose-50 hover:text-rose-500' : 'text-slate-600 hover:bg-slate-100'
           }`}
         >
           <Plus size={12} />
         </button>
       </div>
 
-      {/* Subtotal & Delete */}
       <div className='flex items-center gap-1 text-right shrink-0'>
         <span className='font-extrabold text-slate-900 text-xs w-14 truncate'>
-          {formatCurrency(item.totalPrice)}
+          {formatCurrencyUsd(item.totalPrice)}
         </span>
         <button
           type='button'

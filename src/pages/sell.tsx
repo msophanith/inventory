@@ -1,22 +1,16 @@
-import { useCallback, useMemo, useState } from 'react';
+import { useMemo, useState } from 'react';
 import { useProduct } from '../features/product/hooks/use-product';
 import { usePosCart } from '../features/sell/hooks/use-pos-cart';
 import { useCheckout } from '../features/sell/hooks/use-checkout';
+import { useMovement } from '../features/movement/hooks/use-movement';
 import { useHardwareScanner } from '../features/sell/hooks/use-hardware-scanner';
 import { playScanSound } from '../features/sell/utils/scan-sound';
-import { productService } from '../services';
-import {
-  PosCameraScannerModal,
-  PosCartPanel,
-  PosCheckoutModal,
-  PosMobileCartBar,
-  PosMobileCartDrawer,
-  PosProductGrid,
-  PosReceiptModal,
-} from '../features/sell/components';
+import { PosCartPanel, PosMobileCartBar, PosProductGrid } from '../features/sell/components';
 import { PosHeaderBanner } from '../features/sell/components/pos-header-banner';
+import { PosModals } from '../features/sell/components/pos-modals';
 import Toast from '../components/ui/alert';
 import { PageContainer } from '../components/layout/page-container';
+import { useSellPageState } from './hooks/use-sell-page-state';
 
 const SellPage = () => {
   const [search, setSearch] = useState('');
@@ -30,62 +24,29 @@ const SellPage = () => {
   });
   const products = useMemo(() => response?.data || [], [response?.data]);
 
+  const { data: movements = [] } = useMovement();
   const cart = usePosCart();
   const checkout = useCheckout();
-  const [isCameraScanOpen, setIsCameraScanOpen] = useState(false);
-  const [isMobileCartOpen, setIsMobileCartOpen] = useState(false);
-  const [alert, setAlert] = useState<{
-    type: 'success' | 'error';
-    message: string;
-  } | null>(null);
 
-  const handleStockExceeded = useCallback((productName: string, maxStock: number) => {
-    setAlert({
-      type: 'error',
-      message: `Stock limit reached! Only ${maxStock} units of "${productName}" available in stock.`,
-    });
-  }, []);
-
-  const handleBarcodeScanned = useCallback(
-    async (code: string) => {
-      const clean = code.trim().toLowerCase();
-      if (!clean) return;
-
-      let target = products.find(
-        (p) =>
-          p.barcode?.toLowerCase() === clean ||
-          p.id.toLowerCase() === clean ||
-          p.name.toLowerCase() === clean,
-      );
-
-      if (!target) {
-        target = (await productService.getByBarcodeOrSearch(clean)) ?? undefined;
-      }
-
-      if (target) {
-        if (target.quantity <= 0) {
-          setAlert({ type: 'error', message: `"${target.name}" is out of stock!` });
-          return;
-        }
-        playScanSound();
-        cart.addItem(target);
-        setAlert({ type: 'success', message: `Added "${target.name}" to cart` });
-      } else {
-        setAlert({ type: 'error', message: `No product found for barcode: "${code}"` });
-      }
-    },
-    [products, cart],
-  );
+  const {
+    isCameraScanOpen,
+    setIsCameraScanOpen,
+    isMobileCartOpen,
+    setIsMobileCartOpen,
+    isOrderHistoryOpen,
+    setIsOrderHistoryOpen,
+    alert,
+    setAlert,
+    handleStockExceeded,
+    handleBarcodeScanned,
+  } = useSellPageState(products, cart);
 
   useHardwareScanner({
-    enabled: !checkout.isCheckoutOpen && !isCameraScanOpen && !isMobileCartOpen,
+    enabled: !checkout.isCheckoutOpen && !isCameraScanOpen && !isMobileCartOpen && !isOrderHistoryOpen,
     onScan: handleBarcodeScanned,
   });
 
-  const handleConfirmPayment = async (params: {
-    paymentMethod: 'CASH' | 'CARD' | 'QR';
-    amountPaid: number;
-  }) => {
+  const handleConfirmPayment = async (params: { paymentMethod: 'CASH' | 'CARD' | 'QR'; amountPaid: number }) => {
     await checkout.processCheckout({
       items: cart.items,
       subtotal: cart.subtotal,
@@ -101,11 +62,12 @@ const SellPage = () => {
 
   return (
     <PageContainer className='space-y-5 pb-24 lg:pb-0'>
-      {alert && (
-        <Toast type={alert.type} message={alert.message} onClose={() => setAlert(null)} />
-      )}
+      {alert && <Toast type={alert.type} message={alert.message} onClose={() => setAlert(null)} />}
 
-      <PosHeaderBanner onOpenScanModal={() => setIsCameraScanOpen(true)} />
+      <PosHeaderBanner
+        onOpenScanModal={() => setIsCameraScanOpen(true)}
+        onOpenReceiptHistory={() => setIsOrderHistoryOpen(true)}
+      />
 
       <div className='flex flex-col gap-6 lg:flex-row relative'>
         <PosProductGrid
@@ -116,10 +78,7 @@ const SellPage = () => {
           onSearchChange={setSearch}
           selectedCategory={category}
           onCategoryChange={setCategory}
-          onAddToCart={(p) => {
-            playScanSound();
-            cart.addItem(p);
-          }}
+          onAddToCart={(p) => { playScanSound(); cart.addItem(p); }}
           onOpenScanModal={() => setIsCameraScanOpen(true)}
         />
 
@@ -146,14 +105,26 @@ const SellPage = () => {
         onOpenScanModal={() => setIsCameraScanOpen(true)}
       />
 
-      <PosMobileCartDrawer
-        open={isMobileCartOpen}
-        items={cart.items}
+      <PosModals
+        cartItems={cart.items}
         subtotal={cart.subtotal}
         tax={cart.tax}
         totalAmount={cart.totalAmount}
         itemCount={cart.itemCount}
-        onClose={() => setIsMobileCartOpen(false)}
+        movements={movements}
+        isMobileCartOpen={isMobileCartOpen}
+        isCameraScanOpen={isCameraScanOpen}
+        isCheckoutOpen={checkout.isCheckoutOpen}
+        isOrderHistoryOpen={isOrderHistoryOpen}
+        checkoutPending={checkout.isPending}
+        receiptData={checkout.receiptData}
+        onCloseMobileCart={() => setIsMobileCartOpen(false)}
+        onCloseCameraScan={() => setIsCameraScanOpen(false)}
+        onCloseCheckout={() => checkout.setIsCheckoutOpen(false)}
+        onCloseOrderHistory={() => setIsOrderHistoryOpen(false)}
+        onCloseReceipt={() => checkout.setReceiptData(null)}
+        onBarcodeScanned={handleBarcodeScanned}
+        onConfirmPayment={handleConfirmPayment}
         onUpdateQty={cart.updateQuantity}
         onSetExactQty={cart.setExactQuantity}
         onUpdatePrice={cart.updateUnitPrice}
@@ -161,24 +132,7 @@ const SellPage = () => {
         onClearCart={cart.clearCart}
         onCheckout={() => checkout.setIsCheckoutOpen(true)}
         onStockExceeded={handleStockExceeded}
-      />
-
-      <PosCameraScannerModal
-        open={isCameraScanOpen}
-        onClose={() => setIsCameraScanOpen(false)}
-        onDetectedBarcode={handleBarcodeScanned}
-      />
-      <PosCheckoutModal
-        open={checkout.isCheckoutOpen}
-        items={cart.items}
-        total={cart.totalAmount}
-        isPending={checkout.isPending}
-        onClose={() => checkout.setIsCheckoutOpen(false)}
-        onConfirm={handleConfirmPayment}
-      />
-      <PosReceiptModal
-        receipt={checkout.receiptData}
-        onClose={() => checkout.setReceiptData(null)}
+        onOpenReceipt={(receipt) => checkout.setReceiptData(receipt)}
       />
     </PageContainer>
   );

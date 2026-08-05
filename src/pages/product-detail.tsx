@@ -45,21 +45,15 @@ const ProductDetailsPage = () => {
   }
 
   const handleAction = async (actionType: string) => {
-    switch (actionType) {
-      case 'in':
-        setType('IN');
-        setOpen(true);
-        break;
-      case 'out':
-        setType('OUT');
-        setOpen(true);
-        break;
-      case 'return':
-        setType('RETURN');
-        setOpen(true);
-        break;
-      default:
-        break;
+    if (actionType === 'in') {
+      setType('IN');
+      setOpen(true);
+    } else if (actionType === 'out') {
+      setType('OUT');
+      setOpen(true);
+    } else if (actionType === 'return') {
+      setType('RETURN');
+      setOpen(true);
     }
   };
 
@@ -84,46 +78,32 @@ const ProductDetailsPage = () => {
 
   return (
     <PageContainer className='space-y-6'>
-      {/* Back Button */}
       <div>
         <button
           type='button'
           className='inline-flex items-center gap-2 text-xs font-bold text-slate-600 hover:text-slate-900 bg-white border border-slate-200 px-3.5 py-2 rounded-xl shadow-2xs transition cursor-pointer'
           onClick={() => navigate('/products')}
         >
-          <ArrowLeft size={16} />
-          Back to Products
+          <ArrowLeft size={16} /> Back to Products
         </button>
       </div>
 
-      {/* Hero Section */}
       <ProductHero product={product} />
-
-      {/* Quick Actions Bar */}
       <QuickActions
         isLoading={isCreatingMovement}
         onStockIn={() => handleAction('in')}
         onStockOut={() => handleAction('out')}
         onReturn={() => handleAction('return')}
       />
-
-      {/* Statistics Metric Cards */}
       <ProductStats product={product} />
-
-      {/* Stock Level Progress */}
       <StockProgress
         quantity={product.quantity}
         minStock={product.minStock}
         unit={product.unit}
       />
-
-      {/* Audit History */}
       <ProductMovementHistory movements={movements} />
-
-      {/* Full Product Specifications */}
       <ProductInfoCard product={product} />
 
-      {/* Stock Movement Modal */}
       <StockMovementModal
         open={open}
         type={type}
@@ -135,7 +115,6 @@ const ProductDetailsPage = () => {
         }}
       />
 
-      {/* Toast Alert */}
       {alert && (
         <Toast
           type={alert.type}

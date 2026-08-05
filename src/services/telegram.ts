@@ -2,14 +2,11 @@ import type { ReceiptData } from '../features/sell/types/sell.types';
 import { generatePdfInvoiceBlob } from '../features/sell/utils/pdf-generator';
 import type { Movement } from './movement';
 import type { Product } from './product';
-import { formatDateTime } from '../utils/date';
-
-const formatCurrency = (amount: number) =>
-  new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(amount);
-
-function escapeHtml(str: string): string {
-  return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
-}
+import {
+  formatLowStockAlertMessage,
+  formatMovementNotificationMessage,
+  formatSaleNotificationCaption,
+} from './telegram-formatter';
 
 export class TelegramService {
   private get botToken(): string {
@@ -33,8 +30,6 @@ export class TelegramService {
       });
 
       if (!response.ok) {
-        const errText = await response.text();
-        console.error('[TelegramService] sendMessage HTML failed:', errText);
         const fallbackResp = await fetch(`https://api.telegram.org/bot${this.botToken}/sendMessage`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -50,10 +45,7 @@ export class TelegramService {
   }
 
   async sendDocument(fileBlob: Blob, fileName: string, caption?: string): Promise<boolean> {
-    if (!this.botToken || !this.chatId) {
-      console.warn('[TelegramService] VITE_TELEGRAM_BOT_TOKEN or VITE_TELEGRAM_CHAT_ID missing in .env');
-      return false;
-    }
+    if (!this.botToken || !this.chatId) return false;
     try {
       const formData = new FormData();
       formData.append('chat_id', this.chatId);
@@ -69,8 +61,6 @@ export class TelegramService {
       });
 
       if (!response.ok) {
-        const errText = await response.text();
-        console.error('[TelegramService] sendDocument HTML failed:', errText);
         const fallbackForm = new FormData();
         fallbackForm.append('chat_id', this.chatId);
         fallbackForm.append('document', fileBlob, fileName);
@@ -90,42 +80,12 @@ export class TelegramService {
   }
 
   async sendMovementNotification(movement: Movement, product?: Product | null): Promise<boolean> {
-    const isDamaged = Boolean(movement.isDamaged || movement.reference?.toLowerCase() === 'damage');
-    let typeEmoji = '📦';
-    if (movement.type === 'IN') typeEmoji = '📥';
-    else if (movement.type === 'OUT') typeEmoji = isDamaged ? '⚠️' : '📤';
-    else if (movement.type === 'RETURN') typeEmoji = '🔄';
-
-    const name = product?.name || movement.product?.name || `Product #${movement.productId}`;
-    const qty = Math.abs(movement.quantity || 0);
-    const unitPrice = movement.unitPrice ?? product?.sellPrice ?? 0;
-
-    const message = [
-      `${typeEmoji} <b>Stock Movement (${escapeHtml(movement.type)})</b>`,
-      `<b>Product:</b> ${escapeHtml(name)}`,
-      `<b>Qty:</b> ${qty} ${escapeHtml(product?.unit || 'units')}`,
-      `<b>Total Value:</b> ${formatCurrency(qty * unitPrice)}${isDamaged ? ' (🚨 Damaged)' : ''}`,
-      `<b>Date:</b> ${formatDateTime(movement.createdAt)}`,
-    ].join('\n');
-
+    const message = formatMovementNotificationMessage(movement, product);
     return this.sendMessage(message);
   }
 
   async sendSaleNotification(receipt: ReceiptData): Promise<boolean> {
-    const itemsFormatted = receipt.items
-      .map((i) => `• <b>${i.quantity}x</b> ${escapeHtml(i.product.name)} = <b>${formatCurrency(i.quantity * i.unitPrice)}</b>`)
-      .join('\n');
-
-    const caption = [
-      `🛍️ <b>Sale Completed (#${escapeHtml(receipt.orderId)})</b>`,
-      '----------------------------------',
-      itemsFormatted,
-      '----------------------------------',
-      `<b>Grand Total:</b> ${formatCurrency(receipt.total)} (${escapeHtml(receipt.paymentMethod.toUpperCase())})`,
-      `<b>Cashier:</b> ${escapeHtml(receipt.soldBy || 'Admin')}`,
-      `<b>Date:</b> ${formatDateTime(receipt.createdAt)}`,
-      '📄 <i>PDF Invoice Attached Below</i>',
-    ].join('\n');
+    const caption = formatSaleNotificationCaption(receipt);
 
     try {
       const pdfBlob = await generatePdfInvoiceBlob(receipt);
@@ -140,18 +100,7 @@ export class TelegramService {
   }
 
   async sendLowStockAlert(product: Product): Promise<boolean> {
-    const isOut = product.quantity <= 0;
-    const header = isOut ? '🚨 <b>CRITICAL: OUT OF STOCK ALERT</b>' : '⚠️ <b>WARNING: LOW STOCK ALERT</b>';
-    const message = [
-      header,
-      `<b>Product:</b> ${escapeHtml(product.name)}`,
-      `<b>Category:</b> ${escapeHtml(product.category)}`,
-      `<b>Current Stock:</b> <code>${product.quantity} ${escapeHtml(product.unit)}</code>`,
-      `<b>Min Required Stock:</b> <code>${product.minStock} ${escapeHtml(product.unit)}</code>`,
-      `<b>Status:</b> ${isOut ? '❌ Item is completely out of stock!' : '📉 Stock is running critically low!'}`,
-      '<i>Please restock this product as soon as possible.</i>',
-    ].join('\n');
-
+    const message = formatLowStockAlertMessage(product);
     return this.sendMessage(message);
   }
 }
