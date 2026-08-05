@@ -22,14 +22,17 @@ const LoginPage = () => {
   if (user) return <Navigate to='/' replace />;
 
   return (
-    <div className='relative flex min-h-screen items-center justify-center overflow-hidden bg-indigo-950 px-4'>
-      {/* Decorative blobs */}
-      <div className='pointer-events-none absolute -left-40 -top-40 h-96 w-96 rounded-full bg-indigo-600/30 blur-3xl' />
-      <div className='pointer-events-none absolute -bottom-40 -right-40 h-96 w-96 rounded-full bg-blue-600/30 blur-3xl' />
-      <div className='pointer-events-none absolute left-1/2 top-1/3 h-64 w-64 -translate-x-1/2 rounded-full bg-purple-600/20 blur-3xl' />
+    <div className='relative flex min-h-screen items-center justify-center overflow-hidden bg-slate-50 px-4 py-12 selection:bg-indigo-600 selection:text-white'>
+      {/* Subtle Background Lighting & Mesh Accents */}
+      <div className='pointer-events-none absolute -left-40 -top-40 h-125 w-125 rounded-full bg-linear-to-tr from-indigo-200/40 via-blue-200/30 to-transparent blur-[100px]' />
+      <div className='pointer-events-none absolute -bottom-40 -right-40 h-125 w-125 rounded-full bg-linear-to-br from-purple-200/40 via-indigo-100/50 to-transparent blur-[100px]' />
+
+      {/* Soft Grid Background Overlay */}
+      <div className='pointer-events-none absolute inset-0 bg-[linear-gradient(to_right,#e2e8f080_1px,transparent_1px),linear-gradient(to_bottom,#e2e8f080_1px,transparent_1px)] bg-size-[3rem_3rem]' />
 
       <div className='relative z-10 w-full max-w-md'>
-        <div className='rounded-3xl border border-white/10 bg-white/5 p-8 shadow-2xl backdrop-blur-2xl'>
+        {/* Main Clean Card */}
+        <div className='rounded-3xl border border-slate-200/80 bg-white p-6 sm:p-8 shadow-xl shadow-slate-200/60 backdrop-blur-xl transition-all duration-300 hover:shadow-2xl hover:shadow-indigo-500/10'>
           <LoginBrand />
           <LoginAlerts serverError={serverError} />
           <LoginForm

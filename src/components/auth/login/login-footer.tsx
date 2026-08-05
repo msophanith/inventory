@@ -1,7 +1,12 @@
+import { Sparkles } from 'lucide-react';
+
 export function LoginFooter() {
   return (
-    <p className='mt-6 text-center text-xs text-indigo-400/60'>
-      © {new Date().getFullYear()} Inventory App · All rights reserved
-    </p>
+    <div className='mt-8 text-center space-y-2'>
+      <p className='text-xs font-semibold text-slate-500 flex items-center justify-center gap-1.5'>
+        <Sparkles size={14} className='text-amber-500' />
+        មានលាភ Stock Controller · {new Date().getFullYear()}
+      </p>
+    </div>
   );
 }
