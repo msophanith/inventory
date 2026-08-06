@@ -40,9 +40,15 @@ export function renderInvoiceTotals(doc: jsPDF, receipt: ReceiptData, startY: nu
   y += 5;
 
   doc.setFont(fontName, 'normal');
-  if (receipt.subtotal !== receipt.total) {
+  if (receipt.subtotal !== receipt.total || receipt.discount > 0) {
     drawText(doc, 'Subtotal:', 45, y, { align: 'right' });
     drawText(doc, formatCurrencyUsd(receipt.subtotal), 75, y, { align: 'right' });
+    y += 4;
+  }
+
+  if (receipt.discount > 0) {
+    drawText(doc, 'Discount:', 45, y, { align: 'right' });
+    drawText(doc, `-${formatCurrencyUsd(receipt.discount)}`, 75, y, { align: 'right' });
     y += 4;
   }
 
@@ -75,3 +81,4 @@ export function renderInvoiceTotals(doc: jsPDF, receipt: ReceiptData, startY: nu
 
   return y;
 }
+

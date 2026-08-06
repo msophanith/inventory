@@ -1,12 +1,14 @@
-import { CreditCard, FileText } from 'lucide-react';
+import { CreditCard, FileText, Tag } from 'lucide-react';
 import { formatCurrencyKhr, formatCurrencyUsd } from '../../../utils/currency';
 
 interface Props {
   readonly subtotal: number;
   readonly tax: number;
+  readonly discount?: number;
   readonly totalAmount: number;
   readonly hasItems: boolean;
   readonly isGeneratingPdf: boolean;
+  readonly onOpenDiscount?: () => void;
   readonly onPreviewPdf: () => void;
   readonly onCheckout: () => void;
 }
@@ -14,27 +16,61 @@ interface Props {
 export function PosCartFooter({
   subtotal,
   tax,
+  discount = 0,
   totalAmount,
   hasItems,
   isGeneratingPdf,
+  onOpenDiscount,
   onPreviewPdf,
   onCheckout,
 }: Props) {
   return (
     <div className='border-t border-slate-100 pt-4 space-y-3'>
       <div className='space-y-1.5 text-xs text-slate-600 font-medium'>
-        <div className='flex justify-between'>
+        <div className='flex justify-between items-center'>
           <span>Subtotal</span>
-          <span>{formatCurrencyUsd(subtotal)}</span>
+          <div className='flex items-center gap-2'>
+            <span>{formatCurrencyUsd(subtotal)}</span>
+            {onOpenDiscount && (
+              <button
+                type='button'
+                onClick={onOpenDiscount}
+                disabled={!hasItems}
+                className={`flex items-center gap-1 rounded-full px-2 py-0.5 text-[11px] font-extrabold transition cursor-pointer ${
+                  discount > 0
+                    ? 'bg-emerald-100 text-emerald-700 border border-emerald-300'
+                    : 'bg-indigo-50 text-indigo-600 border border-indigo-200 hover:bg-indigo-100'
+                } disabled:opacity-40`}
+              >
+                <Tag size={11} />
+                <span>
+                  {discount > 0
+                    ? `-${formatCurrencyUsd(discount)}`
+                    : 'Discount'}
+                </span>
+              </button>
+            )}
+          </div>
         </div>
+
+        {discount > 0 && (
+          <div className='flex justify-between text-emerald-600 font-bold'>
+            <span>Discount Applied</span>
+            <span>-{formatCurrencyUsd(discount)}</span>
+          </div>
+        )}
+
         {tax > 0 && (
           <div className='flex justify-between'>
             <span>Tax</span>
             <span>{formatCurrencyUsd(tax)}</span>
           </div>
         )}
+
         <div className='flex justify-between items-baseline pt-2 border-t border-slate-100'>
-          <span className='font-bold text-slate-900 text-sm'>Total Payable</span>
+          <span className='font-bold text-slate-900 text-sm'>
+            Total Payable
+          </span>
           <div className='text-right'>
             <span className='text-lg font-black text-emerald-600 block leading-tight'>
               {formatCurrencyUsd(totalAmount)}
@@ -48,6 +84,7 @@ export function PosCartFooter({
 
       <div className='flex gap-2'>
         <button
+          type='button'
           disabled={!hasItems || isGeneratingPdf}
           onClick={onPreviewPdf}
           title='Preview PDF Invoice'
@@ -58,6 +95,7 @@ export function PosCartFooter({
         </button>
 
         <button
+          type='button'
           disabled={!hasItems}
           onClick={onCheckout}
           className='flex-1 flex items-center justify-center gap-2 rounded-2xl bg-linear-to-r from-emerald-600 to-teal-600 py-3.5 text-sm font-extrabold text-white shadow-lg shadow-emerald-600/20 transition hover:from-emerald-700 hover:to-teal-700 disabled:opacity-50 cursor-pointer active:scale-98'

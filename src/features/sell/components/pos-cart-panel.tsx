@@ -9,8 +9,10 @@ interface Props {
   readonly items: CartItem[];
   readonly subtotal: number;
   readonly tax: number;
+  readonly discount?: number;
   readonly totalAmount: number;
   readonly itemCount: number;
+  readonly onOpenDiscount?: () => void;
   readonly onUpdateQty: (productId: string, delta: number) => void;
   readonly onSetExactQty?: (productId: string, exactQty: number) => void;
   readonly onUpdatePrice: (productId: string, newPrice: number) => void;
@@ -24,8 +26,10 @@ export function PosCartPanel({
   items,
   subtotal,
   tax,
+  discount = 0,
   totalAmount,
   itemCount,
+  onOpenDiscount,
   onUpdateQty,
   onSetExactQty,
   onUpdatePrice,
@@ -52,7 +56,7 @@ export function PosCartPanel({
         })),
         subtotal,
         tax,
-        discount: 0,
+        discount,
         total: totalAmount,
         amountPaid: totalAmount,
         change: 0,
@@ -121,12 +125,15 @@ export function PosCartPanel({
       <PosCartFooter
         subtotal={subtotal}
         tax={tax}
+        discount={discount}
         totalAmount={totalAmount}
         hasItems={items.length > 0}
         isGeneratingPdf={isGeneratingPdf}
+        onOpenDiscount={onOpenDiscount}
         onPreviewPdf={handlePreviewPdf}
         onCheckout={onCheckout}
       />
     </div>
   );
 }
+

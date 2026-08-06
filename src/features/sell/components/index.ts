@@ -9,3 +9,5 @@ export { PosMobileCartBar } from './pos-mobile-cart-bar';
 export { PosMobileCartDrawer } from './pos-mobile-cart-drawer';
 export { PosCashPresets } from './pos-cash-presets';
 export { PosOrderHistoryModal } from './pos-order-history-modal';
+export { PosDiscountModal } from './pos-discount-modal';
+

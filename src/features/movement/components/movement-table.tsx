@@ -81,7 +81,7 @@ const MovementTable = ({ movements, isLoading }: Props) => {
       {/* Header */}
       <div>
         <h1 className='text-2xl font-bold text-slate-900 tracking-tight'>
-          Stock Movement History
+          History
         </h1>
         <p className='text-sm text-slate-500'>
           Track inventory restocks, sales transactions, customer returns, and

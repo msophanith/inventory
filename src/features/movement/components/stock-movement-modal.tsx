@@ -44,8 +44,8 @@ export default function StockMovementModal({
 
   return (
     <div
-      className='fixed inset-0 z-[100] flex items-end sm:items-center justify-center bg-slate-900/70 p-0 sm:p-4 backdrop-blur-xs animate-in fade-in duration-200'
       onClick={onClose}
+      className='fixed inset-0 z-100 flex items-end sm:items-center justify-center bg-slate-900/70 p-0 sm:p-4 backdrop-blur-xs animate-in fade-in duration-200'
     >
       <div
         className='relative w-full max-w-lg max-h-[90vh] sm:max-h-[85vh] overflow-hidden rounded-t-3xl sm:rounded-3xl bg-white shadow-2xl animate-in slide-in-from-bottom sm:zoom-in-95 duration-200 flex flex-col'

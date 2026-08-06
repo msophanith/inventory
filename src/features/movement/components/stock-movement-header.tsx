@@ -41,7 +41,7 @@ export default function StockMovementHeader({ type, product }: Props) {
 
   return (
     <div
-      className={`bg-gradient-to-br ${item.color} p-4 sm:p-6 text-white shadow-xs`}
+      className={`bg-linear-to-br ${item.color} p-4 sm:p-6 text-white shadow-xs`}
     >
       <div className='flex items-center gap-3 sm:gap-4 pr-10'>
         <div className='flex h-10 w-10 sm:h-12 sm:w-12 items-center justify-center rounded-2xl bg-white/20 p-2.5 backdrop-blur-md shrink-0 shadow-inner'>

@@ -7,7 +7,7 @@ export interface CartItem {
   totalPrice: number;
 }
 
-export type PaymentMethod = 'CASH' | 'CARD' | 'QR';
+export type PaymentMethod = 'CASH' | 'QR';
 
 export interface ReceiptData {
   orderId: string;

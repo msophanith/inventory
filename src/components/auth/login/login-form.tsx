@@ -109,7 +109,10 @@ export function LoginForm({
         {formState.isSubmitting ? (
           <Loader2 size={18} className='animate-spin' />
         ) : (
-          <LogIn size={18} className='transition-transform group-hover:translate-x-0.5' />
+          <LogIn
+            size={18}
+            className='transition-transform group-hover:translate-x-0.5'
+          />
         )}
         {formState.isSubmitting ? 'Authenticating…' : 'Sign In to Dashboard'}
       </button>

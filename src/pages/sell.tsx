@@ -5,7 +5,7 @@ import { useCheckout } from '../features/sell/hooks/use-checkout';
 import { useMovement } from '../features/movement/hooks/use-movement';
 import { useHardwareScanner } from '../features/sell/hooks/use-hardware-scanner';
 import { playScanSound } from '../features/sell/utils/scan-sound';
-import { PosCartPanel, PosMobileCartBar, PosProductGrid } from '../features/sell/components';
+import { PosCartPanel, PosDiscountModal, PosMobileCartBar, PosProductGrid } from '../features/sell/components';
 import { PosHeaderBanner } from '../features/sell/components/pos-header-banner';
 import { PosModals } from '../features/sell/components/pos-modals';
 import Toast from '../components/ui/alert';
@@ -15,34 +15,22 @@ import { useSellPageState } from './hooks/use-sell-page-state';
 const SellPage = () => {
   const [search, setSearch] = useState('');
   const [category, setCategory] = useState('ALL');
+  const [isDiscountOpen, setIsDiscountOpen] = useState(false);
+  const [discount, setDiscount] = useState<{ type: 'PERCENT' | 'FIXED'; value: number; amount: number }>({ type: 'PERCENT', value: 0, amount: 0 });
 
   const { useGetProducts } = useProduct(false);
-  const { data: response, isLoading: productsLoading } = useGetProducts({
-    search,
-    category: category === 'ALL' ? '' : category,
-    limit: 100,
-  });
+  const { data: response, isLoading: productsLoading } = useGetProducts({ search, category: category === 'ALL' ? '' : category, limit: 100 });
   const products = useMemo(() => response?.data || [], [response?.data]);
 
   const { data: movements = [] } = useMovement();
   const cart = usePosCart();
   const checkout = useCheckout();
+  const finalTotal = Math.max(0, cart.subtotal + cart.tax - discount.amount);
 
-  const {
-    isCameraScanOpen,
-    setIsCameraScanOpen,
-    isMobileCartOpen,
-    setIsMobileCartOpen,
-    isOrderHistoryOpen,
-    setIsOrderHistoryOpen,
-    alert,
-    setAlert,
-    handleStockExceeded,
-    handleBarcodeScanned,
-  } = useSellPageState(products, cart);
+  const { isCameraScanOpen, setIsCameraScanOpen, isMobileCartOpen, setIsMobileCartOpen, isOrderHistoryOpen, setIsOrderHistoryOpen, alert, setAlert, handleStockExceeded, handleBarcodeScanned } = useSellPageState(products, cart);
 
   useHardwareScanner({
-    enabled: !checkout.isCheckoutOpen && !isCameraScanOpen && !isMobileCartOpen && !isOrderHistoryOpen,
+    enabled: !checkout.isCheckoutOpen && !isCameraScanOpen && !isMobileCartOpen && !isOrderHistoryOpen && !isDiscountOpen,
     onScan: handleBarcodeScanned,
   });
 
@@ -51,12 +39,13 @@ const SellPage = () => {
       items: cart.items,
       subtotal: cart.subtotal,
       tax: cart.tax,
-      discount: 0,
-      total: cart.totalAmount,
+      discount: discount.amount,
+      total: finalTotal,
       amountPaid: params.amountPaid,
       paymentMethod: params.paymentMethod,
     });
     cart.clearCart();
+    setDiscount({ type: 'PERCENT', value: 0, amount: 0 });
     setIsMobileCartOpen(false);
   };
 
@@ -86,13 +75,15 @@ const SellPage = () => {
           items={cart.items}
           subtotal={cart.subtotal}
           tax={cart.tax}
-          totalAmount={cart.totalAmount}
+          discount={discount.amount}
+          totalAmount={finalTotal}
           itemCount={cart.itemCount}
+          onOpenDiscount={() => setIsDiscountOpen(true)}
           onUpdateQty={cart.updateQuantity}
           onSetExactQty={cart.setExactQuantity}
           onUpdatePrice={cart.updateUnitPrice}
           onRemoveItem={cart.removeItem}
-          onClearCart={cart.clearCart}
+          onClearCart={() => { cart.clearCart(); setDiscount({ type: 'PERCENT', value: 0, amount: 0 }); }}
           onCheckout={() => checkout.setIsCheckoutOpen(true)}
           onStockExceeded={handleStockExceeded}
         />
@@ -100,16 +91,23 @@ const SellPage = () => {
 
       <PosMobileCartBar
         itemCount={cart.itemCount}
-        totalAmount={cart.totalAmount}
+        totalAmount={finalTotal}
         onOpenCartDrawer={() => setIsMobileCartOpen(true)}
         onOpenScanModal={() => setIsCameraScanOpen(true)}
+      />
+
+      <PosDiscountModal
+        open={isDiscountOpen}
+        subtotal={cart.subtotal}
+        onClose={() => setIsDiscountOpen(false)}
+        onApplyDiscount={setDiscount}
       />
 
       <PosModals
         cartItems={cart.items}
         subtotal={cart.subtotal}
         tax={cart.tax}
-        totalAmount={cart.totalAmount}
+        totalAmount={finalTotal}
         itemCount={cart.itemCount}
         movements={movements}
         isMobileCartOpen={isMobileCartOpen}
@@ -129,7 +127,7 @@ const SellPage = () => {
         onSetExactQty={cart.setExactQuantity}
         onUpdatePrice={cart.updateUnitPrice}
         onRemoveItem={cart.removeItem}
-        onClearCart={cart.clearCart}
+        onClearCart={() => { cart.clearCart(); setDiscount({ type: 'PERCENT', value: 0, amount: 0 }); }}
         onCheckout={() => checkout.setIsCheckoutOpen(true)}
         onStockExceeded={handleStockExceeded}
         onOpenReceipt={(receipt) => checkout.setReceiptData(receipt)}
@@ -139,3 +137,5 @@ const SellPage = () => {
 };
 
 export { SellPage };
+
+
