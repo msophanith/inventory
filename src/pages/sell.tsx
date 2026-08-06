@@ -11,6 +11,7 @@ import { PosModals } from '../features/sell/components/pos-modals';
 import Toast from '../components/ui/alert';
 import { PageContainer } from '../components/layout/page-container';
 import { useSellPageState } from './hooks/use-sell-page-state';
+import type { PaymentMethod } from '../features/sell/types/sell.types';
 
 const SellPage = () => {
   const [search, setSearch] = useState('');
@@ -34,7 +35,7 @@ const SellPage = () => {
     onScan: handleBarcodeScanned,
   });
 
-  const handleConfirmPayment = async (params: { paymentMethod: 'CASH' | 'CARD' | 'QR'; amountPaid: number }) => {
+  const handleConfirmPayment = async (params: { paymentMethod: PaymentMethod; amountPaid: number }) => {
     await checkout.processCheckout({
       items: cart.items,
       subtotal: cart.subtotal,
