@@ -1,6 +1,7 @@
 import { Package, Plus } from 'lucide-react';
 import type { Product } from '../../../services/product';
 import { formatCurrencyKhr, formatCurrencyUsd } from '../../../utils/currency';
+import { useLanguage } from '../../../i18n/language-context';
 
 interface Props {
   readonly product: Product;
@@ -9,6 +10,7 @@ interface Props {
 }
 
 export function PosProductCard({ product, cartQuantity, onAddToCart }: Props) {
+  const { t } = useLanguage();
   const isOutOfStock = product.quantity <= 0;
   const remainingStock = product.quantity - cartQuantity;
 
@@ -52,7 +54,7 @@ export function PosProductCard({ product, cartQuantity, onAddToCart }: Props) {
         <span
           className={`absolute top-2 right-2 rounded-full px-2.5 py-0.5 text-[10px] font-black uppercase tracking-wider ${stockBadgeStyle}`}
         >
-          {isDisabled ? 'Out of Stock' : `${remainingStock} left`}
+          {isDisabled ? t('products.outOfStock') : t('pos.lowStock', { qty: remainingStock })}
         </span>
 
         {/* Cart Count Pill */}
@@ -66,7 +68,7 @@ export function PosProductCard({ product, cartQuantity, onAddToCart }: Props) {
       {/* Product Name & Dual Pricing */}
       <div className='mt-3 space-y-1'>
         <p className='text-[10px] font-extrabold text-slate-400 uppercase tracking-widest truncate'>
-          {product.category || 'General'}
+          {product.category || t('common.all')}
         </p>
         <h3 className='font-extrabold text-slate-900 line-clamp-1 text-xs leading-snug group-hover:text-indigo-600 transition-colors'>
           {product.name}

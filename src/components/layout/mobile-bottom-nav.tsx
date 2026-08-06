@@ -4,21 +4,23 @@ import { NavLink, useLocation } from 'react-router-dom';
 import { useAuth } from '../../features/auth/use-auth';
 import { ShortcutsModal } from './shortcuts-modal';
 import { MobileNavDrawer } from './mobile-nav-drawer';
-import { bottomBarMenus, drawerMenus } from './mobile-nav-items';
+import { getBottomBarMenus, getDrawerMenus } from './mobile-nav-items';
 import { useMobileNavScroll } from './use-mobile-nav-scroll';
+import { useLanguage } from '../../i18n/language-context';
 
 export default function MobileBottomNav() {
   const { isAdmin } = useAuth();
+  const { t } = useLanguage();
   const location = useLocation();
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [isShortcutsModalOpen, setIsShortcutsModalOpen] = useState(false);
 
   const isVisible = useMobileNavScroll(isDrawerOpen);
 
-  const visibleBottomMenus = bottomBarMenus.filter(
+  const visibleBottomMenus = getBottomBarMenus(t).filter(
     (m) => isAdmin || !m.adminOnly,
   );
-  const visibleDrawerMenus = drawerMenus.filter((m) => isAdmin || !m.adminOnly);
+  const visibleDrawerMenus = getDrawerMenus(t).filter((m) => isAdmin || !m.adminOnly);
 
   const [prevPathname, setPrevPathname] = useState(location.pathname);
   if (prevPathname !== location.pathname) {

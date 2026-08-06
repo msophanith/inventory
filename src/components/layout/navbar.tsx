@@ -4,10 +4,13 @@ import { useAuth } from '../../features/auth/use-auth';
 import Logo from './logo';
 import { NotificationBell } from './notification-bell';
 import { KhrRateSelector } from './khr-rate-selector';
+import { LanguageSelector } from './language-selector';
 import { SignoutModal } from './signout-modal';
+import { useLanguage } from '../../i18n/language-context';
 
 export default function Navbar() {
   const { user, signOut, isAdmin, role } = useAuth();
+  const { t } = useLanguage();
   const [showConfirmModal, setShowConfirmModal] = useState(false);
   const [isLoggingOut, setIsLoggingOut] = useState(false);
 
@@ -44,14 +47,16 @@ export default function Navbar() {
               <span className='absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75' />
               <span className='relative inline-flex h-2 w-2 rounded-full bg-emerald-500' />
             </span>
-            <span>System Online</span>
+            <span>{t('common.systemOnline')}</span>
           </div>
 
+          <LanguageSelector />
           <KhrRateSelector />
         </div>
 
         <div className='flex items-center gap-1.5 sm:gap-3 lg:gap-4 shrink-0'>
-          <div className='lg:hidden shrink-0'>
+          <div className='lg:hidden flex items-center gap-1.5 shrink-0'>
+            <LanguageSelector />
             <KhrRateSelector />
           </div>
 
@@ -67,18 +72,18 @@ export default function Navbar() {
 
             <div className='hidden flex-col lg:flex'>
               <span className='max-w-44 truncate text-xs font-bold text-slate-900 leading-snug'>
-                {user?.email ?? 'User Account'}
+                {user?.email ?? t('common.userAccount')}
               </span>
               <span className='flex items-center gap-1 text-[10px] font-bold uppercase tracking-wider text-slate-500'>
                 {isAdmin ? (
                   <>
                     <ShieldCheck size={11} className='text-indigo-500' />
-                    Admin Manager
+                    {t('common.adminManager')}
                   </>
                 ) : (
                   <>
                     <User size={11} className='text-emerald-500' />
-                    POS Cashier
+                    {t('common.posCashier')}
                   </>
                 )}
               </span>
@@ -89,11 +94,11 @@ export default function Navbar() {
             id='btn-sign-out'
             type='button'
             onClick={() => setShowConfirmModal(true)}
-            title='Sign out'
+            title={t('common.signOut')}
             className='group flex items-center justify-center gap-1.5 rounded-xl border border-slate-200/80 bg-white p-2 sm:px-3.5 sm:py-2 text-xs font-bold text-slate-700 shadow-2xs transition-all duration-200 hover:border-rose-200 hover:bg-rose-50 hover:text-rose-600 hover:shadow-xs cursor-pointer active:scale-95 shrink-0'
           >
             <LogOut size={16} className='transition-transform duration-200 group-hover:-translate-x-0.5 text-slate-500 group-hover:text-rose-600' />
-            <span className='hidden sm:inline'>Sign out</span>
+            <span className='hidden sm:inline'>{t('common.signOut')}</span>
           </button>
         </div>
       </header>

@@ -3,6 +3,7 @@ import type { Movement, MovementType } from '../../../services/movement';
 import { MovementTableFilter } from './movement-table-filter';
 import { MovementTablePagination } from './movement-table-pagination';
 import { MovementTableRow } from './movement-table-row';
+import { useLanguage } from '../../../i18n/language-context';
 
 interface Props {
   readonly movements: Movement[];
@@ -12,6 +13,7 @@ interface Props {
 const PAGE_SIZE_OPTIONS = [10, 20, 50];
 
 const MovementTable = ({ movements, isLoading }: Props) => {
+  const { t } = useLanguage();
   const [type, setType] = useState<MovementType | 'ALL'>('ALL');
   const [damagedOnly, setDamagedOnly] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
@@ -52,7 +54,7 @@ const MovementTable = ({ movements, isLoading }: Props) => {
             colSpan={7}
             className='p-10 text-center text-slate-400 font-medium'
           >
-            Loading stock movements...
+            {t('common.loading')}
           </td>
         </tr>
       );
@@ -65,7 +67,7 @@ const MovementTable = ({ movements, isLoading }: Props) => {
             colSpan={7}
             className='p-12 text-center text-slate-500 font-medium'
           >
-            No movement records found matching criteria.
+            {t('common.noData')}
           </td>
         </tr>
       );
@@ -81,19 +83,18 @@ const MovementTable = ({ movements, isLoading }: Props) => {
       {/* Header */}
       <div>
         <h1 className='text-2xl font-bold text-slate-900 tracking-tight'>
-          History
+          {t('movement.stockMovement')}
         </h1>
         <p className='text-sm text-slate-500'>
-          Track inventory restocks, sales transactions, customer returns, and
-          damaged stock writes.
+          {t('movement.stockMovement')}
         </p>
       </div>
 
       {/* Filter & Search Toolbar */}
       <MovementTableFilter
         selectedType={type}
-        onTypeChange={(t) => {
-          setType(t);
+        onTypeChange={(tVal) => {
+          setType(tVal);
           setPage(1);
         }}
         damagedOnly={damagedOnly}
@@ -113,13 +114,13 @@ const MovementTable = ({ movements, isLoading }: Props) => {
         <table className='w-full border-collapse text-left text-sm'>
           <thead>
             <tr className='border-b border-slate-200 bg-slate-50/80 text-xs font-bold uppercase tracking-wider text-slate-500'>
-              <th className='px-5 py-3.5'>Product</th>
-              <th className='px-5 py-3.5'>Type</th>
-              <th className='px-5 py-3.5 text-center'>Quantity</th>
-              <th className='px-5 py-3.5 text-center'>Remaining Stock</th>
-              <th className='px-5 py-3.5'>Condition</th>
-              <th className='px-5 py-3.5'>Reference / Note</th>
-              <th className='px-5 py-3.5 text-right'>Date & Time</th>
+              <th className='px-5 py-3.5'>{t('products.productName')}</th>
+              <th className='px-5 py-3.5'>{t('movement.movementType')}</th>
+              <th className='px-5 py-3.5 text-center'>{t('movement.quantity')}</th>
+              <th className='px-5 py-3.5 text-center'>{t('products.stock')}</th>
+              <th className='px-5 py-3.5'>{t('common.status')}</th>
+              <th className='px-5 py-3.5'>{t('movement.reason')}</th>
+              <th className='px-5 py-3.5 text-right'>{t('common.date')}</th>
             </tr>
           </thead>
           <tbody className='divide-y divide-slate-100'>

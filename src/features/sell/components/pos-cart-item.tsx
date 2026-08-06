@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Edit2, Minus, Plus, Trash2 } from 'lucide-react';
 import type { CartItem } from '../types/sell.types';
 import { formatCurrencyUsd } from '../../../utils/currency';
+import { useLanguage } from '../../../i18n/language-context';
 
 interface Props {
   readonly item: CartItem;
@@ -20,6 +21,7 @@ export function PosCartItem({
   onRemove,
   onStockExceeded,
 }: Props) {
+  const { t } = useLanguage();
   const [isEditingPrice, setIsEditingPrice] = useState(false);
   const [customPrice, setCustomPrice] = useState(item.unitPrice.toString());
   const [prevQuantity, setPrevQuantity] = useState(item.quantity);
@@ -79,16 +81,17 @@ export function PosCartItem({
               onKeyDown={(e) => e.key === 'Enter' && handlePriceSubmit()}
               className='w-16 rounded-md border border-emerald-500 bg-white px-1.5 py-0.5 text-xs font-bold text-slate-900 focus:outline-none'
             />
-            <button onClick={handlePriceSubmit} className='text-[10px] font-bold text-emerald-600 cursor-pointer'>
-              Save
+            <button type='button' onClick={handlePriceSubmit} className='text-[10px] font-bold text-emerald-600 cursor-pointer'>
+              {t('common.save')}
             </button>
           </div>
         ) : (
           <div className='flex items-center gap-1 text-xs text-slate-500 font-medium'>
-            <span>{formatCurrencyUsd(item.unitPrice)} each</span>
+            <span>{formatCurrencyUsd(item.unitPrice)}</span>
             <button
+              type='button'
               onClick={() => setIsEditingPrice(true)}
-              title='Custom Price'
+              title={t('common.edit')}
               className='text-slate-400 hover:text-emerald-600 cursor-pointer'
             >
               <Edit2 size={11} />

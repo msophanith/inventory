@@ -6,6 +6,7 @@ import { router } from "./routes";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { AuthProvider } from "./features/auth/context/auth-context";
 import { CurrencyProvider } from "./features/currency/context/currency-context";
+import { LanguageProvider } from "./i18n/language-context";
 
 const queryClient = new QueryClient();
 
@@ -16,7 +17,9 @@ ReactDOM.createRoot(
     <QueryClientProvider client={queryClient}>
       <AuthProvider>
         <CurrencyProvider>
-          <RouterProvider router={router} />
+          <LanguageProvider>
+            <RouterProvider router={router} />
+          </LanguageProvider>
         </CurrencyProvider>
       </AuthProvider>
     </QueryClientProvider>

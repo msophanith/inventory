@@ -4,6 +4,7 @@ import type { CartItem, ReceiptData } from '../types/sell.types';
 import { PosCartItem } from './pos-cart-item';
 import { generatePdfInvoiceBlob } from '../utils/pdf-generator';
 import { PosCartFooter } from './pos-cart-footer';
+import { useLanguage } from '../../../i18n/language-context';
 
 interface Props {
   readonly items: CartItem[];
@@ -38,6 +39,7 @@ export function PosCartPanel({
   onCheckout,
   onStockExceeded,
 }: Props) {
+  const { t } = useLanguage();
   const [isGeneratingPdf, setIsGeneratingPdf] = useState(false);
 
   const handlePreviewPdf = async () => {
@@ -81,20 +83,21 @@ export function PosCartPanel({
             <ShoppingCart size={20} />
           </div>
           <div>
-            <h2 className='font-bold text-slate-900 text-base'>Current Order</h2>
+            <h2 className='font-bold text-slate-900 text-base'>{t('pos.cart')}</h2>
             <p className='text-xs text-slate-400 font-medium'>
-              {itemCount} {itemCount === 1 ? 'item' : 'items'} in cart
+              {t('pos.itemsCount', { count: itemCount })}
             </p>
           </div>
         </div>
 
         {items.length > 0 && (
           <button
+            type='button'
             onClick={onClearCart}
-            title='Clear Cart'
+            title={t('pos.clearCart')}
             className='flex items-center gap-1 text-xs font-semibold text-rose-500 hover:text-rose-700 transition cursor-pointer'
           >
-            <Trash2 size={14} /> Clear
+            <Trash2 size={14} /> {t('pos.clearCart')}
           </button>
         )}
       </div>
@@ -104,8 +107,8 @@ export function PosCartPanel({
         {items.length === 0 ? (
           <div className='flex h-48 flex-col items-center justify-center text-center text-slate-400'>
             <ShoppingCart size={32} className='text-slate-300 mb-2' />
-            <p className='text-xs font-semibold text-slate-500'>Cart is empty</p>
-            <p className='text-[11px] text-slate-400'>Scan barcode or click products to add.</p>
+            <p className='text-xs font-semibold text-slate-500'>{t('pos.cartEmpty')}</p>
+            <p className='text-[11px] text-slate-400'>{t('pos.cartEmptyDesc')}</p>
           </div>
         ) : (
           items.map((item) => (

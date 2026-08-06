@@ -16,20 +16,22 @@ import { NavLink } from 'react-router-dom';
 import Logo from './logo';
 import { ShortcutsModal } from './shortcuts-modal';
 import { useAuth } from '../../features/auth/use-auth';
-
-const menus = [
-  { icon: Gauge, label: 'Dashboard', to: '/', shortcut: 'D', adminOnly: true },
-  { icon: ShoppingCart, label: 'POS / Sell', to: '/sell', shortcut: 'S', adminOnly: false },
-  { icon: QrCode, label: 'Scan Lookup', to: '/scan', shortcut: 'C', adminOnly: false },
-  { icon: Box, label: 'Products', to: '/products', shortcut: 'P', adminOnly: true },
-  { icon: RefreshCcw, label: 'Movement', to: '/movement', shortcut: 'M', adminOnly: true },
-  { icon: HistoryIcon, label: 'Report', to: '/report', shortcut: 'R', adminOnly: true },
-];
+import { useLanguage } from '../../i18n/language-context';
 
 export default function Sidebar() {
   const { isAdmin, role } = useAuth();
+  const { t } = useLanguage();
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [isShortcutsModalOpen, setIsShortcutsModalOpen] = useState(false);
+
+  const menus = [
+    { icon: Gauge, label: t('reports.dashboard'), to: '/', shortcut: 'D', adminOnly: true },
+    { icon: ShoppingCart, label: t('pos.cart'), to: '/sell', shortcut: 'S', adminOnly: false },
+    { icon: QrCode, label: t('pos.scanBarcode'), to: '/scan', shortcut: 'C', adminOnly: false },
+    { icon: Box, label: t('products.products'), to: '/products', shortcut: 'P', adminOnly: true },
+    { icon: RefreshCcw, label: t('movement.stockMovement'), to: '/movement', shortcut: 'M', adminOnly: true },
+    { icon: HistoryIcon, label: t('reports.reports'), to: '/report', shortcut: 'R', adminOnly: true },
+  ];
 
   const visibleMenus = menus.filter((m) => isAdmin || !m.adminOnly);
 
@@ -114,7 +116,7 @@ export default function Sidebar() {
               </div>
               <p className='text-xs text-slate-300 flex items-center gap-1 font-medium'>
                 <UserCheck size={12} className='text-indigo-400' />
-                {isAdmin ? 'Full Admin Access' : 'POS Cashier Access'}
+                {isAdmin ? t('common.adminManager') : t('common.posCashier')}
               </p>
               <p className='text-xs text-slate-300 flex items-center gap-1 font-medium'>
                 <Code size={12} className='text-indigo-400' />

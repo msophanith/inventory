@@ -2,6 +2,7 @@ import { AlertTriangle, DollarSign, Package, ShoppingBag, TrendingUp } from 'luc
 import { useNavigate } from 'react-router-dom';
 import { formatCurrencyKhr, formatCurrencyUsd } from '../../../utils/currency';
 import type { TodaySaleSummary } from '../../../services/movement';
+import { useLanguage } from '../../../i18n/language-context';
 
 interface Props {
   readonly totalItems: number;
@@ -19,6 +20,7 @@ export function DashboardKpiCards({
   todaySale,
 }: Props) {
   const navigate = useNavigate();
+  const { t } = useLanguage();
   const totalSales = todaySale?.totalSales ?? 0;
   const totalOrders = todaySale?.totalOrders ?? 0;
 
@@ -30,7 +32,7 @@ export function DashboardKpiCards({
       <div className='relative overflow-hidden rounded-3xl border border-slate-200/80 bg-white p-5 shadow-sm transition hover:shadow-md'>
         <div className='flex items-center justify-between'>
           <span className='text-xs font-bold uppercase tracking-wider text-slate-500'>
-            Inventory Value
+            {t('reports.totalValue')}
           </span>
           <div className='flex h-10 w-10 items-center justify-center rounded-2xl bg-emerald-50 text-emerald-600'>
             <DollarSign size={20} />
@@ -46,7 +48,7 @@ export function DashboardKpiCards({
         </div>
         <div className='mt-3 flex items-center gap-1.5 text-[11px] text-slate-400 font-semibold'>
           <TrendingUp size={13} className='text-emerald-500' />
-          <span>Total catalog stock asset valuation</span>
+          <span>{t('reports.analyticsDesc')}</span>
         </div>
       </div>
 
@@ -54,7 +56,7 @@ export function DashboardKpiCards({
       <div className='relative overflow-hidden rounded-3xl border border-slate-200/80 bg-white p-5 shadow-sm transition hover:shadow-md'>
         <div className='flex items-center justify-between'>
           <span className='text-xs font-bold uppercase tracking-wider text-slate-500'>
-            Today's Sales
+            {t('reports.todaySales')}
           </span>
           <div className='flex h-10 w-10 items-center justify-center rounded-2xl bg-blue-50 text-blue-600'>
             <ShoppingBag size={20} />
@@ -69,8 +71,8 @@ export function DashboardKpiCards({
           </p>
         </div>
         <div className='mt-3 flex items-center justify-between text-[11px] font-bold'>
-          <span className='text-slate-500'>{totalOrders} orders completed today</span>
-          <span className='rounded-full bg-blue-100 px-2 py-0.5 text-blue-700'>Live</span>
+          <span className='text-slate-500'>{totalOrders} {t('reports.totalOrders')}</span>
+          <span className='rounded-full bg-blue-100 px-2 py-0.5 text-blue-700'>{t('common.status')}</span>
         </div>
       </div>
 
@@ -78,7 +80,7 @@ export function DashboardKpiCards({
       <div className='relative overflow-hidden rounded-3xl border border-slate-200/80 bg-white p-5 shadow-sm transition hover:shadow-md'>
         <div className='flex items-center justify-between'>
           <span className='text-xs font-bold uppercase tracking-wider text-slate-500'>
-            Products Catalog
+            {t('products.products')}
           </span>
           <div className='flex h-10 w-10 items-center justify-center rounded-2xl bg-indigo-50 text-indigo-600'>
             <Package size={20} />
@@ -86,19 +88,20 @@ export function DashboardKpiCards({
         </div>
         <div className='mt-3 space-y-0.5'>
           <h3 className='text-2xl font-black text-slate-900 tracking-tight'>
-            {totalItems} <span className='text-sm font-bold text-slate-400'>items</span>
+            {totalItems} <span className='text-sm font-bold text-slate-400'>{t('pos.itemsCount', { count: totalItems })}</span>
           </h3>
           <p className='text-xs font-extrabold text-emerald-600'>
-            {Math.max(0, totalItems - totalAlerts)} Healthy Stock
+            {Math.max(0, totalItems - totalAlerts)} {t('products.inStock')}
           </p>
         </div>
         <div className='mt-3 flex items-center justify-between text-[11px] font-semibold text-slate-400'>
-          <span>Active SKU catalog</span>
+          <span>{t('products.products')}</span>
           <button
+            type='button'
             onClick={() => navigate('/products')}
             className='text-indigo-600 font-bold hover:underline cursor-pointer'
           >
-            View all →
+            {t('common.all')} →
           </button>
         </div>
       </div>
@@ -107,7 +110,7 @@ export function DashboardKpiCards({
       <div className='relative overflow-hidden rounded-3xl border border-rose-200/80 bg-rose-50/40 p-5 shadow-sm transition hover:shadow-md'>
         <div className='flex items-center justify-between'>
           <span className='text-xs font-bold uppercase tracking-wider text-rose-700'>
-            Stock Alerts
+            {t('reports.lowStockCount')}
           </span>
           <div className='flex h-10 w-10 items-center justify-center rounded-2xl bg-rose-100 text-rose-600'>
             <AlertTriangle size={20} />
@@ -115,19 +118,20 @@ export function DashboardKpiCards({
         </div>
         <div className='mt-3 space-y-0.5'>
           <h3 className='text-2xl font-black text-rose-900 tracking-tight'>
-            {totalAlerts} <span className='text-sm font-bold text-rose-600'>alerts</span>
+            {totalAlerts}
           </h3>
           <p className='text-xs font-extrabold text-rose-600'>
-            {outOfStock} Out of Stock • {lowStock} Low Stock
+            {outOfStock} {t('products.outOfStock')} • {lowStock} {t('reports.lowStockCount')}
           </p>
         </div>
         <div className='mt-3 flex items-center justify-between text-[11px] font-bold'>
-          <span className='text-rose-700'>Needs restock attention</span>
+          <span className='text-rose-700'>{t('reports.lowStockCount')}</span>
           <button
+            type='button'
             onClick={() => navigate('/products')}
             className='rounded-full bg-rose-600 px-2.5 py-0.5 text-white hover:bg-rose-700 transition cursor-pointer'
           >
-            Restock Now
+            {t('movement.recordMovement')}
           </button>
         </div>
       </div>

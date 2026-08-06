@@ -1,4 +1,5 @@
 import { Camera, Search, Sparkles } from 'lucide-react';
+import { useLanguage } from '../../../i18n/language-context';
 
 interface Props {
   readonly manualCode: string;
@@ -15,6 +16,8 @@ export function ScanViewfinder({
   onOpenCamModal,
   isSearching,
 }: Props) {
+  const { t } = useLanguage();
+
   return (
     <div className='rounded-3xl border border-slate-200 bg-white p-5 sm:p-6 shadow-xs space-y-5'>
       {/* Search Input Bar */}
@@ -34,7 +37,7 @@ export function ScanViewfinder({
             type='text'
             value={manualCode}
             onChange={(e) => onManualCodeChange(e.target.value)}
-            placeholder='Scan barcode or type product ID / name...'
+            placeholder={t('products.searchProduct')}
             className='w-full rounded-2xl border border-slate-200 bg-slate-50/70 pl-10 pr-4 py-3 text-sm font-bold text-slate-900 focus:bg-white focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 shadow-2xs'
           />
         </div>
@@ -43,7 +46,7 @@ export function ScanViewfinder({
           disabled={!manualCode.trim() || isSearching}
           className='rounded-2xl bg-slate-900 px-5 py-3 text-xs font-black text-white shadow-md hover:bg-slate-800 disabled:opacity-50 transition cursor-pointer shrink-0'
         >
-          Lookup
+          {t('common.search')}
         </button>
       </form>
 
@@ -56,10 +59,10 @@ export function ScanViewfinder({
         <div className='relative z-10 mx-auto h-28 w-56 rounded-xl border-2 border-dashed border-indigo-400/40 flex flex-col items-center justify-center p-3 bg-indigo-950/30 backdrop-blur-xs'>
           <Sparkles size={22} className='text-indigo-400 animate-bounce mb-1' />
           <p className='text-xs font-extrabold text-indigo-200'>
-            Point Barcode at Camera
+            {t('pos.scanBarcode')}
           </p>
           <p className='text-[10px] text-slate-400 font-mono mt-0.5'>
-            Supports UPC, EAN-13, QR Code
+            UPC, EAN-13, QR Code
           </p>
         </div>
 
@@ -69,7 +72,7 @@ export function ScanViewfinder({
           className='relative z-10 w-full flex items-center justify-center gap-2.5 rounded-2xl bg-linear-to-r from-emerald-600 to-teal-600 py-3.5 text-sm font-black text-white shadow-lg shadow-emerald-600/20 hover:from-emerald-700 hover:to-teal-700 transition cursor-pointer active:scale-98'
         >
           <Camera size={18} />
-          <span>Launch Phone Camera Scanner</span>
+          <span>{t('pos.cameraScanner')}</span>
         </button>
       </div>
     </div>
