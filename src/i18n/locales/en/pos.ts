@@ -1,5 +1,5 @@
 export const posEn = {
-  cart: 'Shopping Cart',
+  cart: 'POS',
   cartEmpty: 'Your cart is empty',
   cartEmptyDesc: 'Scan or select items from catalog to start selling',
   subtotal: 'Subtotal',
