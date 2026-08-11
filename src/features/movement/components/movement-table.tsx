@@ -1,5 +1,6 @@
 import { useMemo, useState } from 'react';
 import type { Movement, MovementType } from '../../../services/movement';
+import { getCurrentMonthLabel, isCurrentMonth } from '../../../utils/date';
 import { MovementTableFilter } from './movement-table-filter';
 import { MovementTablePagination } from './movement-table-pagination';
 import { MovementTableRow } from './movement-table-row';
@@ -18,8 +19,11 @@ const MovementTable = ({ movements, isLoading }: Props) => {
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
 
+  const currentMonthLabel = useMemo(() => getCurrentMonthLabel(), []);
+
   const filteredMovements = useMemo(() => {
     return movements.filter((item) => {
+      const matchMonth = isCurrentMonth(item.createdAt);
       const matchType = type === 'ALL' || item.type === type;
       const isItemDamaged = Boolean(
         item.isDamaged || item.reference?.toLowerCase() === 'damage',
@@ -34,7 +38,7 @@ const MovementTable = ({ movements, isLoading }: Props) => {
         item.note?.toLowerCase().includes(q) ||
         item.id.toLowerCase().includes(q);
 
-      return matchType && matchDamage && matchSearch;
+      return matchMonth && matchType && matchDamage && matchSearch;
     });
   }, [movements, type, damagedOnly, searchQuery]);
 
@@ -48,10 +52,7 @@ const MovementTable = ({ movements, isLoading }: Props) => {
     if (isLoading) {
       return (
         <tr>
-          <td
-            colSpan={7}
-            className='p-10 text-center text-slate-400 font-medium'
-          >
+          <td colSpan={7} className='p-10 text-center text-slate-400 font-medium'>
             Loading stock movements...
           </td>
         </tr>
@@ -61,11 +62,8 @@ const MovementTable = ({ movements, isLoading }: Props) => {
     if (paginatedData.length === 0) {
       return (
         <tr>
-          <td
-            colSpan={7}
-            className='p-12 text-center text-slate-500 font-medium'
-          >
-            No movement records found matching criteria.
+          <td colSpan={7} className='p-12 text-center text-slate-500 font-medium'>
+            No movement records found for this month ({currentMonthLabel}) matching criteria.
           </td>
         </tr>
       );
@@ -80,32 +78,28 @@ const MovementTable = ({ movements, isLoading }: Props) => {
     <div className='space-y-6 rounded-3xl border border-slate-200/80 bg-white p-4 sm:p-6 shadow-xs min-w-0 w-full max-w-full overflow-hidden'>
       {/* Header */}
       <div>
-        <h1 className='text-2xl font-bold text-slate-900 tracking-tight'>
-          History
-        </h1>
-        <p className='text-sm text-slate-500'>
+        <div className='flex items-center gap-2.5 flex-wrap'>
+          <h1 className='text-2xl font-bold text-slate-900 tracking-tight'>
+            History
+          </h1>
+          <span className='px-2.5 py-0.5 rounded-full text-xs font-semibold bg-emerald-100 text-emerald-800 border border-emerald-200/60'>
+            This Month ({currentMonthLabel})
+          </span>
+        </div>
+        <p className='text-sm text-slate-500 mt-1'>
           Track inventory restocks, sales transactions, customer returns, and
-          damaged stock writes.
+          damaged stock writes for this month ({currentMonthLabel}).
         </p>
       </div>
 
       {/* Filter & Search Toolbar */}
       <MovementTableFilter
         selectedType={type}
-        onTypeChange={(t) => {
-          setType(t);
-          setPage(1);
-        }}
+        onTypeChange={(t) => { setType(t); setPage(1); }}
         damagedOnly={damagedOnly}
-        onToggleDamaged={() => {
-          setDamagedOnly(!damagedOnly);
-          setPage(1);
-        }}
+        onToggleDamaged={() => { setDamagedOnly(!damagedOnly); setPage(1); }}
         searchQuery={searchQuery}
-        onSearchChange={(q) => {
-          setSearchQuery(q);
-          setPage(1);
-        }}
+        onSearchChange={(q) => { setSearchQuery(q); setPage(1); }}
       />
 
       {/* Responsive Table View */}
@@ -136,13 +130,12 @@ const MovementTable = ({ movements, isLoading }: Props) => {
         pageSize={pageSize}
         pageSizeOptions={PAGE_SIZE_OPTIONS}
         onPageChange={setPage}
-        onPageSizeChange={(newSize) => {
-          setPageSize(newSize);
-          setPage(1);
-        }}
+        onPageSizeChange={(newSize) => { setPageSize(newSize); setPage(1); }}
       />
     </div>
   );
 };
 
 export default MovementTable;
+
+

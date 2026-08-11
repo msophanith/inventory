@@ -1,4 +1,4 @@
-import { addHours, format, parseISO } from 'date-fns';
+import { addHours, format, parseISO, subMonths } from 'date-fns';
 
 /**
  * Standard offset in hours from UTC/Ireland server response to Phnom Penh local time (UTC+7).
@@ -64,3 +64,63 @@ export function formatDateTime(
 ): string {
   return formatDate(value, pattern, fallback, offsetHours);
 }
+
+/**
+ * Check if a date falls within the current calendar month.
+ */
+export function isCurrentMonth(
+  value: Date | string | number | null | undefined,
+  offsetHours = PHNOM_PENH_TZ_OFFSET_HOURS,
+): boolean {
+  const adjusted = getAdjustedDate(value, offsetHours);
+  if (!adjusted) return false;
+
+  const now = getAdjustedDate(new Date(), offsetHours) || new Date();
+
+  return (
+    adjusted.getFullYear() === now.getFullYear() &&
+    adjusted.getMonth() === now.getMonth()
+  );
+}
+
+/**
+ * Get formatted label for the current calendar month (e.g. 'August 2026').
+ */
+export function getCurrentMonthLabel(
+  offsetHours = PHNOM_PENH_TZ_OFFSET_HOURS,
+): string {
+  const now = getAdjustedDate(new Date(), offsetHours) || new Date();
+  return format(now, 'MMMM yyyy');
+}
+
+/**
+ * Check if a date falls within the previous calendar month.
+ */
+export function isLastMonth(
+  value: Date | string | number | null | undefined,
+  offsetHours = PHNOM_PENH_TZ_OFFSET_HOURS,
+): boolean {
+  const adjusted = getAdjustedDate(value, offsetHours);
+  if (!adjusted) return false;
+
+  const now = getAdjustedDate(new Date(), offsetHours) || new Date();
+  const lastMonthDate = subMonths(now, 1);
+
+  return (
+    adjusted.getFullYear() === lastMonthDate.getFullYear() &&
+    adjusted.getMonth() === lastMonthDate.getMonth()
+  );
+}
+
+/**
+ * Get formatted label for the previous calendar month (e.g. 'July 2026').
+ */
+export function getLastMonthLabel(
+  offsetHours = PHNOM_PENH_TZ_OFFSET_HOURS,
+): string {
+  const now = getAdjustedDate(new Date(), offsetHours) || new Date();
+  const lastMonthDate = subMonths(now, 1);
+  return format(lastMonthDate, 'MMMM yyyy');
+}
+
+
