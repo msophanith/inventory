@@ -1,3 +1,4 @@
+import { memo } from 'react';
 import { Package, Plus } from 'lucide-react';
 import type { Product } from '../../../services/product';
 import { formatCurrencyKhr, formatCurrencyUsd } from '../../../utils/currency';
@@ -8,7 +9,11 @@ interface Props {
   readonly onAddToCart: (product: Product) => void;
 }
 
-export function PosProductCard({ product, cartQuantity, onAddToCart }: Props) {
+export const PosProductCard = memo(function PosProductCard({
+  product,
+  cartQuantity,
+  onAddToCart,
+}: Props) {
   const isOutOfStock = product.quantity <= 0;
   const remainingStock = product.quantity - cartQuantity;
 
@@ -94,4 +99,4 @@ export function PosProductCard({ product, cartQuantity, onAddToCart }: Props) {
       </div>
     </button>
   );
-}
+});
