@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import type { Product } from '../../../services/product';
 import type { CartItem } from '../types/sell.types';
 
@@ -7,7 +7,7 @@ export function usePosCart() {
   const [taxRate] = useState(0);
   const [discountAmount] = useState(0);
 
-  const addItem = (product: Product) => {
+  const addItem = useCallback((product: Product) => {
     if (product.quantity <= 0) return;
 
     setItems((prev) => {
@@ -33,9 +33,9 @@ export function usePosCart() {
         },
       ];
     });
-  };
+  }, []);
 
-  const updateQuantity = (productId: string, delta: number) => {
+  const updateQuantity = useCallback((productId: string, delta: number) => {
     setItems((prev) =>
       prev
         .map((item) => {
@@ -51,9 +51,9 @@ export function usePosCart() {
         })
         .filter(Boolean) as CartItem[],
     );
-  };
+  }, []);
 
-  const setExactQuantity = (productId: string, exactQty: number) => {
+  const setExactQuantity = useCallback((productId: string, exactQty: number) => {
     setItems((prev) =>
       prev
         .map((item) => {
@@ -69,9 +69,9 @@ export function usePosCart() {
         })
         .filter(Boolean) as CartItem[],
     );
-  };
+  }, []);
 
-  const updateUnitPrice = (productId: string, newUnitPrice: number) => {
+  const updateUnitPrice = useCallback((productId: string, newUnitPrice: number) => {
     const validPrice = Math.max(0, newUnitPrice);
     setItems((prev) =>
       prev.map((item) => {
@@ -83,13 +83,13 @@ export function usePosCart() {
         };
       }),
     );
-  };
+  }, []);
 
-  const removeItem = (productId: string) => {
+  const removeItem = useCallback((productId: string) => {
     setItems((prev) => prev.filter((item) => item.product.id !== productId));
-  };
+  }, []);
 
-  const clearCart = () => setItems([]);
+  const clearCart = useCallback(() => setItems([]), []);
 
   const subtotal = useMemo(
     () => items.reduce((sum, item) => sum + item.totalPrice, 0),

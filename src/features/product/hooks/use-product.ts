@@ -8,6 +8,8 @@ const useProduct = (enableSummary?: boolean) => {
     return useQuery({
       queryKey: ['products', params],
       queryFn: () => productService.getAll(params),
+      staleTime: 60 * 1000,
+      placeholderData: (previousData) => previousData,
     });
   };
 

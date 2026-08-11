@@ -13,6 +13,11 @@ export function useHardwareScanner({ enabled = true, onScan }: Options) {
   const bufferRef = useRef<string>('');
   const lastKeyTimeRef = useRef<number>(0);
   const fastKeyCountRef = useRef<number>(0);
+  const onScanRef = useRef(onScan);
+
+  useEffect(() => {
+    onScanRef.current = onScan;
+  }, [onScan]);
 
   useEffect(() => {
     if (!enabled) return;
@@ -40,7 +45,7 @@ export function useHardwareScanner({ enabled = true, onScan }: Options) {
         const barcode = bufferRef.current.trim();
         // Fire scan if burst detected or buffer contains valid barcode string
         if (barcode.length >= 2 && (fastKeyCountRef.current >= 1 || timeDiff < 150)) {
-          onScan(barcode);
+          onScanRef.current(barcode);
           e.preventDefault();
         }
         bufferRef.current = '';
@@ -52,5 +57,5 @@ export function useHardwareScanner({ enabled = true, onScan }: Options) {
 
     window.addEventListener('keydown', handleKeyDown, true);
     return () => window.removeEventListener('keydown', handleKeyDown, true);
-  }, [enabled, onScan]);
+  }, [enabled]);
 }

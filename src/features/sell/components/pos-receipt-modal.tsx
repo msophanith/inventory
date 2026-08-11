@@ -4,6 +4,7 @@ import type { ReceiptData } from '../types/sell.types';
 import { formatDateTime } from '../../../utils/date';
 import { generatePdfInvoiceBlob } from '../utils/pdf-generator';
 import { formatCurrencyKhr, formatCurrencyUsd } from '../../../utils/currency';
+import { printThermalReceipt } from '../utils/thermal-printer';
 
 interface Props {
   readonly receipt: ReceiptData | null;
@@ -13,10 +14,20 @@ interface Props {
 export function PosReceiptModal({ receipt, onClose }: Props) {
   const [isGeneratingPdf, setIsGeneratingPdf] = useState(false);
 
+  const [isPrintingThermal, setIsPrintingThermal] = useState(false);
+
   if (!receipt) return null;
 
-  const handlePrint = () => {
-    window.print();
+  const handlePrint = async () => {
+    if (!receipt) return;
+    try {
+      setIsPrintingThermal(true);
+      await printThermalReceipt(receipt);
+    } catch (err) {
+      console.error('Failed to print thermal receipt:', err);
+    } finally {
+      setIsPrintingThermal(false);
+    }
   };
 
   const handlePreviewPdf = async () => {
@@ -138,9 +149,10 @@ export function PosReceiptModal({ receipt, onClose }: Props) {
             <button
               type='button'
               onClick={handlePrint}
-              className='flex-1 flex items-center justify-center gap-2 rounded-xl border border-slate-200 py-2.5 text-xs font-bold text-slate-700 hover:bg-slate-50 cursor-pointer transition'
+              disabled={isPrintingThermal}
+              className='flex-1 flex items-center justify-center gap-2 rounded-xl border border-slate-200 py-2.5 text-xs font-bold text-slate-700 hover:bg-slate-50 cursor-pointer disabled:opacity-50 transition'
             >
-              <Printer size={16} /> Print
+              <Printer size={16} /> {isPrintingThermal ? 'Printing...' : 'Print'}
             </button>
           </div>
           <button
