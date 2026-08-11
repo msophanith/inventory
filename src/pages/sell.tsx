@@ -5,21 +5,35 @@ import { useCheckout } from '../features/sell/hooks/use-checkout';
 import { useMovement } from '../features/movement/hooks/use-movement';
 import { useHardwareScanner } from '../features/sell/hooks/use-hardware-scanner';
 import { playScanSound } from '../features/sell/utils/scan-sound';
-import { PosCartPanel, PosDiscountModal, PosMobileCartBar, PosProductGrid } from '../features/sell/components';
+import {
+  PosCartPanel,
+  PosDiscountModal,
+  PosMobileCartBar,
+  PosProductGrid,
+} from '../features/sell/components';
 import { PosHeaderBanner } from '../features/sell/components/pos-header-banner';
 import { PosModals } from '../features/sell/components/pos-modals';
 import Toast from '../components/ui/alert';
 import { PageContainer } from '../components/layout/page-container';
 import { useSellPageState } from './hooks/use-sell-page-state';
+import type { PaymentMethod } from '../features/sell/types/sell.types';
 
 const SellPage = () => {
   const [search, setSearch] = useState('');
   const [category, setCategory] = useState('ALL');
   const [isDiscountOpen, setIsDiscountOpen] = useState(false);
-  const [discount, setDiscount] = useState<{ type: 'PERCENT' | 'FIXED'; value: number; amount: number }>({ type: 'PERCENT', value: 0, amount: 0 });
+  const [discount, setDiscount] = useState<{
+    type: 'PERCENT' | 'FIXED';
+    value: number;
+    amount: number;
+  }>({ type: 'PERCENT', value: 0, amount: 0 });
 
   const { useGetProducts } = useProduct(false);
-  const { data: response, isLoading: productsLoading } = useGetProducts({ search, category: category === 'ALL' ? '' : category, limit: 100 });
+  const { data: response, isLoading: productsLoading } = useGetProducts({
+    search,
+    category: category === 'ALL' ? '' : category,
+    limit: 100,
+  });
   const products = useMemo(() => response?.data || [], [response?.data]);
 
   const { data: movements = [] } = useMovement();
@@ -27,14 +41,33 @@ const SellPage = () => {
   const checkout = useCheckout();
   const finalTotal = Math.max(0, cart.subtotal + cart.tax - discount.amount);
 
-  const { isCameraScanOpen, setIsCameraScanOpen, isMobileCartOpen, setIsMobileCartOpen, isOrderHistoryOpen, setIsOrderHistoryOpen, alert, setAlert, handleStockExceeded, handleBarcodeScanned } = useSellPageState(products, cart);
+  const {
+    isCameraScanOpen,
+    setIsCameraScanOpen,
+    isMobileCartOpen,
+    setIsMobileCartOpen,
+    isOrderHistoryOpen,
+    setIsOrderHistoryOpen,
+    alert,
+    setAlert,
+    handleStockExceeded,
+    handleBarcodeScanned,
+  } = useSellPageState(products, cart);
 
   useHardwareScanner({
-    enabled: !checkout.isCheckoutOpen && !isCameraScanOpen && !isMobileCartOpen && !isOrderHistoryOpen && !isDiscountOpen,
+    enabled:
+      !checkout.isCheckoutOpen &&
+      !isCameraScanOpen &&
+      !isMobileCartOpen &&
+      !isOrderHistoryOpen &&
+      !isDiscountOpen,
     onScan: handleBarcodeScanned,
   });
 
-  const handleConfirmPayment = async (params: { paymentMethod: 'CASH' | 'CARD' | 'QR'; amountPaid: number }) => {
+  const handleConfirmPayment = async (params: {
+    paymentMethod: PaymentMethod;
+    amountPaid: number;
+  }) => {
     await checkout.processCheckout({
       items: cart.items,
       subtotal: cart.subtotal,
@@ -51,7 +84,13 @@ const SellPage = () => {
 
   return (
     <PageContainer className='space-y-5 pb-24 lg:pb-0'>
-      {alert && <Toast type={alert.type} message={alert.message} onClose={() => setAlert(null)} />}
+      {alert && (
+        <Toast
+          type={alert.type}
+          message={alert.message}
+          onClose={() => setAlert(null)}
+        />
+      )}
 
       <PosHeaderBanner
         onOpenScanModal={() => setIsCameraScanOpen(true)}
@@ -67,7 +106,10 @@ const SellPage = () => {
           onSearchChange={setSearch}
           selectedCategory={category}
           onCategoryChange={setCategory}
-          onAddToCart={(p) => { playScanSound(); cart.addItem(p); }}
+          onAddToCart={(p) => {
+            playScanSound();
+            cart.addItem(p);
+          }}
           onOpenScanModal={() => setIsCameraScanOpen(true)}
         />
 
@@ -83,7 +125,10 @@ const SellPage = () => {
           onSetExactQty={cart.setExactQuantity}
           onUpdatePrice={cart.updateUnitPrice}
           onRemoveItem={cart.removeItem}
-          onClearCart={() => { cart.clearCart(); setDiscount({ type: 'PERCENT', value: 0, amount: 0 }); }}
+          onClearCart={() => {
+            cart.clearCart();
+            setDiscount({ type: 'PERCENT', value: 0, amount: 0 });
+          }}
           onCheckout={() => checkout.setIsCheckoutOpen(true)}
           onStockExceeded={handleStockExceeded}
         />
@@ -127,7 +172,10 @@ const SellPage = () => {
         onSetExactQty={cart.setExactQuantity}
         onUpdatePrice={cart.updateUnitPrice}
         onRemoveItem={cart.removeItem}
-        onClearCart={() => { cart.clearCart(); setDiscount({ type: 'PERCENT', value: 0, amount: 0 }); }}
+        onClearCart={() => {
+          cart.clearCart();
+          setDiscount({ type: 'PERCENT', value: 0, amount: 0 });
+        }}
         onCheckout={() => checkout.setIsCheckoutOpen(true)}
         onStockExceeded={handleStockExceeded}
         onOpenReceipt={(receipt) => checkout.setReceiptData(receipt)}
@@ -137,5 +185,3 @@ const SellPage = () => {
 };
 
 export { SellPage };
-
-
