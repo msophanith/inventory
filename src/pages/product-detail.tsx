@@ -59,12 +59,13 @@ const ProductDetailsPage = () => {
 
   const onUpdateStock = async (values: FormValues) => {
     const payload = {
-      unitPrice: product.sellPrice,
+      unitPrice: values.unitPrice ?? (type === 'IN' ? product.buyPrice : product.sellPrice),
       productId: productId ?? '',
       type,
       isDamaged: values.reason === 'Damage',
       quantity: values.quantity,
       reference: values.reason,
+      note: values.note,
       createdAt: '',
     };
 
