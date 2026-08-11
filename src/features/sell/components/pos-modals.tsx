@@ -1,5 +1,5 @@
 import type { Movement } from '../../../services/movement';
-import type { CartItem, PaymentMethod, ReceiptData } from '../types/sell.types';
+import type { CartItem, ReceiptData } from '../types/sell.types';
 import {
   PosCameraScannerModal,
   PosCheckoutModal,
@@ -28,7 +28,7 @@ interface Props {
   readonly onCloseReceipt: () => void;
   readonly onBarcodeScanned: (code: string) => void;
   readonly onConfirmPayment: (params: {
-    paymentMethod: PaymentMethod;
+    paymentMethod: 'CASH' | 'CARD' | 'QR';
     amountPaid: number;
   }) => void;
   readonly onUpdateQty: (productId: string, delta: number) => void;
@@ -95,7 +95,7 @@ export function PosModals({
       />
       <PosCheckoutModal
         open={isCheckoutOpen}
-        // items={cartItems}
+        items={cartItems}
         total={totalAmount}
         isPending={checkoutPending}
         onClose={onCloseCheckout}
