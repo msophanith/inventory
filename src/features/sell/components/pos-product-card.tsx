@@ -1,7 +1,7 @@
-import { Package, Plus } from 'lucide-react';
+import { memo } from 'react';
+import { AlertTriangle, Ban, Package, Plus } from 'lucide-react';
 import type { Product } from '../../../services/product';
 import { formatCurrencyKhr, formatCurrencyUsd } from '../../../utils/currency';
-import { useLanguage } from '../../../i18n/language-context';
 
 interface Props {
   readonly product: Product;
@@ -9,8 +9,11 @@ interface Props {
   readonly onAddToCart: (product: Product) => void;
 }
 
-export function PosProductCard({ product, cartQuantity, onAddToCart }: Props) {
-  const { t } = useLanguage();
+export const PosProductCard = memo(function PosProductCard({
+  product,
+  cartQuantity,
+  onAddToCart,
+}: Props) {
   const isOutOfStock = product.quantity <= 0;
   const remainingStock = product.quantity - cartQuantity;
 
@@ -19,7 +22,7 @@ export function PosProductCard({ product, cartQuantity, onAddToCart }: Props) {
     product.minStock && product.minStock > 0 ? product.minStock : 5;
   const isLowStock =
     !isOutOfStock && remainingStock > 0 && remainingStock <= lowThreshold;
-  // const isMaxInCart = !isOutOfStock && cartQuantity > 0 && remainingStock <= 0;
+  const isMaxInCart = !isOutOfStock && cartQuantity > 0 && remainingStock <= 0;
 
   let cardBorderStyle =
     'border-slate-200/80 bg-white/90 hover:border-indigo-400/80';
@@ -36,40 +39,40 @@ export function PosProductCard({ product, cartQuantity, onAddToCart }: Props) {
     plusIconStyle = 'bg-amber-500 text-white group-hover:bg-amber-600';
   }
 
-  // const renderStatusBadge = () => {
-  //   const badgeBase =
-  //     'inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-[10px] font-black uppercase tracking-wider text-white shadow-md';
+  const renderStatusBadge = () => {
+    const badgeBase =
+      'inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-[10px] font-black uppercase tracking-wider text-white shadow-md';
 
-  //   if (isOutOfStock) {
-  //     return (
-  //       <span
-  //         className={`${badgeBase} bg-rose-600 backdrop-blur-md ring-1 ring-white/30 animate-pulse`}
-  //       >
-  //         <Ban size={11} strokeWidth={2.5} /> Out of Stock
-  //       </span>
-  //     );
-  //   }
-  //   if (isMaxInCart) {
-  //     return (
-  //       <span className={`${badgeBase} bg-rose-500`}>
-  //         <Ban size={11} strokeWidth={2.5} /> Max In Cart
-  //       </span>
-  //     );
-  //   }
-  //   if (isLowStock) {
-  //     return (
-  //       <span className={`${badgeBase} bg-amber-500 ring-1 ring-white/40`}>
-  //         <AlertTriangle size={11} strokeWidth={2.5} /> Low: {remainingStock}{' '}
-  //         left
-  //       </span>
-  //     );
-  //   }
-  //   return (
-  //     <span className='inline-flex items-center rounded-full bg-slate-900/80 px-2.5 py-0.5 text-[10px] font-extrabold uppercase tracking-wider text-white backdrop-blur-md shadow-xs'>
-  //       {remainingStock} in stock
-  //     </span>
-  //   );
-  // };
+    if (isOutOfStock) {
+      return (
+        <span
+          className={`${badgeBase} bg-rose-600 backdrop-blur-md ring-1 ring-white/30 animate-pulse`}
+        >
+          <Ban size={11} strokeWidth={2.5} /> Out of Stock
+        </span>
+      );
+    }
+    if (isMaxInCart) {
+      return (
+        <span className={`${badgeBase} bg-rose-500`}>
+          <Ban size={11} strokeWidth={2.5} /> Max In Cart
+        </span>
+      );
+    }
+    if (isLowStock) {
+      return (
+        <span className={`${badgeBase} bg-amber-500 ring-1 ring-white/40`}>
+          <AlertTriangle size={11} strokeWidth={2.5} /> Low: {remainingStock}{' '}
+          left
+        </span>
+      );
+    }
+    return (
+      <span className='inline-flex items-center rounded-full bg-slate-900/80 px-2.5 py-0.5 text-[10px] font-extrabold uppercase tracking-wider text-white backdrop-blur-md shadow-xs'>
+        {remainingStock} in stock
+      </span>
+    );
+  };
 
   return (
     <button
@@ -99,14 +102,10 @@ export function PosProductCard({ product, cartQuantity, onAddToCart }: Props) {
           />
         )}
 
-        {/* Stock Badge */}
-        <span
-          className={`absolute top-2 right-2 rounded-full px-2.5 py-0.5 text-[10px] font-black uppercase tracking-wider`}
-        >
-          {isDisabled
-            ? t('products.outOfStock')
-            : t('pos.lowStock', { qty: remainingStock })}
-        </span>
+        {/* Status Visual Pill */}
+        <div className='absolute top-2 right-2 flex flex-col items-end gap-1 z-10'>
+          {renderStatusBadge()}
+        </div>
 
         {/* In Cart Count Pill */}
         {cartQuantity > 0 && (
@@ -131,7 +130,7 @@ export function PosProductCard({ product, cartQuantity, onAddToCart }: Props) {
       {/* Product Name & Dual Pricing */}
       <div className='mt-3 space-y-1'>
         <p className='text-[10px] font-extrabold text-slate-400 uppercase tracking-widest truncate'>
-          {product.category || t('common.all')}
+          {product.category}
         </p>
         <h3 className='font-extrabold text-slate-900 line-clamp-1 text-xs leading-snug group-hover:text-indigo-600 transition-colors'>
           {product.name}
@@ -157,4 +156,4 @@ export function PosProductCard({ product, cartQuantity, onAddToCart }: Props) {
       </div>
     </button>
   );
-}
+});
