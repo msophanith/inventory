@@ -45,10 +45,10 @@ export default function StockMovementModal({
   return (
     <div
       onClick={onClose}
-      className='fixed inset-0 z-100 flex items-end sm:items-center justify-center bg-slate-900/70 p-0 sm:p-4 backdrop-blur-xs animate-in fade-in duration-200'
+      className='fixed inset-0 z-100 flex items-end sm:items-center justify-center bg-slate-950/75 p-0 sm:p-4 backdrop-blur-md animate-in fade-in duration-200'
     >
       <div
-        className='relative w-full max-w-lg max-h-[90vh] sm:max-h-[85vh] overflow-hidden rounded-t-3xl sm:rounded-3xl bg-white shadow-2xl animate-in slide-in-from-bottom sm:zoom-in-95 duration-200 flex flex-col'
+        className='relative w-full max-w-lg max-h-[92vh] sm:max-h-[85vh] overflow-hidden rounded-t-3xl sm:rounded-3xl bg-white shadow-2xl shadow-slate-950/25 border border-slate-100 animate-in slide-in-from-bottom sm:zoom-in-95 duration-200 flex flex-col'
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header Section */}
@@ -59,22 +59,20 @@ export default function StockMovementModal({
             type='button'
             onClick={onClose}
             title='Close modal'
-            className='absolute right-4 top-4 sm:right-5 sm:top-5 flex h-8 w-8 sm:h-9 sm:w-9 items-center justify-center rounded-full bg-white/20 text-white hover:bg-white/30 transition cursor-pointer active:scale-95'
+            className='absolute right-4 top-4 sm:right-5 sm:top-5 flex h-8 w-8 sm:h-9 sm:w-9 items-center justify-center rounded-full bg-white/20 text-white hover:bg-white/35 transition-all cursor-pointer active:scale-90 border border-white/20 backdrop-blur-md shadow-xs'
           >
             <X size={18} />
           </button>
         </div>
 
-        {/* Scrollable Form Body */}
-        <div className='flex-1 overflow-y-auto min-h-0'>
-          <MovementForm
-            type={type}
-            product={product}
-            loading={loading}
-            onClose={onClose}
-            onSubmit={onSubmit}
-          />
-        </div>
+        {/* Form Body with Sticky Footer */}
+        <MovementForm
+          type={type}
+          product={product}
+          loading={loading}
+          onClose={onClose}
+          onSubmit={onSubmit}
+        />
       </div>
     </div>
   );

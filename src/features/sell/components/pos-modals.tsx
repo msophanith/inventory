@@ -95,7 +95,6 @@ export function PosModals({
       />
       <PosCheckoutModal
         open={isCheckoutOpen}
-        // items={cartItems}
         total={totalAmount}
         isPending={checkoutPending}
         onClose={onCloseCheckout}

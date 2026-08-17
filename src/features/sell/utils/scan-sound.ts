@@ -1,11 +1,30 @@
+let audioCtxInstance: AudioContext | null = null;
+
+function getAudioContext(): AudioContext | null {
+  if (typeof window === 'undefined') return null;
+  if (!audioCtxInstance) {
+    const AudioCtx =
+      window.AudioContext ||
+      (window as unknown as { webkitAudioContext: typeof AudioContext })
+        .webkitAudioContext;
+    if (AudioCtx) {
+      audioCtxInstance = new AudioCtx();
+    }
+  }
+  if (audioCtxInstance && audioCtxInstance.state === 'suspended') {
+    audioCtxInstance.resume().catch(() => {});
+  }
+  return audioCtxInstance;
+}
+
 /**
- * Plays a clean barcode scanner audio beep using Web Audio API
+ * Plays a clean barcode scanner audio beep using Web Audio API with zero latency
  */
 export function playScanSound() {
   try {
-    const AudioCtx = window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext;
-    if (!AudioCtx) return;
-    const ctx = new AudioCtx();
+    const ctx = getAudioContext();
+    if (!ctx) return;
+
     const osc = ctx.createOscillator();
     const gain = ctx.createGain();
 
@@ -23,3 +42,4 @@ export function playScanSound() {
     // Audio context initialization might fail without user gesture, silently fallback
   }
 }
+

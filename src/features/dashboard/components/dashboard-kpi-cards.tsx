@@ -1,4 +1,10 @@
-import { AlertTriangle, DollarSign, Package, ShoppingBag, TrendingUp } from 'lucide-react';
+import {
+  AlertTriangle,
+  DollarSign,
+  Package,
+  ShoppingBag,
+  TrendingUp,
+} from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { formatCurrencyKhr, formatCurrencyUsd } from '../../../utils/currency';
 import type { TodaySaleSummary } from '../../../services/movement';

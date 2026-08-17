@@ -1,5 +1,6 @@
 import { useMemo, useState } from 'react';
 import type { Movement, MovementType } from '../../../services/movement';
+import { isCurrentMonth } from '../../../utils/date';
 import { MovementTableFilter } from './movement-table-filter';
 import { MovementTablePagination } from './movement-table-pagination';
 import { MovementTableRow } from './movement-table-row';
@@ -22,6 +23,7 @@ const MovementTable = ({ movements, isLoading }: Props) => {
 
   const filteredMovements = useMemo(() => {
     return movements.filter((item) => {
+      const matchMonth = isCurrentMonth(item.createdAt);
       const matchType = type === 'ALL' || item.type === type;
       const isItemDamaged = Boolean(
         item.isDamaged || item.reference?.toLowerCase() === 'damage',
@@ -36,7 +38,7 @@ const MovementTable = ({ movements, isLoading }: Props) => {
         item.note?.toLowerCase().includes(q) ||
         item.id.toLowerCase().includes(q);
 
-      return matchType && matchDamage && matchSearch;
+      return matchMonth && matchType && matchDamage && matchSearch;
     });
   }, [movements, type, damagedOnly, searchQuery]);
 
@@ -85,9 +87,7 @@ const MovementTable = ({ movements, isLoading }: Props) => {
         <h1 className='text-2xl font-bold text-slate-900 tracking-tight'>
           {t('movement.stockMovement')}
         </h1>
-        <p className='text-sm text-slate-500'>
-          {t('movement.stockMovement')}
-        </p>
+        <p className='text-sm text-slate-500'>{t('movement.stockMovement')}</p>
       </div>
 
       {/* Filter & Search Toolbar */}
@@ -116,7 +116,9 @@ const MovementTable = ({ movements, isLoading }: Props) => {
             <tr className='border-b border-slate-200 bg-slate-50/80 text-xs font-bold uppercase tracking-wider text-slate-500'>
               <th className='px-5 py-3.5'>{t('products.productName')}</th>
               <th className='px-5 py-3.5'>{t('movement.movementType')}</th>
-              <th className='px-5 py-3.5 text-center'>{t('movement.quantity')}</th>
+              <th className='px-5 py-3.5 text-center'>
+                {t('movement.quantity')}
+              </th>
               <th className='px-5 py-3.5 text-center'>{t('products.stock')}</th>
               <th className='px-5 py-3.5'>{t('common.status')}</th>
               <th className='px-5 py-3.5'>{t('movement.reason')}</th>

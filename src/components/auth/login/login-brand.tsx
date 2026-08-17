@@ -17,7 +17,7 @@ export function LoginBrand() {
         </h1>
         <p className='mt-1 text-xs sm:text-sm font-semibold text-slate-500 flex items-center justify-center gap-1.5'>
           <ShieldCheck size={15} className='text-emerald-600' />
-          Enterprise Inventory Management
+          Smart Inventory Manager
         </p>
       </div>
     </div>
