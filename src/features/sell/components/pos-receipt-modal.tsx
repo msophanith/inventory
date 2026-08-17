@@ -4,7 +4,7 @@ import type { ReceiptData } from '../types/sell.types';
 import { formatDateTime } from '../../../utils/date';
 import { generatePdfInvoiceBlob } from '../utils/pdf-generator';
 import { formatCurrencyKhr, formatCurrencyUsd } from '../../../utils/currency';
-import { printThermalReceipt } from '../utils/thermal-printer';
+import { printThermalReceipt, printThermalReceiptWebUSB } from '../utils/thermal-printer';
 
 interface Props {
   readonly receipt: ReceiptData | null;
@@ -13,8 +13,8 @@ interface Props {
 
 export function PosReceiptModal({ receipt, onClose }: Props) {
   const [isGeneratingPdf, setIsGeneratingPdf] = useState(false);
-
   const [isPrintingThermal, setIsPrintingThermal] = useState(false);
+  const [isPrintingUSB, setIsPrintingUSB] = useState(false);
 
   if (!receipt) return null;
 
@@ -27,6 +27,20 @@ export function PosReceiptModal({ receipt, onClose }: Props) {
       console.error('Failed to print thermal receipt:', err);
     } finally {
       setIsPrintingThermal(false);
+    }
+  };
+
+  const handlePrintUSB = async () => {
+    if (!receipt) return;
+    try {
+      setIsPrintingUSB(true);
+      await printThermalReceiptWebUSB(receipt);
+    } catch (err) {
+      console.error('Failed to print thermal receipt via WebUSB:', err);
+      // Very basic fallback alert
+      alert(err instanceof Error ? err.message : 'USB Print failed');
+    } finally {
+      setIsPrintingUSB(false);
     }
   };
 
@@ -140,7 +154,7 @@ export function PosReceiptModal({ receipt, onClose }: Props) {
             <button
               type='button'
               onClick={handlePreviewPdf}
-              disabled={isGeneratingPdf}
+              disabled={isGeneratingPdf || isPrintingUSB}
               className='flex-1 flex items-center justify-center gap-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 py-2.5 text-xs font-bold text-white shadow-md cursor-pointer disabled:opacity-50 transition'
             >
               <FileText size={16} />{' '}
@@ -148,12 +162,22 @@ export function PosReceiptModal({ receipt, onClose }: Props) {
             </button>
             <button
               type='button'
-              onClick={handlePrint}
-              disabled={isPrintingThermal}
-              className='flex-1 flex items-center justify-center gap-2 rounded-xl border border-slate-200 py-2.5 text-xs font-bold text-slate-700 hover:bg-slate-50 cursor-pointer disabled:opacity-50 transition'
+              onClick={handlePrintUSB}
+              disabled={isPrintingUSB || isGeneratingPdf}
+              className='flex-1 flex items-center justify-center gap-2 rounded-xl border border-emerald-200 bg-emerald-50 text-emerald-700 hover:bg-emerald-100 py-2.5 text-xs font-bold shadow-xs cursor-pointer disabled:opacity-50 transition'
             >
-              <Printer size={16} /> {isPrintingThermal ? 'Printing...' : 'Print'}
+              <Printer size={16} /> {isPrintingUSB ? 'Printing...' : 'Direct USB Print'}
             </button>
+          </div>
+          <div className='flex gap-2'>
+             <button
+                type='button'
+                onClick={handlePrint}
+                disabled={isPrintingThermal}
+                className='w-full flex items-center justify-center gap-2 rounded-xl border border-slate-200 py-2.5 text-xs font-bold text-slate-700 hover:bg-slate-50 cursor-pointer disabled:opacity-50 transition'
+              >
+                <Printer size={16} /> {isPrintingThermal ? 'Printing (Browser)...' : 'Browser Print'}
+              </button>
           </div>
           <button
             type='button'

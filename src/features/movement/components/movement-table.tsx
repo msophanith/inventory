@@ -1,10 +1,9 @@
 import { useMemo, useState } from 'react';
 import type { Movement, MovementType } from '../../../services/movement';
-import { isCurrentMonth } from '../../../utils/date';
+import { getCurrentMonthLabel, isCurrentMonth } from '../../../utils/date';
 import { MovementTableFilter } from './movement-table-filter';
 import { MovementTablePagination } from './movement-table-pagination';
 import { MovementTableRow } from './movement-table-row';
-import { useLanguage } from '../../../i18n/language-context';
 
 interface Props {
   readonly movements: Movement[];
@@ -14,12 +13,13 @@ interface Props {
 const PAGE_SIZE_OPTIONS = [10, 20, 50];
 
 const MovementTable = ({ movements, isLoading }: Props) => {
-  const { t } = useLanguage();
   const [type, setType] = useState<MovementType | 'ALL'>('ALL');
   const [damagedOnly, setDamagedOnly] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
+
+  const currentMonthLabel = useMemo(() => getCurrentMonthLabel(), []);
 
   const filteredMovements = useMemo(() => {
     return movements.filter((item) => {
@@ -56,7 +56,7 @@ const MovementTable = ({ movements, isLoading }: Props) => {
             colSpan={7}
             className='p-10 text-center text-slate-400 font-medium'
           >
-            {t('common.loading')}
+            Loading stock movements...
           </td>
         </tr>
       );
@@ -69,7 +69,8 @@ const MovementTable = ({ movements, isLoading }: Props) => {
             colSpan={7}
             className='p-12 text-center text-slate-500 font-medium'
           >
-            {t('common.noData')}
+            No movement records found for this month ({currentMonthLabel})
+            matching criteria.
           </td>
         </tr>
       );
@@ -84,17 +85,25 @@ const MovementTable = ({ movements, isLoading }: Props) => {
     <div className='space-y-6 rounded-3xl border border-slate-200/80 bg-white p-4 sm:p-6 shadow-xs min-w-0 w-full max-w-full overflow-hidden'>
       {/* Header */}
       <div>
-        <h1 className='text-2xl font-bold text-slate-900 tracking-tight'>
-          {t('movement.stockMovement')}
-        </h1>
-        <p className='text-sm text-slate-500'>{t('movement.stockMovement')}</p>
+        <div className='flex items-center gap-2.5 flex-wrap'>
+          <h1 className='text-2xl font-bold text-slate-900 tracking-tight'>
+            History
+          </h1>
+          <span className='px-2.5 py-0.5 rounded-full text-xs font-semibold bg-emerald-100 text-emerald-800 border border-emerald-200/60'>
+            This Month ({currentMonthLabel})
+          </span>
+        </div>
+        <p className='text-sm text-slate-500 mt-1'>
+          Track inventory restocks, sales transactions, customer returns, and
+          damaged stock writes for this month ({currentMonthLabel}).
+        </p>
       </div>
 
       {/* Filter & Search Toolbar */}
       <MovementTableFilter
         selectedType={type}
-        onTypeChange={(tVal) => {
-          setType(tVal);
+        onTypeChange={(t) => {
+          setType(t);
           setPage(1);
         }}
         damagedOnly={damagedOnly}
@@ -114,15 +123,13 @@ const MovementTable = ({ movements, isLoading }: Props) => {
         <table className='w-full border-collapse text-left text-sm'>
           <thead>
             <tr className='border-b border-slate-200 bg-slate-50/80 text-xs font-bold uppercase tracking-wider text-slate-500'>
-              <th className='px-5 py-3.5'>{t('products.productName')}</th>
-              <th className='px-5 py-3.5'>{t('movement.movementType')}</th>
-              <th className='px-5 py-3.5 text-center'>
-                {t('movement.quantity')}
-              </th>
-              <th className='px-5 py-3.5 text-center'>{t('products.stock')}</th>
-              <th className='px-5 py-3.5'>{t('common.status')}</th>
-              <th className='px-5 py-3.5'>{t('movement.reason')}</th>
-              <th className='px-5 py-3.5 text-right'>{t('common.date')}</th>
+              <th className='px-5 py-3.5'>Product</th>
+              <th className='px-5 py-3.5'>Type</th>
+              <th className='px-5 py-3.5 text-center'>Quantity</th>
+              <th className='px-5 py-3.5 text-center'>Remaining Stock</th>
+              <th className='px-5 py-3.5'>Condition</th>
+              <th className='px-5 py-3.5'>Reference / Note</th>
+              <th className='px-5 py-3.5 text-right'>Date & Time</th>
             </tr>
           </thead>
           <tbody className='divide-y divide-slate-100'>

@@ -5,9 +5,10 @@ import { useNavigate } from 'react-router-dom';
 
 interface Props {
   readonly product: Product;
+  readonly onDeleteClick: () => void;
 }
 
-const ProductHero = ({ product }: Props) => {
+const ProductHero = ({ product, onDeleteClick }: Props) => {
   const navigate = useNavigate();
   const [copied, setCopied] = useState(false);
 
@@ -91,6 +92,7 @@ const ProductHero = ({ product }: Props) => {
 
           <button
             type='button'
+            onClick={onDeleteClick}
             className='flex-1 sm:flex-initial inline-flex items-center justify-center gap-2 rounded-2xl bg-rose-500 px-4 py-2.5 text-sm font-extrabold text-white hover:bg-rose-600 shadow-md shadow-rose-500/20 transition cursor-pointer'
           >
             <Trash2 size={16} />

@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { ArrowLeft } from 'lucide-react';
 import { useNavigate, useParams } from 'react-router-dom';
 
@@ -8,6 +9,7 @@ import StockProgress from '../features/product-details/components/stock-progress
 import QuickActions from '../features/product-details/components/quick-action';
 import ProductDetailsSkeleton from '../features/product-details/components/skeleton';
 import ProductMovementHistory from '../features/product-details/components/product-movement';
+import ConfirmDeleteModal from '../features/product-details/components/confirm-delete-modal';
 
 import { useProduct } from '../features/product/hooks/use-product';
 import { useMovement } from '../features/movement/hooks/use-movement';
@@ -21,7 +23,9 @@ import { PageContainer } from '../components/layout/page-container';
 const ProductDetailsPage = () => {
   const { productId } = useParams();
   const navigate = useNavigate();
-  const { useGetProductById } = useProduct(false);
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const { useGetProductById, useDeleteProduct } = useProduct(false);
+  const deleteProductMutation = useDeleteProduct();
   const {
     useGetMovementById,
     alert,
@@ -59,7 +63,9 @@ const ProductDetailsPage = () => {
 
   const onUpdateStock = async (values: FormValues) => {
     const payload = {
-      unitPrice: values.unitPrice ?? (type === 'IN' ? product.buyPrice : product.sellPrice),
+      unitPrice:
+        values.unitPrice ??
+        (type === 'IN' ? product.buyPrice : product.sellPrice),
       productId: productId ?? '',
       type,
       isDamaged: values.reason === 'Damage',
@@ -77,6 +83,17 @@ const ProductDetailsPage = () => {
     }
   };
 
+  const handleDeleteProduct = async () => {
+    try {
+      await deleteProductMutation.mutateAsync(productId!);
+      setAlert({ type: 'success', message: 'Product deleted successfully' });
+      setIsDeleteDialogOpen(false);
+      setTimeout(() => navigate('/products'), 1000);
+    } catch {
+      setAlert({ type: 'error', message: 'Failed to delete product' });
+    }
+  };
+
   return (
     <PageContainer className='space-y-6'>
       <div>
@@ -89,7 +106,10 @@ const ProductDetailsPage = () => {
         </button>
       </div>
 
-      <ProductHero product={product} />
+      <ProductHero
+        product={product}
+        onDeleteClick={() => setIsDeleteDialogOpen(true)}
+      />
       <QuickActions
         isLoading={isCreatingMovement}
         onStockIn={() => handleAction('in')}
@@ -123,6 +143,14 @@ const ProductDetailsPage = () => {
           onClose={() => setAlert(null)}
         />
       )}
+
+      <ConfirmDeleteModal
+        open={isDeleteDialogOpen}
+        productName={product.name}
+        loading={deleteProductMutation.isPending}
+        onClose={() => setIsDeleteDialogOpen(false)}
+        onConfirm={handleDeleteProduct}
+      />
     </PageContainer>
   );
 };
