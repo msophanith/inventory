@@ -20,6 +20,7 @@ export function useCheckout() {
       amountPaid,
       paymentMethod,
       soldBy,
+      customerNote,
     }: {
       items: CartItem[];
       subtotal: number;
@@ -29,6 +30,7 @@ export function useCheckout() {
       amountPaid: number;
       paymentMethod: PaymentMethod;
       soldBy?: string;
+      customerNote?: string;
     }) => {
       const orderId = `POS-${Date.now().toString().slice(-6)}`;
       const cashierName =
@@ -45,7 +47,13 @@ export function useCheckout() {
             unitPrice: item.unitPrice,
             isDamaged: false,
             reference: `POS Sale #${orderId}`,
-            note: `Payment via ${paymentMethod} (${item.quantity} ${item.unit || item.product.unit || 'units'})`,
+            note: [
+              `Payment via ${paymentMethod}`,
+              `(${item.quantity} ${item.unit || item.product.unit || 'units'})`,
+              customerNote ? `| Customer: ${customerNote}` : '',
+            ]
+              .filter(Boolean)
+              .join(' '),
           },
           true,
         );

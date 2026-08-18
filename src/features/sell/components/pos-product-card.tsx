@@ -135,6 +135,11 @@ export const PosProductCard = memo(function PosProductCard({
         <h3 className='font-extrabold text-slate-900 line-clamp-1 text-xs leading-snug group-hover:text-indigo-600 transition-colors'>
           {product.name}
         </h3>
+        {product.barcode && (
+          <span className='text-[9px] font-mono text-slate-400 truncate block mt-0.5 tracking-wide'>
+            #{product.barcode}
+          </span>
+        )}
 
         <div className='flex items-center justify-between pt-1'>
           <div>

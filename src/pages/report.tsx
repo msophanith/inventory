@@ -6,7 +6,10 @@ import {
   ReportSummary,
   ReportTable,
 } from '../features/report/components';
+import { ReportRevenueCOGSChart } from '../features/report/components/report-revenue-cogs-chart';
 import { PageContainer } from '../components/layout/page-container';
+import { DashboardSalesMarginChart } from '../features/dashboard/components/dashboard-sales-margin-chart';
+import { useMovement } from '../features/movement/hooks/use-movement';
 
 const ReportPage = () => {
   const {
@@ -21,10 +24,19 @@ const ReportPage = () => {
     summary,
     productReports,
     monthlyMovements,
+    rawMovements,
+    dateMode,
+    setDateMode,
+    customStart,
+    setCustomStart,
+    customEnd,
+    setCustomEnd,
     handleExportExcel,
     handleExportCsv,
     handleExportTodayCsv,
   } = useReport();
+
+  const { data: movements, isLoading: isMovementLoading } = useMovement();
 
   const [exportModalState, setExportModalState] = useState<{
     isOpen: boolean;
@@ -69,7 +81,7 @@ const ReportPage = () => {
         </span>
       </div>
 
-      {/* Header with Month Selector & Export Actions */}
+      {/* Header with Month/Range Selector & Export Actions */}
       <div className='animate-in fade-in slide-in-from-bottom-2 duration-500 delay-75'>
         <ReportHeader
           selectedMonth={selectedMonth}
@@ -80,6 +92,12 @@ const ReportPage = () => {
           onExportTodayCsv={() => handleOpenExportModal('TODAY_CSV')}
           onRefresh={() => refetch()}
           isRefreshing={isLoading}
+          dateMode={dateMode}
+          onDateModeChange={setDateMode}
+          customStart={customStart}
+          customEnd={customEnd}
+          onCustomStartChange={setCustomStart}
+          onCustomEndChange={setCustomEnd}
         />
       </div>
 
@@ -102,8 +120,20 @@ const ReportPage = () => {
         />
       </div>
 
+      {/* Revenue vs COGS Stacked Chart */}
+      <div className='animate-in fade-in slide-in-from-bottom-3 duration-500 delay-200 space-y-6'>
+        <ReportRevenueCOGSChart
+          rawMovements={rawMovements}
+          isLoading={isLoading || isMovementLoading}
+        />
+        <DashboardSalesMarginChart
+          movements={movements}
+          isLoading={isMovementLoading || isLoading}
+        />
+      </div>
+
       {/* Breakdown Tables (Product Summary & Transactions) */}
-      <div className='animate-in fade-in slide-in-from-bottom-4 duration-500 delay-200'>
+      <div className='animate-in fade-in slide-in-from-bottom-4 duration-500 delay-250'>
         <ReportTable
           productReports={productReports}
           monthlyMovements={monthlyMovements}

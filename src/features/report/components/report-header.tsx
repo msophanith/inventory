@@ -1,5 +1,6 @@
-import { Calendar, Download, FileSpreadsheet, RefreshCw, Zap } from 'lucide-react';
+import { Calendar, CalendarRange, Download, FileSpreadsheet, RefreshCw, Zap } from 'lucide-react';
 import type { MonthOption } from '../types/report.types';
+import type { DateMode } from '../hooks/use-report';
 import { useLanguage } from '../../../i18n/language-context';
 
 interface Props {
@@ -11,6 +12,12 @@ interface Props {
   readonly onExportTodayCsv: () => void;
   readonly onRefresh: () => void;
   readonly isRefreshing?: boolean;
+  readonly dateMode: DateMode;
+  readonly onDateModeChange: (mode: DateMode) => void;
+  readonly customStart: string;
+  readonly customEnd: string;
+  readonly onCustomStartChange: (v: string) => void;
+  readonly onCustomEndChange: (v: string) => void;
 }
 
 export function ReportHeader({
@@ -22,6 +29,12 @@ export function ReportHeader({
   onExportTodayCsv,
   onRefresh,
   isRefreshing,
+  dateMode,
+  onDateModeChange,
+  customStart,
+  customEnd,
+  onCustomStartChange,
+  onCustomEndChange,
 }: Props) {
   const { t } = useLanguage();
 
@@ -47,22 +60,46 @@ export function ReportHeader({
 
       {/* Controls & Actions */}
       <div className='flex flex-wrap items-center gap-2.5 sm:gap-3'>
-        {/* Month Selector */}
-        <div className='relative flex items-center group'>
-          <Calendar size={18} className='absolute left-3.5 text-emerald-600 group-hover:text-emerald-700 transition-colors pointer-events-none' />
-          <select
-            value={selectedMonth}
-            onChange={(e) => onSelectMonth(e.target.value)}
-            className='h-11 rounded-xl border border-slate-200 bg-white/90 pl-10 pr-9 text-xs sm:text-sm font-bold text-slate-800 shadow-xs transition hover:border-emerald-300 focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 cursor-pointer appearance-none'
-          >
-            {monthOptions.map((opt) => (
-              <option key={opt.value} value={opt.value}>
-                {opt.label}
-              </option>
-            ))}
-          </select>
-          <span className='absolute right-3.5 pointer-events-none text-xs text-slate-400 group-hover:text-slate-600 transition-colors'>▼</span>
+        {/* Mode Toggle */}
+        <div className='flex items-center gap-1 rounded-xl bg-slate-100 p-1 border border-slate-200/60'>
+          <button type='button' onClick={() => onDateModeChange('MONTH')}
+            className={`flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-extrabold transition-all ${
+              dateMode === 'MONTH' ? 'bg-white text-emerald-600 shadow-sm' : 'text-slate-500 hover:text-slate-800'
+            }`}>
+            <Calendar size={13} /> Month
+          </button>
+          <button type='button' onClick={() => onDateModeChange('RANGE')}
+            className={`flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-extrabold transition-all ${
+              dateMode === 'RANGE' ? 'bg-white text-indigo-600 shadow-sm' : 'text-slate-500 hover:text-slate-800'
+            }`}>
+            <CalendarRange size={13} /> Range
+          </button>
         </div>
+
+        {/* Month Selector or Date Range */}
+        {dateMode === 'MONTH' ? (
+          <div className='relative flex items-center group'>
+            <Calendar size={18} className='absolute left-3.5 text-emerald-600 pointer-events-none' />
+            <select
+              value={selectedMonth}
+              onChange={(e) => onSelectMonth(e.target.value)}
+              className='h-11 rounded-xl border border-slate-200 bg-white/90 pl-10 pr-9 text-xs sm:text-sm font-bold text-slate-800 shadow-xs transition hover:border-emerald-300 focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 cursor-pointer appearance-none'
+            >
+              {monthOptions.map((opt) => (
+                <option key={opt.value} value={opt.value}>{opt.label}</option>
+              ))}
+            </select>
+            <span className='absolute right-3.5 pointer-events-none text-xs text-slate-400'>▼</span>
+          </div>
+        ) : (
+          <div className='flex items-center gap-2'>
+            <input type='date' value={customStart} onChange={(e) => onCustomStartChange(e.target.value)}
+              className='h-11 rounded-xl border border-indigo-200 bg-white px-3 text-xs font-bold text-slate-800 shadow-xs focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 cursor-pointer' />
+            <span className='text-xs font-bold text-slate-400'>→</span>
+            <input type='date' value={customEnd} onChange={(e) => onCustomEndChange(e.target.value)}
+              className='h-11 rounded-xl border border-indigo-200 bg-white px-3 text-xs font-bold text-slate-800 shadow-xs focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 cursor-pointer' />
+          </div>
+        )}
 
         {/* Refresh Button */}
         <button

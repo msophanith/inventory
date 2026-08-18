@@ -61,7 +61,7 @@ export function ReportSummary({ summary, monthLabel, loading }: Props) {
           <div className='mt-4 inline-flex items-center gap-1.5 rounded-full bg-white/15 px-3 py-1 text-xs font-semibold text-emerald-50 backdrop-blur-xs'>
             <ShoppingBag size={13} />
             <span>
-              {summary.totalItemsSold} {t('pos.itemsCount', { count: summary.totalItemsSold })} ({summary.orderCount} {t('reports.totalOrders')})
+            {t('pos.itemsCount', { count: summary.totalItemsSold })} ({summary.orderCount} {t('reports.totalOrders')})
             </span>
           </div>
         </div>

@@ -67,6 +67,7 @@ const SellPage = () => {
   const handleConfirmPayment = async (params: {
     paymentMethod: PaymentMethod;
     amountPaid: number;
+    customerNote?: string;
   }) => {
     await checkout.processCheckout({
       items: cart.items,
@@ -76,6 +77,7 @@ const SellPage = () => {
       total: finalTotal,
       amountPaid: params.amountPaid,
       paymentMethod: params.paymentMethod,
+      customerNote: params.customerNote,
     });
     cart.clearCart();
     setDiscount({ type: 'PERCENT', value: 0, amount: 0 });
