@@ -1,14 +1,14 @@
 import { useState } from 'react';
-import { Edit2, Minus, Plus, Trash2 } from 'lucide-react';
+import { Minus, Plus, Trash2 } from 'lucide-react';
 import type { CartItem } from '../types/sell.types';
 import { formatCurrencyUsd } from '../../../utils/currency';
-import { useLanguage } from '../../../i18n/language-context';
 
 interface Props {
   readonly item: CartItem;
   readonly onUpdateQty: (productId: string, delta: number) => void;
   readonly onSetExactQty: (productId: string, exactQty: number) => void;
   readonly onUpdatePrice: (productId: string, newPrice: number) => void;
+  readonly onUpdateUnit: (productId: string, newUnit: string) => void;
   readonly onRemove: (productId: string) => void;
   readonly onStockExceeded?: (productName: string, maxStock: number) => void;
 }
@@ -18,12 +18,16 @@ export function PosCartItem({
   onUpdateQty,
   onSetExactQty,
   onUpdatePrice,
+  onUpdateUnit,
   onRemove,
   onStockExceeded,
 }: Props) {
-  const { t } = useLanguage();
   const [isEditingPrice, setIsEditingPrice] = useState(false);
   const [customPrice, setCustomPrice] = useState(item.unitPrice.toString());
+  const [isEditingUnit, setIsEditingUnit] = useState(false);
+  const [customUnit, setCustomUnit] = useState(
+    item.unit || item.product.unit || 'pcs',
+  );
   const [prevQuantity, setPrevQuantity] = useState(item.quantity);
   const [qtyInput, setQtyInput] = useState(item.quantity.toString());
   const maxStock = item.product.quantity;
@@ -39,6 +43,13 @@ export function PosCartItem({
       onUpdatePrice(item.product.id, parsed);
     }
     setIsEditingPrice(false);
+  };
+
+  const handleUnitSubmit = () => {
+    if (customUnit.trim()) {
+      onUpdateUnit(item.product.id, customUnit.trim());
+    }
+    setIsEditingUnit(false);
   };
 
   const handleQtyInputChange = (valStr: string) => {
@@ -66,38 +77,62 @@ export function PosCartItem({
   return (
     <div className='flex items-center justify-between gap-2 rounded-2xl border border-slate-100 bg-slate-50/60 p-2.5 transition hover:bg-slate-100/80'>
       <div className='flex-1 min-w-0'>
-        <h4 className='font-bold text-slate-900 text-xs truncate'>{item.product.name}</h4>
+        <h4 className='font-bold text-slate-900 text-xs truncate'>
+          {item.product.name}
+        </h4>
 
-        {isEditingPrice ? (
-          <div className='flex items-center gap-1 mt-1'>
-            <input
-              type='number'
-              step='0.01'
-              min='0'
-              autoFocus
-              value={customPrice}
-              onChange={(e) => setCustomPrice(e.target.value)}
-              onBlur={handlePriceSubmit}
-              onKeyDown={(e) => e.key === 'Enter' && handlePriceSubmit()}
-              className='w-16 rounded-md border border-emerald-500 bg-white px-1.5 py-0.5 text-xs font-bold text-slate-900 focus:outline-none'
-            />
-            <button type='button' onClick={handlePriceSubmit} className='text-[10px] font-bold text-emerald-600 cursor-pointer'>
-              {t('common.save')}
-            </button>
-          </div>
-        ) : (
-          <div className='flex items-center gap-1 text-xs text-slate-500 font-medium'>
-            <span>{formatCurrencyUsd(item.unitPrice)}</span>
+        <div className='flex items-center gap-1 mt-1 text-[11px]'>
+          {isEditingPrice ? (
+            <div className='flex items-center bg-white rounded shadow-2xs ring-1 ring-emerald-400/50 overflow-hidden px-1.5'>
+              <span className='text-emerald-500 font-bold text-[10px] mr-0.5'>
+                $
+              </span>
+              <input
+                type='number'
+                step='0.01'
+                min='0'
+                autoFocus
+                value={customPrice}
+                onChange={(e) => setCustomPrice(e.target.value)}
+                onBlur={handlePriceSubmit}
+                onKeyDown={(e) => e.key === 'Enter' && handlePriceSubmit()}
+                className='w-10 py-0.5 font-bold text-slate-800 focus:outline-none bg-transparent'
+              />
+            </div>
+          ) : (
             <button
               type='button'
               onClick={() => setIsEditingPrice(true)}
-              title={t('common.edit')}
-              className='text-slate-400 hover:text-emerald-600 cursor-pointer'
+              title='Edit Price'
+              className='cursor-pointer font-bold text-slate-500 hover:text-emerald-600 transition-colors underline decoration-dashed decoration-slate-300 underline-offset-2 hover:decoration-emerald-400'
             >
-              <Edit2 size={11} />
+              {formatCurrencyUsd(item.unitPrice)}
             </button>
-          </div>
-        )}
+          )}
+
+          <span className='text-slate-300 mx-0.5 font-light'>/</span>
+
+          {isEditingUnit ? (
+            <input
+              type='text'
+              autoFocus
+              value={customUnit}
+              onChange={(e) => setCustomUnit(e.target.value)}
+              onBlur={handleUnitSubmit}
+              onKeyDown={(e) => e.key === 'Enter' && handleUnitSubmit()}
+              className='w-14 bg-white rounded shadow-2xs ring-1 ring-indigo-400/50 px-1.5 py-0.5 font-bold text-slate-800 focus:outline-none'
+            />
+          ) : (
+            <button
+              type='button'
+              onClick={() => setIsEditingUnit(true)}
+              title='Edit Unit'
+              className='cursor-pointer font-bold text-slate-500 hover:text-indigo-600 transition-colors underline decoration-dashed decoration-slate-300 underline-offset-2 hover:decoration-indigo-400'
+            >
+              {item.unit || item.product.unit || 'pcs'}
+            </button>
+          )}
+        </div>
       </div>
 
       <div className='flex items-center gap-1 rounded-xl bg-white border border-slate-200 p-1 shadow-2xs'>
@@ -121,7 +156,9 @@ export function PosCartItem({
           type='button'
           onClick={handleIncrement}
           className={`flex h-6 w-6 items-center justify-center rounded-lg transition cursor-pointer ${
-            item.quantity >= maxStock ? 'text-slate-300 hover:bg-rose-50 hover:text-rose-500' : 'text-slate-600 hover:bg-slate-100'
+            item.quantity >= maxStock
+              ? 'text-slate-300 hover:bg-rose-50 hover:text-rose-500'
+              : 'text-slate-600 hover:bg-slate-100'
           }`}
         >
           <Plus size={12} />

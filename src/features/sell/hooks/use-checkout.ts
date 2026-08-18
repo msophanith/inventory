@@ -45,7 +45,7 @@ export function useCheckout() {
             unitPrice: item.unitPrice,
             isDamaged: false,
             reference: `POS Sale #${orderId}`,
-            note: `Payment via ${paymentMethod}`,
+            note: `Payment via ${paymentMethod} (${item.quantity} ${item.unit || item.product.unit || 'units'})`,
           },
           true,
         );
