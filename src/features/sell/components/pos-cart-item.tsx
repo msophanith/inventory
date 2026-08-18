@@ -100,14 +100,14 @@ export function PosCartItem({
               />
             </div>
           ) : (
-            <button
-              type='button'
-              onClick={() => setIsEditingPrice(true)}
-              title='Edit Price'
+              <button
+                type='button'
+                onClick={() => setIsEditingPrice(true)}
+                title='Edit Price'
               className='cursor-pointer font-bold text-slate-500 hover:text-emerald-600 transition-colors underline decoration-dashed decoration-slate-300 underline-offset-2 hover:decoration-emerald-400'
-            >
-              {formatCurrencyUsd(item.unitPrice)}
-            </button>
+              >
+                {formatCurrencyUsd(item.unitPrice)}
+              </button>
           )}
 
           <span className='text-slate-300 mx-0.5 font-light'>/</span>

@@ -7,7 +7,8 @@ import { DashboardHeader } from '../features/dashboard/components/dashboard-head
 import { DashboardKpiCards } from '../features/dashboard/components/dashboard-kpi-cards';
 import { DashboardAnalyticsCharts } from '../features/dashboard/components/dashboard-analytics-charts';
 import { DashboardRecentActivity } from '../features/dashboard/components/dashboard-recent-activity';
-import { DashboardSalesMarginChart } from '../features/dashboard/components/dashboard-sales-margin-chart';
+import { DashboardTopSellers } from '../features/dashboard/components/dashboard-top-sellers';
+import { DashboardLowStockFeed } from '../features/dashboard/components/dashboard-low-stock-feed';
 
 const DashboardPage = () => {
   const { productSummary, productSummaryLoading } = useProduct(true);
@@ -31,18 +32,23 @@ const DashboardPage = () => {
             todaySale={summary}
           />
 
-          {/* 3. Interactive Analytics & Distribution */}
+          {/* 3. Stock Distribution + Revenue Trend Line Chart (2-col grid) */}
           <DashboardAnalyticsCharts
             totalItems={productSummary?.totalItems || 0}
             lowStock={productSummary?.lowStockItems || 0}
             outOfStock={productSummary?.outOfStockItems || 0}
+            movements={movements}
+            isLoading={isMovementLoading}
           />
 
-          {/* 4. Live Activity Feed & Sales vs Margin Performance Chart */}
-          <div className='space-y-6'>
-            <DashboardRecentActivity movements={movements} isLoading={isMovementLoading} />
-            <DashboardSalesMarginChart movements={movements} isLoading={isMovementLoading} />
+          {/* 4. Top Sellers + Low-Stock Feed (2-col grid) */}
+          <div className='grid grid-cols-1 gap-6 lg:grid-cols-2'>
+            <DashboardTopSellers movements={movements} isLoading={isMovementLoading} />
+            <DashboardLowStockFeed />
           </div>
+
+          {/* 5. Live Activity Feed & Sales vs Margin Performance Chart */}
+          <DashboardRecentActivity movements={movements} isLoading={isMovementLoading} />
         </>
       )}
     </PageContainer>

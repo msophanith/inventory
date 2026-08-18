@@ -1,0 +1,16 @@
+export const productsKm = {
+  products: 'បញ្ជីទំនិញ',
+  addProduct: 'បន្ថែមទំនិញ',
+  editProduct: 'កែប្រែទំនិញ',
+  productName: 'ឈ្មោះទំនិញ',
+  category: 'ប្រភេទទំនិញ',
+  price: 'តម្លៃលក់',
+  cost: 'តម្លៃដើម',
+  stock: 'ចំនួនស្ដុក',
+  barcode: 'បារកូដ',
+  sku: 'កូដ SKU',
+  description: 'ការបរិយាយ',
+  inStock: 'មានក្នុងស្ដុក',
+  outOfStock: 'អស់ពីស្ដុក',
+  searchProduct: 'ស្វែងរកទំនិញតាមឈ្មោះ ឬបារកូដ...',
+};

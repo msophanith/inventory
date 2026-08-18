@@ -52,7 +52,10 @@ const MovementTable = ({ movements, isLoading }: Props) => {
     if (isLoading) {
       return (
         <tr>
-          <td colSpan={7} className='p-10 text-center text-slate-400 font-medium'>
+          <td
+            colSpan={7}
+            className='p-10 text-center text-slate-400 font-medium'
+          >
             Loading stock movements...
           </td>
         </tr>
@@ -62,8 +65,12 @@ const MovementTable = ({ movements, isLoading }: Props) => {
     if (paginatedData.length === 0) {
       return (
         <tr>
-          <td colSpan={7} className='p-12 text-center text-slate-500 font-medium'>
-            No movement records found for this month ({currentMonthLabel}) matching criteria.
+          <td
+            colSpan={7}
+            className='p-12 text-center text-slate-500 font-medium'
+          >
+            No movement records found for this month ({currentMonthLabel})
+            matching criteria.
           </td>
         </tr>
       );
@@ -95,11 +102,20 @@ const MovementTable = ({ movements, isLoading }: Props) => {
       {/* Filter & Search Toolbar */}
       <MovementTableFilter
         selectedType={type}
-        onTypeChange={(t) => { setType(t); setPage(1); }}
+        onTypeChange={(t) => {
+          setType(t);
+          setPage(1);
+        }}
         damagedOnly={damagedOnly}
-        onToggleDamaged={() => { setDamagedOnly(!damagedOnly); setPage(1); }}
+        onToggleDamaged={() => {
+          setDamagedOnly(!damagedOnly);
+          setPage(1);
+        }}
         searchQuery={searchQuery}
-        onSearchChange={(q) => { setSearchQuery(q); setPage(1); }}
+        onSearchChange={(q) => {
+          setSearchQuery(q);
+          setPage(1);
+        }}
       />
 
       {/* Responsive Table View */}
@@ -130,12 +146,13 @@ const MovementTable = ({ movements, isLoading }: Props) => {
         pageSize={pageSize}
         pageSizeOptions={PAGE_SIZE_OPTIONS}
         onPageChange={setPage}
-        onPageSizeChange={(newSize) => { setPageSize(newSize); setPage(1); }}
+        onPageSizeChange={(newSize) => {
+          setPageSize(newSize);
+          setPage(1);
+        }}
       />
     </div>
   );
 };
 
 export default MovementTable;
-
-

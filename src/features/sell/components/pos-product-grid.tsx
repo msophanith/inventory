@@ -1,5 +1,6 @@
-import { useMemo } from 'react';
+import { useMemo, useRef, useState, useLayoutEffect } from 'react';
 import { Camera, Search, Sparkles } from 'lucide-react';
+import { useWindowVirtualizer } from '@tanstack/react-virtual';
 import type { Product } from '../../../services/product';
 import type { CartItem } from '../types/sell.types';
 import { PosProductCard } from './pos-product-card';
@@ -41,11 +42,49 @@ export function PosProductGrid({
     return map;
   }, [cartItems]);
 
+  const listRef = useRef<HTMLDivElement>(null);
+  const [columns, setColumns] = useState(2);
+  const [listOffset, setListOffset] = useState(0);
+
+  useLayoutEffect(() => {
+    const updateDimensions = () => {
+      const width = window.innerWidth;
+      if (width >= 1536) setColumns(5); // 2xl
+      else if (width >= 1280) setColumns(4); // xl
+      else if (width >= 480) setColumns(3); // min-480, sm, md
+      else setColumns(2);
+
+      if (listRef.current) {
+        setListOffset(listRef.current.getBoundingClientRect().top + window.scrollY);
+      }
+    };
+
+    updateDimensions();
+    window.addEventListener('resize', updateDimensions);
+    return () => window.removeEventListener('resize', updateDimensions);
+  }, [products.length]); // Recalculate if products change and cause layout shifts
+
+  const rowCount = Math.ceil(products.length / columns);
+
+  const rowVirtualizer = useWindowVirtualizer({
+    count: rowCount,
+    estimateSize: () => 240, // Approximate row height including gap
+    overscan: 4,
+    scrollMargin: listOffset,
+  });
+
+  const gridColsClass = {
+    2: 'grid-cols-2',
+    3: 'grid-cols-3',
+    4: 'grid-cols-4',
+    5: 'grid-cols-5',
+  }[columns] || 'grid-cols-2';
+
   const renderContent = () => {
     if (isLoading) {
       return (
-        <div className='grid grid-cols-2 gap-3 min-[480px]:grid-cols-3 sm:grid-cols-3 md:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5'>
-          {[1, 2, 3, 4, 5, 6, 7, 8].map((i) => (
+        <div className={`grid gap-3 ${gridColsClass}`}>
+          {[...Array(columns * 2)].map((_, i) => (
             <div
               key={i}
               className='h-52 animate-pulse rounded-3xl bg-slate-200/70'
@@ -69,16 +108,40 @@ export function PosProductGrid({
       );
     }
 
+    const items = rowVirtualizer.getVirtualItems();
+
     return (
-      <div className='grid grid-cols-2 gap-3 min-[480px]:grid-cols-3 sm:grid-cols-3 md:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5'>
-        {products.map((p) => (
-          <PosProductCard
-            key={p.id}
-            product={p}
-            cartQuantity={cartMap.get(p.id) || 0}
-            onAddToCart={onAddToCart}
-          />
-        ))}
+      <div 
+        ref={listRef} 
+        className='relative w-full' 
+        style={{ height: `${rowVirtualizer.getTotalSize()}px` }}
+      >
+        {items.map((virtualRow) => {
+          const startIndex = virtualRow.index * columns;
+          const rowProducts = products.slice(startIndex, startIndex + columns);
+
+          return (
+            <div
+              key={virtualRow.index}
+              ref={rowVirtualizer.measureElement}
+              data-index={virtualRow.index}
+              className={`absolute top-0 left-0 w-full grid gap-3 ${gridColsClass}`}
+              style={{
+                transform: `translateY(${virtualRow.start - listOffset}px)`,
+                paddingBottom: '12px', // gap between rows
+              }}
+            >
+              {rowProducts.map((p) => (
+                <PosProductCard
+                  key={p.id}
+                  product={p}
+                  cartQuantity={cartMap.get(p.id) || 0}
+                  onAddToCart={onAddToCart}
+                />
+              ))}
+            </div>
+          );
+        })}
       </div>
     );
   };

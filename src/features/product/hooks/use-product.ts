@@ -1,9 +1,11 @@
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { productService } from '../../../services';
 import type { ProductQueryParams } from '../../../services/product';
 import { useState } from 'react';
 
 const useProduct = (enableSummary?: boolean) => {
+  const queryClient = useQueryClient();
+
   const useGetProducts = (params?: ProductQueryParams) => {
     return useQuery({
       queryKey: ['products', params],
@@ -51,6 +53,16 @@ const useProduct = (enableSummary?: boolean) => {
     });
   };
 
+  const useDeleteProduct = () => {
+    return useMutation({
+      mutationFn: (id: string) => productService.delete(id),
+      onSuccess: () => {
+        queryClient.invalidateQueries({ queryKey: ['products'] });
+        queryClient.invalidateQueries({ queryKey: ['productSummary'] });
+      },
+    });
+  };
+
   const [search, setSearch] = useState('');
 
   const handleSearchChange = (search: string) => {
@@ -63,6 +75,7 @@ const useProduct = (enableSummary?: boolean) => {
     useGetProductById,
     useGetOutOfStockProducts,
     useGetLowStockProducts,
+    useDeleteProduct,
     productSummary,
     productSummaryLoading,
     search,

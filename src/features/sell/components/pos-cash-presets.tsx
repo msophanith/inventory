@@ -1,4 +1,5 @@
-import { Banknote, Calculator } from 'lucide-react';
+import { useState } from 'react';
+import { Banknote, Calculator, PenLine } from 'lucide-react';
 import { formatCurrencyKhr, formatCurrencyUsd } from '../../../utils/currency';
 
 interface Props {
@@ -16,10 +17,32 @@ const KHR_DENOMINATIONS = [
 ];
 
 export function PosCashPresets({ total, amountPaid, onSelectAmount }: Props) {
+  const [customAmt, setCustomAmt] = useState('');
   const changeUsd = Math.max(0, amountPaid - total);
+
+  const handleCustomChange = (val: string) => {
+    setCustomAmt(val);
+    const parsed = Number.parseFloat(val);
+    if (!Number.isNaN(parsed) && parsed > 0) onSelectAmount(parsed);
+  };
 
   return (
     <div className='space-y-3 rounded-2xl border border-slate-200 bg-slate-50/70 p-3.5'>
+      {/* Custom Amount Input */}
+      <div className='flex items-center gap-2 rounded-xl border border-indigo-200 bg-white px-3 py-2 shadow-xs'>
+        <PenLine size={13} className='text-indigo-400 shrink-0' />
+        <input
+          type='number'
+          min='0'
+          step='0.01'
+          placeholder='Custom amount ($)'
+          value={customAmt}
+          onChange={(e) => handleCustomChange(e.target.value)}
+          className='flex-1 text-xs font-black text-slate-800 focus:outline-none bg-transparent placeholder:font-medium placeholder:text-slate-400'
+        />
+        <span className='text-xs font-black text-slate-400'>$</span>
+      </div>
+
       <div className='flex items-center justify-between text-xs font-bold text-slate-700'>
         <div className='flex items-center gap-1.5'>
           <Banknote size={15} className='text-emerald-600' />

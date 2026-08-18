@@ -1,6 +1,7 @@
 import { Eye, EyeOff, Loader2, LogIn, Mail, Lock } from 'lucide-react';
 import type { FormState, UseFormRegister } from 'react-hook-form';
 import type { LoginFormValues } from '../../../features/auth/hooks/use-login';
+import { useLanguage } from '../../../i18n/language-context';
 
 interface LoginFormProps {
   readonly register: UseFormRegister<LoginFormValues>;
@@ -19,6 +20,7 @@ export function LoginForm({
   onTogglePassword,
   onSubmit,
 }: LoginFormProps) {
+  const { t } = useLanguage();
   const inputBase =
     'w-full rounded-2xl border bg-slate-50/70 py-3.5 pl-11 pr-4 text-sm font-medium text-slate-900 placeholder-slate-400 outline-none transition-all duration-200 focus:bg-white focus:ring-4';
   const inputError =
@@ -34,7 +36,7 @@ export function LoginForm({
           htmlFor='email'
           className='mb-1.5 block text-xs font-extrabold uppercase tracking-wider text-slate-700'
         >
-          Email Address
+          {t('auth.email')}
         </label>
         <div className='relative'>
           <Mail
@@ -64,7 +66,7 @@ export function LoginForm({
             htmlFor='password'
             className='block text-xs font-extrabold uppercase tracking-wider text-slate-700'
           >
-            Password
+            {t('auth.password')}
           </label>
         </div>
         <div className='relative'>
@@ -114,7 +116,7 @@ export function LoginForm({
             className='transition-transform group-hover:translate-x-0.5'
           />
         )}
-        {formState.isSubmitting ? 'Authenticating…' : 'Sign In to Dashboard'}
+        {formState.isSubmitting ? t('common.loading') : t('auth.signIn')}
       </button>
     </form>
   );

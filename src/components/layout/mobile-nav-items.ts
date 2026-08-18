@@ -17,88 +17,92 @@ export interface MenuItem {
   readonly adminOnly: boolean;
 }
 
-export const bottomBarMenus: MenuItem[] = [
-  {
-    icon: Gauge,
-    label: 'Dashboard',
-    to: '/',
-    description: 'Analytics & metrics',
-    badgeColor: 'from-indigo-500 to-blue-600',
-    adminOnly: true,
-  },
-  {
-    icon: ShoppingCart,
-    label: 'Sell',
-    to: '/sell',
-    description: 'Process sales & checkout',
-    badgeColor: 'from-emerald-500 to-teal-600',
-    adminOnly: false,
-  },
-  {
-    icon: Box,
-    label: 'Products',
-    to: '/products',
-    description: 'Manage catalog & stock',
-    badgeColor: 'from-blue-500 to-cyan-600',
-    adminOnly: true,
-  },
-  {
-    icon: QrCode,
-    label: 'Scan',
-    to: '/scan',
-    description: 'Quick barcode lookup',
-    badgeColor: 'from-amber-500 to-orange-600',
-    adminOnly: false,
-  },
-];
+export function getBottomBarMenus(t: (key: string) => string): MenuItem[] {
+  return [
+    {
+      icon: Gauge,
+      label: t('reports.dashboard'),
+      to: '/',
+      description: t('reports.dashboard'),
+      badgeColor: 'from-indigo-500 to-blue-600',
+      adminOnly: true,
+    },
+    {
+      icon: ShoppingCart,
+      label: t('pos.cart'),
+      to: '/sell',
+      description: t('pos.cart'),
+      badgeColor: 'from-emerald-500 to-teal-600',
+      adminOnly: false,
+    },
+    {
+      icon: Box,
+      label: t('products.products'),
+      to: '/products',
+      description: t('products.products'),
+      badgeColor: 'from-blue-500 to-cyan-600',
+      adminOnly: true,
+    },
+    {
+      icon: QrCode,
+      label: t('pos.scanBarcode'),
+      to: '/scan',
+      description: t('pos.scanBarcode'),
+      badgeColor: 'from-amber-500 to-orange-600',
+      adminOnly: false,
+    },
+  ];
+}
 
-export const drawerMenus: MenuItem[] = [
-  {
-    icon: ShoppingCart,
-    label: 'POS / Sell',
-    to: '/sell',
-    description: 'Process sales & checkout',
-    badgeColor: 'from-emerald-500 to-teal-600',
-    adminOnly: false,
-  },
-  {
-    icon: QrCode,
-    label: 'Scan Lookup',
-    to: '/scan',
-    description: 'Quick barcode lookup',
-    badgeColor: 'from-amber-500 to-orange-600',
-    adminOnly: false,
-  },
-  {
-    icon: Gauge,
-    label: 'Dashboard',
-    to: '/',
-    description: 'Analytics & metrics',
-    badgeColor: 'from-indigo-500 to-blue-600',
-    adminOnly: true,
-  },
-  {
-    icon: Box,
-    label: 'Products',
-    to: '/products',
-    description: 'Manage catalog & stock',
-    badgeColor: 'from-blue-500 to-cyan-600',
-    adminOnly: true,
-  },
-  {
-    icon: RefreshCcw,
-    label: 'Stock Movement',
-    to: '/movement',
-    description: 'Adjustments & logs',
-    badgeColor: 'from-purple-500 to-indigo-600',
-    adminOnly: true,
-  },
-  {
-    icon: HistoryIcon,
-    label: 'Reports & Stats',
-    to: '/report',
-    description: 'Sales & profit reports',
-    badgeColor: 'from-rose-500 to-pink-600',
-    adminOnly: true,
-  },
-];
+export function getDrawerMenus(t: (key: string) => string): MenuItem[] {
+  return [
+    {
+      icon: ShoppingCart,
+      label: t('pos.cart'),
+      to: '/sell',
+      description: t('pos.cartEmptyDesc'),
+      badgeColor: 'from-emerald-500 to-teal-600',
+      adminOnly: false,
+    },
+    {
+      icon: QrCode,
+      label: t('pos.scanBarcode'),
+      to: '/scan',
+      description: t('pos.scanBarcode'),
+      badgeColor: 'from-amber-500 to-orange-600',
+      adminOnly: false,
+    },
+    {
+      icon: Gauge,
+      label: t('reports.dashboard'),
+      to: '/',
+      description: t('reports.dashboard'),
+      badgeColor: 'from-indigo-500 to-blue-600',
+      adminOnly: true,
+    },
+    {
+      icon: Box,
+      label: t('products.products'),
+      to: '/products',
+      description: t('products.products'),
+      badgeColor: 'from-blue-500 to-cyan-600',
+      adminOnly: true,
+    },
+    {
+      icon: RefreshCcw,
+      label: t('movement.stockMovement'),
+      to: '/movement',
+      description: t('movement.stockMovement'),
+      badgeColor: 'from-purple-500 to-indigo-600',
+      adminOnly: true,
+    },
+    {
+      icon: HistoryIcon,
+      label: t('reports.reports'),
+      to: '/report',
+      description: t('reports.reports'),
+      badgeColor: 'from-rose-500 to-pink-600',
+      adminOnly: true,
+    },
+  ];
+}

@@ -1,4 +1,5 @@
 import { Loader2, LogOut, X } from 'lucide-react';
+import { useLanguage } from '../../i18n/language-context';
 
 interface Props {
   readonly show: boolean;
@@ -13,10 +14,10 @@ export function SignoutModal({
   show,
   isLoggingOut,
   userEmail,
-  role,
   onClose,
   onConfirm,
 }: Props) {
+  const { t } = useLanguage();
   if (!show) return null;
 
   return (
@@ -34,18 +35,18 @@ export function SignoutModal({
               <LogOut size={22} />
             </div>
             <div>
-              <h3 className='text-lg font-bold text-slate-900'>Sign Out</h3>
-              <p className='text-xs text-slate-500 font-medium'>End active session</p>
+              <h3 className='text-lg font-bold text-slate-900'>{t('common.signOut')}</h3>
+              <p className='text-xs text-slate-500 font-medium'>{t('auth.signingOut')}</p>
             </div>
           </div>
 
-          <button onClick={onClose} className='rounded-xl p-1.5 text-slate-400 hover:bg-slate-100 transition'>
+          <button type='button' onClick={onClose} className='rounded-xl p-1.5 text-slate-400 hover:bg-slate-100 transition'>
             <X size={18} />
           </button>
         </div>
 
         <p className='text-sm text-slate-600 leading-relaxed font-medium bg-slate-50/80 rounded-2xl p-4 border border-slate-100'>
-          Are you sure you want to sign out ({userEmail})? You will need to log back in to access the system as {role}.
+          {t('auth.confirmSignOutDesc')} ({userEmail ?? ''})
         </p>
 
         <div className='flex gap-3 pt-1'>
@@ -55,7 +56,7 @@ export function SignoutModal({
             onClick={onClose}
             className='flex-1 rounded-xl border border-slate-200/80 bg-white py-2.5 text-xs font-bold text-slate-700 hover:bg-slate-50 transition cursor-pointer shadow-2xs disabled:opacity-50'
           >
-            Cancel
+            {t('common.cancel')}
           </button>
           <button
             type='button'
@@ -66,12 +67,12 @@ export function SignoutModal({
             {isLoggingOut ? (
               <>
                 <Loader2 size={15} className='animate-spin' />
-                <span>Signing Out…</span>
+                <span>{t('auth.signingOut')}</span>
               </>
             ) : (
               <>
                 <LogOut size={15} />
-                <span>Yes, Sign Out</span>
+                <span>{t('common.signOut')}</span>
               </>
             )}
           </button>

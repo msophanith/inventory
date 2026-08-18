@@ -10,11 +10,27 @@ import {
 } from '../utils/report-calculator';
 import { exportReportToCsv, exportReportToExcel } from '../utils/excel-export';
 import { exportTodaySalesToCsv } from '../utils/today-sales-export';
+import type { Movement } from '../../../services/movement';
+
+export type DateMode = 'MONTH' | 'RANGE';
+
+function filterByDateRange(movements: Movement[], start: string, end: string): Movement[] {
+  if (!start || !end) return movements;
+  const from = new Date(start).getTime();
+  const to = new Date(end + 'T23:59:59').getTime();
+  return movements.filter((m) => {
+    const t = new Date(m.createdAt).getTime();
+    return t >= from && t <= to;
+  });
+}
 
 export function useReport() {
   const currentMonthStr = formatDate(new Date(), 'yyyy-MM');
   const [selectedMonth, setSelectedMonth] = useState<string>(currentMonthStr);
   const [searchQuery, setSearchQuery] = useState<string>('');
+  const [dateMode, setDateMode] = useState<DateMode>('MONTH');
+  const [customStart, setCustomStart] = useState('');
+  const [customEnd, setCustomEnd] = useState('');
 
   const {
     data: rawMovements = [],
@@ -40,8 +56,9 @@ export function useReport() {
   }, [selectedMonth, monthOptions]);
 
   const monthlyMovements = useMemo(() => {
+    if (dateMode === 'RANGE') return filterByDateRange(rawMovements, customStart, customEnd);
     return filterMovementsByMonth(rawMovements, activeMonth);
-  }, [rawMovements, activeMonth]);
+  }, [rawMovements, activeMonth, dateMode, customStart, customEnd]);
 
   const summary = useMemo(() => {
     return calculateReportSummary(monthlyMovements);
@@ -62,9 +79,10 @@ export function useReport() {
   }, [allProductReports, searchQuery]);
 
   const activeMonthLabel = useMemo(() => {
+    if (dateMode === 'RANGE' && customStart && customEnd) return `${customStart} → ${customEnd}`;
     const found = monthOptions.find((m) => m.value === activeMonth);
     return found ? found.label : activeMonth;
-  }, [monthOptions, activeMonth]);
+  }, [monthOptions, activeMonth, dateMode, customStart, customEnd]);
 
   const handleExportExcel = (password?: string) => {
     exportReportToExcel(
@@ -97,6 +115,13 @@ export function useReport() {
     summary,
     productReports: filteredProductReports,
     monthlyMovements,
+    rawMovements,
+    dateMode,
+    setDateMode,
+    customStart,
+    setCustomStart,
+    customEnd,
+    setCustomEnd,
     handleExportExcel,
     handleExportCsv,
     handleExportTodayCsv,

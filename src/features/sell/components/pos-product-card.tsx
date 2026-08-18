@@ -130,11 +130,16 @@ export const PosProductCard = memo(function PosProductCard({
       {/* Product Name & Dual Pricing */}
       <div className='mt-3 space-y-1'>
         <p className='text-[10px] font-extrabold text-slate-400 uppercase tracking-widest truncate'>
-          {product.category || 'General'}
+          {product.category}
         </p>
         <h3 className='font-extrabold text-slate-900 line-clamp-1 text-xs leading-snug group-hover:text-indigo-600 transition-colors'>
           {product.name}
         </h3>
+        {product.barcode && (
+          <span className='text-[9px] font-mono text-slate-400 truncate block mt-0.5 tracking-wide'>
+            #{product.barcode}
+          </span>
+        )}
 
         <div className='flex items-center justify-between pt-1'>
           <div>

@@ -7,6 +7,7 @@ import {
   TrendingUp,
 } from 'lucide-react';
 import type { MonthlyReportSummary } from '../types/report.types';
+import { useLanguage } from '../../../i18n/language-context';
 
 interface Props {
   readonly summary: MonthlyReportSummary;
@@ -23,6 +24,8 @@ const formatCurrency = (val: number) =>
   }).format(val);
 
 export function ReportSummary({ summary, monthLabel, loading }: Props) {
+  const { t } = useLanguage();
+
   if (loading) {
     return (
       <div className='grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4'>
@@ -46,7 +49,7 @@ export function ReportSummary({ summary, monthLabel, loading }: Props) {
           <div className='absolute -right-8 -top-8 h-36 w-36 rounded-full bg-white/10 blur-2xl pointer-events-none' />
           <div className='flex items-center justify-between'>
             <p className='text-xs font-extrabold uppercase tracking-wider text-emerald-100/90'>
-              Total Revenue ({monthLabel})
+              {t('reports.totalSales')} ({monthLabel})
             </p>
             <div className='rounded-2xl bg-white/20 p-2.5 backdrop-blur-md shadow-xs'>
               <DollarSign size={22} className='text-white' />
@@ -58,7 +61,7 @@ export function ReportSummary({ summary, monthLabel, loading }: Props) {
           <div className='mt-4 inline-flex items-center gap-1.5 rounded-full bg-white/15 px-3 py-1 text-xs font-semibold text-emerald-50 backdrop-blur-xs'>
             <ShoppingBag size={13} />
             <span>
-              {summary.totalItemsSold} items sold ({summary.orderCount} orders)
+            {t('pos.itemsCount', { count: summary.totalItemsSold })} ({summary.orderCount} {t('reports.totalOrders')})
             </span>
           </div>
         </div>
@@ -67,7 +70,7 @@ export function ReportSummary({ summary, monthLabel, loading }: Props) {
         <div className='relative overflow-hidden rounded-3xl border border-slate-200/80 bg-white/80 p-6 shadow-xs backdrop-blur-md transition-all duration-300 hover:-translate-y-1.5 hover:border-slate-300 hover:shadow-md'>
           <div className='flex items-center justify-between'>
             <p className='text-xs font-extrabold uppercase tracking-wider text-slate-500'>
-              Cost of Goods (COGS)
+              {t('products.cost')}
             </p>
             <div className='rounded-2xl bg-indigo-50 p-2.5 text-indigo-600 shadow-xs'>
               <Package size={22} />
@@ -77,7 +80,7 @@ export function ReportSummary({ summary, monthLabel, loading }: Props) {
             {formatCurrency(summary.totalCost)}
           </h2>
           <p className='mt-4 text-xs font-medium text-slate-500'>
-            Original inventory procurement cost
+            {t('products.cost')}
           </p>
         </div>
 
@@ -85,7 +88,7 @@ export function ReportSummary({ summary, monthLabel, loading }: Props) {
         <div className='relative overflow-hidden rounded-3xl border border-slate-200/80 bg-white/80 p-6 shadow-xs backdrop-blur-md transition-all duration-300 hover:-translate-y-1.5 hover:border-slate-300 hover:shadow-md'>
           <div className='flex items-center justify-between'>
             <p className='text-xs font-extrabold uppercase tracking-wider text-slate-500'>
-              Net Profit Margin
+              {t('reports.netProfit')}
             </p>
             <div
               className={`rounded-2xl p-2.5 shadow-xs ${
@@ -115,7 +118,7 @@ export function ReportSummary({ summary, monthLabel, loading }: Props) {
               }`}
             >
               <Percent size={12} />
-              {summary.marginPercentage.toFixed(1)}% Profit Margin
+              {summary.marginPercentage.toFixed(1)}% {t('reports.netProfit')}
             </span>
           </div>
         </div>
@@ -124,7 +127,7 @@ export function ReportSummary({ summary, monthLabel, loading }: Props) {
         <div className='relative overflow-hidden rounded-3xl border border-rose-200/70 bg-gradient-to-br from-rose-50/90 via-orange-50/70 to-rose-100/50 p-6 shadow-xs backdrop-blur-md transition-all duration-300 hover:-translate-y-1.5 hover:shadow-md hover:border-rose-300'>
           <div className='flex items-center justify-between'>
             <p className='text-xs font-extrabold uppercase tracking-wider text-rose-800'>
-              Returns & Damage Loss
+              {t('movement.return')} & {t('movement.damaged')}
             </p>
             <div className='rounded-2xl bg-rose-100 p-2.5 text-rose-600 shadow-xs'>
               <AlertTriangle size={22} />
@@ -134,9 +137,9 @@ export function ReportSummary({ summary, monthLabel, loading }: Props) {
             {formatCurrency(summary.totalLosses)}
           </h2>
           <div className='mt-4 flex items-center gap-2 text-xs font-bold text-rose-700/90'>
-            <span className='rounded-md bg-rose-100 px-2 py-0.5'>{summary.totalItemsReturned} returned</span>
+            <span className='rounded-md bg-rose-100 px-2 py-0.5'>{summary.totalItemsReturned} {t('movement.return')}</span>
             <span>•</span>
-            <span className='rounded-md bg-amber-100 px-2 py-0.5 text-amber-900'>{summary.totalItemsDamaged} damaged</span>
+            <span className='rounded-md bg-amber-100 px-2 py-0.5 text-amber-900'>{summary.totalItemsDamaged} {t('movement.damaged')}</span>
           </div>
         </div>
       </div>

@@ -1,0 +1,16 @@
+export const productsEn = {
+  products: 'Products',
+  addProduct: 'Add Product',
+  editProduct: 'Edit Product',
+  productName: 'Product Name',
+  category: 'Category',
+  price: 'Price',
+  cost: 'Cost',
+  stock: 'Stock',
+  barcode: 'Barcode',
+  sku: 'SKU',
+  description: 'Description',
+  inStock: 'In Stock',
+  outOfStock: 'Out of Stock',
+  searchProduct: 'Search product by name or barcode...',
+};

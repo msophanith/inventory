@@ -5,6 +5,132 @@ import { formatDateTime } from '../../../utils/date';
 import { formatCurrencyKhr, formatCurrencyUsd } from '../../../utils/currency';
 import { PAYMENT_QR_CODE_VALUE } from './pdf-generator';
 
+import { EscPosEncoder } from './esc-pos-encoder';
+
+declare global {
+  interface Navigator {
+    usb: any;
+  }
+}
+
+export async function printThermalReceiptWebUSB(receipt: ReceiptData) {
+  // Check if WebUSB is available
+  if (!navigator.usb) {
+    throw new Error(
+      'WebUSB is not supported in this browser. Please use Chrome or Edge.',
+    );
+  }
+
+  try {
+    // Request device (shows browser prompt)
+    const device = await navigator.usb.requestDevice({ filters: [] });
+    await device.open();
+
+    if (device.configuration === null) {
+      await device.selectConfiguration(1);
+    }
+
+    let interfaceNumber = 0;
+    let endpointNumber = 0;
+
+    const interfaces = device.configuration.interfaces;
+    for (const iface of interfaces) {
+      const alternate = iface.alternate;
+      // Class 7 is Printer
+      if (alternate.interfaceClass === 7) {
+        interfaceNumber = iface.interfaceNumber;
+        for (const ep of alternate.endpoints) {
+          if (ep.direction === 'out') {
+            endpointNumber = ep.endpointNumber;
+            break;
+          }
+        }
+        if (endpointNumber !== 0) break;
+      }
+    }
+
+    // Fallback if not strictly class 7
+    if (endpointNumber === 0 && interfaces.length > 0) {
+      interfaceNumber = interfaces[0].interfaceNumber;
+      for (const ep of interfaces[0].alternate.endpoints) {
+        if (ep.direction === 'out') {
+          endpointNumber = ep.endpointNumber;
+          break;
+        }
+      }
+    }
+
+    if (endpointNumber === 0) {
+      throw new Error(
+        'Could not find a valid USB OUT endpoint for this printer.',
+      );
+    }
+
+    await device.claimInterface(interfaceNumber);
+
+    const encoder = new EscPosEncoder(32);
+    encoder
+      .initialize()
+      .align('center')
+      .bold(true)
+      .size(2, 2)
+      .line('INVOICE')
+      .size(1, 1)
+      .bold(false)
+      .line(`Order #${receipt.orderId}`)
+      .line(formatDateTime(receipt.createdAt))
+      .line(`Cashier: ${receipt.soldBy || 'Admin'}`)
+      .line()
+      .align('left')
+      .divider();
+
+    receipt.items.forEach((item) => {
+      encoder.row(
+        `${item.quantity}x ${item.product.name.substring(0, 16)}`,
+        formatCurrencyUsd(item.totalPrice),
+      );
+    });
+
+    encoder.divider();
+
+    if (receipt.discount > 0) {
+      encoder.row('Discount', `-${formatCurrencyUsd(receipt.discount)}`);
+    }
+
+    encoder
+      .bold(true)
+      .size(2, 2)
+      .row('Total', formatCurrencyUsd(receipt.total))
+      .size(1, 1)
+      .align('right')
+      .line(formatCurrencyKhr(receipt.total))
+      .align('left')
+      .bold(false)
+      .divider()
+      .row(
+        `Paid (${receipt.paymentMethod})`,
+        formatCurrencyUsd(receipt.amountPaid),
+      )
+      .row('Change', formatCurrencyUsd(receipt.change))
+      .line()
+      .align('center')
+      .line('Thank you for your purchase!')
+      .line()
+      .line()
+      .line()
+      .cut();
+
+    const data = encoder.encode();
+    await device.transferOut(endpointNumber, data);
+
+    await device.releaseInterface(interfaceNumber);
+    await device.close();
+  } catch (error) {
+    console.error('Error in WebUSB thermal print:', error);
+    throw error;
+  }
+}
+
 export async function printThermalReceipt(receipt: ReceiptData) {
   try {
     const qrDataUrl = await QRCode.toDataURL(PAYMENT_QR_CODE_VALUE, {

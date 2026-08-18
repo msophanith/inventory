@@ -108,6 +108,7 @@ export function ReportTable({
                 <th className='px-6 py-4 text-right'>Total Sales</th>
                 <th className='px-6 py-4 text-right'>Total Cost</th>
                 <th className='px-6 py-4 text-right'>Net Margin</th>
+                <th className='px-6 py-4 text-right'>Margin %</th>
               </tr>
             </thead>
             <tbody className='divide-y divide-slate-100'>

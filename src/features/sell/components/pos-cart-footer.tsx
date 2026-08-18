@@ -1,5 +1,6 @@
 import { CreditCard, FileText, Tag } from 'lucide-react';
 import { formatCurrencyKhr, formatCurrencyUsd } from '../../../utils/currency';
+import { useLanguage } from '../../../i18n/language-context';
 
 interface Props {
   readonly subtotal: number;
@@ -24,11 +25,13 @@ export function PosCartFooter({
   onPreviewPdf,
   onCheckout,
 }: Props) {
+  const { t } = useLanguage();
+
   return (
     <div className='border-t border-slate-100 pt-4 space-y-3'>
       <div className='space-y-1.5 text-xs text-slate-600 font-medium'>
         <div className='flex justify-between items-center'>
-          <span>Subtotal</span>
+          <span>{t('pos.subtotal')}</span>
           <div className='flex items-center gap-2'>
             <span>{formatCurrencyUsd(subtotal)}</span>
             {onOpenDiscount && (
@@ -46,7 +49,7 @@ export function PosCartFooter({
                 <span>
                   {discount > 0
                     ? `-${formatCurrencyUsd(discount)}`
-                    : 'Discount'}
+                    : t('pos.discount')}
                 </span>
               </button>
             )}
@@ -55,21 +58,21 @@ export function PosCartFooter({
 
         {discount > 0 && (
           <div className='flex justify-between text-emerald-600 font-bold'>
-            <span>Discount Applied</span>
+            <span>{t('pos.discount')}</span>
             <span>-{formatCurrencyUsd(discount)}</span>
           </div>
         )}
 
         {tax > 0 && (
           <div className='flex justify-between'>
-            <span>Tax</span>
+            <span>{t('pos.tax')}</span>
             <span>{formatCurrencyUsd(tax)}</span>
           </div>
         )}
 
         <div className='flex justify-between items-baseline pt-2 border-t border-slate-100'>
           <span className='font-bold text-slate-900 text-sm'>
-            Total Payable
+            {t('pos.total')}
           </span>
           <div className='text-right'>
             <span className='text-lg font-black text-emerald-600 block leading-tight'>
@@ -87,7 +90,7 @@ export function PosCartFooter({
           type='button'
           disabled={!hasItems || isGeneratingPdf}
           onClick={onPreviewPdf}
-          title='Preview PDF Invoice'
+          title={t('pos.downloadPdf')}
           className='flex items-center justify-center gap-1.5 rounded-2xl border border-indigo-200 bg-indigo-50 px-3 py-3 text-xs font-bold text-indigo-700 hover:bg-indigo-100 disabled:opacity-40 transition cursor-pointer'
         >
           <FileText size={16} />
@@ -101,7 +104,7 @@ export function PosCartFooter({
           className='flex-1 flex items-center justify-center gap-2 rounded-2xl bg-linear-to-r from-emerald-600 to-teal-600 py-3.5 text-sm font-extrabold text-white shadow-lg shadow-emerald-600/20 transition hover:from-emerald-700 hover:to-teal-700 disabled:opacity-50 cursor-pointer active:scale-98'
         >
           <CreditCard size={18} />
-          <span>Proceed to Checkout</span>
+          <span>{t('pos.checkout')}</span>
         </button>
       </div>
     </div>
