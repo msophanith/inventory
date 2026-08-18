@@ -124,6 +124,7 @@ const SellPage = () => {
           onUpdateQty={cart.updateQuantity}
           onSetExactQty={cart.setExactQuantity}
           onUpdatePrice={cart.updateUnitPrice}
+          onUpdateUnit={cart.updateUnit}
           onRemoveItem={cart.removeItem}
           onClearCart={() => {
             cart.clearCart();
@@ -171,6 +172,7 @@ const SellPage = () => {
         onUpdateQty={cart.updateQuantity}
         onSetExactQty={cart.setExactQuantity}
         onUpdatePrice={cart.updateUnitPrice}
+        onUpdateUnit={cart.updateUnit}
         onRemoveItem={cart.removeItem}
         onClearCart={() => {
           cart.clearCart();

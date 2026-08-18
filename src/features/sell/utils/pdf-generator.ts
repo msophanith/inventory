@@ -51,7 +51,7 @@ export async function generatePdfInvoiceBlob(
   receipt.items.forEach((item) => {
     const itemTotal = item.quantity * item.unitPrice;
     drawText(doc, item.product.name, 5, y, { maxWidth: 37 });
-    drawText(doc, `${item.quantity}`, 45, y, { align: 'right' });
+    drawText(doc, `${item.quantity} ${item.unit || item.product.unit || ''}`, 45, y, { align: 'right' });
     drawText(doc, `$${item.unitPrice.toFixed(2)}`, 58, y, { align: 'right' });
     drawText(doc, `$${itemTotal.toFixed(2)}`, 75, y, { align: 'right' });
     y += 4.5;

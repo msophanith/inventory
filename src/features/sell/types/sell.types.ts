@@ -5,6 +5,7 @@ export interface CartItem {
   quantity: number;
   unitPrice: number;
   totalPrice: number;
+  unit?: string;
 }
 
 export type PaymentMethod = 'CASH' | 'QR';

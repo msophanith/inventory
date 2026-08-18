@@ -71,7 +71,7 @@ export function PosReceiptModal({ receipt, onClose }: Props) {
               >
                 <div className='flex justify-between font-bold text-slate-800'>
                   <span>
-                    {i.quantity}x {i.product.name}
+                    {i.quantity} {i.unit || i.product.unit || 'pcs'} of {i.product.name}
                   </span>
                   <span className='font-extrabold text-slate-900'>
                     {formatCurrencyUsd(i.totalPrice)}

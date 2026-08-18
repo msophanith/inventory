@@ -30,6 +30,7 @@ export function usePosCart() {
           quantity: 1,
           unitPrice: product.sellPrice,
           totalPrice: product.sellPrice,
+          unit: product.unit || 'pcs',
         },
       ];
     });
@@ -85,6 +86,18 @@ export function usePosCart() {
     );
   }, []);
 
+  const updateUnit = useCallback((productId: string, newUnit: string) => {
+    setItems((prev) =>
+      prev.map((item) => {
+        if (item.product.id !== productId) return item;
+        return {
+          ...item,
+          unit: newUnit,
+        };
+      }),
+    );
+  }, []);
+
   const removeItem = useCallback((productId: string) => {
     setItems((prev) => prev.filter((item) => item.product.id !== productId));
   }, []);
@@ -113,6 +126,7 @@ export function usePosCart() {
     updateQuantity,
     setExactQuantity,
     updateUnitPrice,
+    updateUnit,
     removeItem,
     clearCart,
     subtotal,

@@ -16,6 +16,7 @@ interface Props {
   readonly onUpdateQty: (productId: string, delta: number) => void;
   readonly onSetExactQty?: (productId: string, exactQty: number) => void;
   readonly onUpdatePrice: (productId: string, newPrice: number) => void;
+  readonly onUpdateUnit: (productId: string, newUnit: string) => void;
   readonly onRemoveItem: (productId: string) => void;
   readonly onClearCart: () => void;
   readonly onCheckout: () => void;
@@ -33,6 +34,7 @@ export function PosCartPanel({
   onUpdateQty,
   onSetExactQty,
   onUpdatePrice,
+  onUpdateUnit,
   onRemoveItem,
   onClearCart,
   onCheckout,
@@ -115,6 +117,7 @@ export function PosCartPanel({
               onUpdateQty={onUpdateQty}
               onSetExactQty={onSetExactQty || ((id, qty) => onUpdateQty(id, qty - item.quantity))}
               onUpdatePrice={onUpdatePrice}
+              onUpdateUnit={onUpdateUnit}
               onRemove={onRemoveItem}
               onStockExceeded={onStockExceeded}
             />

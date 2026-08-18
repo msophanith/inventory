@@ -39,7 +39,7 @@ export function formatSaleNotificationCaption(receipt: ReceiptData): string {
   const itemsFormatted = receipt.items
     .map(
       (i) =>
-        `• <b>${i.quantity}x</b> ${escapeHtml(i.product.name)} = <b>${formatCurrencyUsd(i.quantity * i.unitPrice)}</b>`,
+        `• <b>${i.quantity} ${i.unit || i.product.unit || 'pcs'}</b> of ${escapeHtml(i.product.name)} = <b>${formatCurrencyUsd(i.quantity * i.unitPrice)}</b>`,
     )
     .join('\n');
 
