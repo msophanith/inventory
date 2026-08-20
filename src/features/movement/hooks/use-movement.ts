@@ -4,9 +4,8 @@ import { movementService } from '../../../services';
 import type {
   Movement,
   MovementFilter,
-  MovementType,
 } from '../../../services/movement';
-import { useState } from 'react';
+import { useMovementStore } from '../store/use-movement-store';
 
 const useMovement = (filters?: MovementFilter) => {
   const queryClient = useQueryClient();
@@ -16,12 +15,14 @@ const useMovement = (filters?: MovementFilter) => {
     queryFn: () => movementService.getAll(filters),
   });
 
-  const [open, setOpen] = useState(false);
-  const [type, setType] = useState<MovementType>('IN');
-  const [alert, setAlert] = useState<{
-    type: 'success' | 'error';
-    message: string;
-  } | null>(null);
+  const open = useMovementStore((state) => state.isMovementModalOpen);
+  const setOpen = useMovementStore((state) => state.setIsMovementModalOpen);
+  
+  const type = useMovementStore((state) => state.movementFormType);
+  const setType = useMovementStore((state) => state.setMovementFormType);
+  
+  const alert = useMovementStore((state) => state.alert);
+  const setAlert = useMovementStore((state) => state.setAlert);
 
   const useGetMovementById = (id: string) => {
     const { data, isLoading } = useQuery({

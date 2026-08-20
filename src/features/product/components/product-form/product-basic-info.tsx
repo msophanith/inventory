@@ -1,4 +1,4 @@
-import { useCallback, useState } from 'react';
+import { useCallback } from 'react';
 import { Camera, FileText } from 'lucide-react';
 import FormInput from './form-input';
 import { ProductNameInput } from './product-name-input';
@@ -7,6 +7,7 @@ import { PosCameraScannerModal } from '../../../sell/components/pos-camera-scann
 import { playScanSound } from '../../../sell/utils/scan-sound';
 import type { UseFormSetValue } from 'react-hook-form';
 import type { ProductFormValues } from '../../schema/product.schema';
+import { useProductStore } from '../../store/use-product-store';
 
 interface Props {
   readonly register: any;
@@ -16,7 +17,9 @@ interface Props {
 }
 
 const ProductBasicInfo = ({ register, setValue, watchName, errors }: Props) => {
-  const [isCameraScanOpen, setIsCameraScanOpen] = useState(false);
+  const isCameraScanOpen = useProductStore((state) => state.isCameraScanOpen);
+  const setIsCameraScanOpen = useProductStore((state) => state.setIsCameraScanOpen);
+
 
   const handleBarcodeScanned = useCallback(
     (code: string) => {

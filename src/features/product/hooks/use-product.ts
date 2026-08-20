@@ -1,7 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { productService } from '../../../services';
 import type { ProductQueryParams } from '../../../services/product';
-import { useState } from 'react';
+import { useProductStore } from '../store/use-product-store';
 
 const useProduct = (enableSummary?: boolean) => {
   const queryClient = useQueryClient();
@@ -63,10 +63,11 @@ const useProduct = (enableSummary?: boolean) => {
     });
   };
 
-  const [search, setSearch] = useState('');
+  const search = useProductStore((state) => state.search);
+  const setSearch = useProductStore((state) => state.setSearch);
 
-  const handleSearchChange = (search: string) => {
-    setSearch(search);
+  const handleSearchChange = (newSearch: string) => {
+    setSearch(newSearch);
   };
 
   return {

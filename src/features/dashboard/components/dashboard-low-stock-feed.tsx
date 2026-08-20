@@ -59,7 +59,7 @@ export function DashboardLowStockFeed() {
 
       {isLoading ? (
         <div className='space-y-2'>
-          {[...Array(4)].map((_, i) => (
+          {new Array(4).fill(0).map((_, i) => (
             <div
               key={i}
               className='flex items-center justify-between rounded-2xl border border-rose-100/80 bg-white/40 px-3 py-2.5'

@@ -1,9 +1,10 @@
-import { useMemo, useState } from 'react';
-import type { Movement, MovementType } from '../../../services/movement';
+import { useMemo } from 'react';
+import type { Movement } from '../../../services/movement';
 import { getCurrentMonthLabel, isCurrentMonth } from '../../../utils/date';
 import { MovementTableFilter } from './movement-table-filter';
 import { MovementTablePagination } from './movement-table-pagination';
 import { MovementTableRow } from './movement-table-row';
+import { useMovementStore } from '../store/use-movement-store';
 
 interface Props {
   readonly movements: Movement[];
@@ -13,11 +14,20 @@ interface Props {
 const PAGE_SIZE_OPTIONS = [10, 20, 50];
 
 const MovementTable = ({ movements, isLoading }: Props) => {
-  const [type, setType] = useState<MovementType | 'ALL'>('ALL');
-  const [damagedOnly, setDamagedOnly] = useState(false);
-  const [searchQuery, setSearchQuery] = useState('');
-  const [page, setPage] = useState(1);
-  const [pageSize, setPageSize] = useState(10);
+  const type = useMovementStore((state) => state.filterType);
+  const setType = useMovementStore((state) => state.setFilterType);
+  
+  const damagedOnly = useMovementStore((state) => state.damagedOnly);
+  const setDamagedOnly = useMovementStore((state) => state.setDamagedOnly);
+  
+  const searchQuery = useMovementStore((state) => state.searchQuery);
+  const setSearchQuery = useMovementStore((state) => state.setSearchQuery);
+  
+  const page = useMovementStore((state) => state.page);
+  const setPage = useMovementStore((state) => state.setPage);
+  
+  const pageSize = useMovementStore((state) => state.pageSize);
+  const setPageSize = useMovementStore((state) => state.setPageSize);
 
   const currentMonthLabel = useMemo(() => getCurrentMonthLabel(), []);
 
@@ -102,20 +112,11 @@ const MovementTable = ({ movements, isLoading }: Props) => {
       {/* Filter & Search Toolbar */}
       <MovementTableFilter
         selectedType={type}
-        onTypeChange={(t) => {
-          setType(t);
-          setPage(1);
-        }}
+        onTypeChange={setType}
         damagedOnly={damagedOnly}
-        onToggleDamaged={() => {
-          setDamagedOnly(!damagedOnly);
-          setPage(1);
-        }}
+        onToggleDamaged={() => setDamagedOnly(!damagedOnly)}
         searchQuery={searchQuery}
-        onSearchChange={(q) => {
-          setSearchQuery(q);
-          setPage(1);
-        }}
+        onSearchChange={setSearchQuery}
       />
 
       {/* Responsive Table View */}
@@ -146,10 +147,7 @@ const MovementTable = ({ movements, isLoading }: Props) => {
         pageSize={pageSize}
         pageSizeOptions={PAGE_SIZE_OPTIONS}
         onPageChange={setPage}
-        onPageSizeChange={(newSize) => {
-          setPageSize(newSize);
-          setPage(1);
-        }}
+        onPageSizeChange={setPageSize}
       />
     </div>
   );

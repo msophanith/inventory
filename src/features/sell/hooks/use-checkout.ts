@@ -3,11 +3,15 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { movementService, telegramService } from '../../../services';
 import type { CartItem, PaymentMethod, ReceiptData } from '../types/sell.types';
 import { useAuth } from '../../auth/use-auth';
+import { usePosStore } from '../store/use-pos-store';
 
 export function useCheckout() {
   const queryClient = useQueryClient();
   const { user, role } = useAuth();
-  const [isCheckoutOpen, setIsCheckoutOpen] = useState(false);
+  
+  const isCheckoutOpen = usePosStore((state) => state.isCheckoutOpen);
+  const setIsCheckoutOpen = usePosStore((state) => state.setIsCheckoutOpen);
+
   const [receiptData, setReceiptData] = useState<ReceiptData | null>(null);
 
   const { mutateAsync: processCheckout, isPending } = useMutation({

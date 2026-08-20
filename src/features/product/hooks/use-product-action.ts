@@ -1,11 +1,11 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { useState } from 'react';
 import { v4 as uuidv4 } from 'uuid';
 import { useNavigate } from 'react-router-dom';
 
 import { productService } from '../../../services';
 import { useMovement } from '../../movement/hooks/use-movement';
 import type { ProductFormValues } from '../schema/product.schema';
+import { useProductStore } from '../store/use-product-store';
 
 const useProductAction = () => {
   const queryClient = useQueryClient();
@@ -13,10 +13,8 @@ const useProductAction = () => {
 
   const { createMovement } = useMovement();
 
-  const [alert, setAlert] = useState<{
-    type: 'success' | 'error';
-    message: string;
-  } | null>(null);
+  const alert = useProductStore((state) => state.alert);
+  const setAlert = useProductStore((state) => state.setAlert);
 
   const { mutate: onCreateProduct, isPending: isCreatingProduct } = useMutation(
     {

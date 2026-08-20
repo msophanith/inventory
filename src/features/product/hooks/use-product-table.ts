@@ -1,22 +1,20 @@
 import {
   type ColumnDef,
-  type PaginationState,
-  type SortingState,
   getCoreRowModel,
   getPaginationRowModel,
   getSortedRowModel,
   useReactTable,
 } from "@tanstack/react-table";
-import { useMemo, useState } from "react";
+import { useMemo } from "react";
 import type { Product } from '../../../services/product';
+import { useProductStore } from '../store/use-product-store';
 
 export function useProductTable(products: Product[]) {
-  const [sorting, setSorting] = useState<SortingState>([]);
-
-  const [pagination, setPagination] = useState<PaginationState>({
-    pageIndex: 0,
-    pageSize: 10,
-  });
+  const sorting = useProductStore((state) => state.sorting);
+  const setSorting = useProductStore((state) => state.setSorting);
+  
+  const pagination = useProductStore((state) => state.pagination);
+  const setPagination = useProductStore((state) => state.setPagination);
 
   const columns = useMemo<ColumnDef<Product>[]>(
     () => [

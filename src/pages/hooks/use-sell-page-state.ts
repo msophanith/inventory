@@ -2,14 +2,11 @@ import { useCallback, useMemo, useState } from 'react';
 import { productService } from '../../services';
 import { playScanSound } from '../../features/sell/utils/scan-sound';
 import type { Product } from '../../services/product';
+import { usePosStore } from '../../features/sell/store/use-pos-store';
 
-export function useSellPageState(
-  products: Product[],
-  cart: { addItem: (p: Product) => void },
-) {
-  const [isCameraScanOpen, setIsCameraScanOpen] = useState(false);
-  const [isMobileCartOpen, setIsMobileCartOpen] = useState(false);
-  const [isOrderHistoryOpen, setIsOrderHistoryOpen] = useState(false);
+export function useSellPageState(products: Product[]) {
+  const addItem = usePosStore((state) => state.addItem);
+
   const [alert, setAlert] = useState<{
     type: 'success' | 'error';
     message: string;
@@ -57,7 +54,7 @@ export function useSellPageState(
           return;
         }
         playScanSound();
-        cart.addItem(target);
+        addItem(target);
         setAlert({
           type: 'success',
           message: `Added "${target.name}" to cart`,
@@ -69,16 +66,10 @@ export function useSellPageState(
         });
       }
     },
-    [productMap, cart],
+    [productMap, addItem],
   );
 
   return {
-    isCameraScanOpen,
-    setIsCameraScanOpen,
-    isMobileCartOpen,
-    setIsMobileCartOpen,
-    isOrderHistoryOpen,
-    setIsOrderHistoryOpen,
     alert,
     setAlert,
     handleStockExceeded,

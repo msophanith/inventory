@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react';
 import { useProduct } from '../features/product/hooks/use-product';
-import { usePosCart } from '../features/sell/hooks/use-pos-cart';
+import { usePosStore, usePosCartTotals } from '../features/sell/store/use-pos-store';
 import { useCheckout } from '../features/sell/hooks/use-checkout';
 import { useMovement } from '../features/movement/hooks/use-movement';
 import { useHardwareScanner } from '../features/sell/hooks/use-hardware-scanner';
@@ -21,12 +21,6 @@ import type { PaymentMethod } from '../features/sell/types/sell.types';
 const SellPage = () => {
   const [search, setSearch] = useState('');
   const [category, setCategory] = useState('ALL');
-  const [isDiscountOpen, setIsDiscountOpen] = useState(false);
-  const [discount, setDiscount] = useState<{
-    type: 'PERCENT' | 'FIXED';
-    value: number;
-    amount: number;
-  }>({ type: 'PERCENT', value: 0, amount: 0 });
 
   const { useGetProducts } = useProduct(false);
   const { data: response, isLoading: productsLoading } = useGetProducts({
@@ -37,30 +31,25 @@ const SellPage = () => {
   const products = useMemo(() => response?.data || [], [response?.data]);
 
   const { data: movements = [] } = useMovement();
-  const cart = usePosCart();
+  
+  const cart = usePosStore();
+  const { subtotal, tax, totalAmount: finalTotal, itemCount } = usePosCartTotals();
   const checkout = useCheckout();
-  const finalTotal = Math.max(0, cart.subtotal + cart.tax - discount.amount);
 
   const {
-    isCameraScanOpen,
-    setIsCameraScanOpen,
-    isMobileCartOpen,
-    setIsMobileCartOpen,
-    isOrderHistoryOpen,
-    setIsOrderHistoryOpen,
     alert,
     setAlert,
     handleStockExceeded,
     handleBarcodeScanned,
-  } = useSellPageState(products, cart);
+  } = useSellPageState(products);
 
   useHardwareScanner({
     enabled:
       !checkout.isCheckoutOpen &&
-      !isCameraScanOpen &&
-      !isMobileCartOpen &&
-      !isOrderHistoryOpen &&
-      !isDiscountOpen,
+      !cart.isCameraScanOpen &&
+      !cart.isMobileCartOpen &&
+      !cart.isOrderHistoryOpen &&
+      !cart.isDiscountOpen,
     onScan: handleBarcodeScanned,
   });
 
@@ -71,17 +60,16 @@ const SellPage = () => {
   }) => {
     await checkout.processCheckout({
       items: cart.items,
-      subtotal: cart.subtotal,
-      tax: cart.tax,
-      discount: discount.amount,
+      subtotal: subtotal,
+      tax: tax,
+      discount: cart.discount.amount,
       total: finalTotal,
       amountPaid: params.amountPaid,
       paymentMethod: params.paymentMethod,
       customerNote: params.customerNote,
     });
     cart.clearCart();
-    setDiscount({ type: 'PERCENT', value: 0, amount: 0 });
-    setIsMobileCartOpen(false);
+    cart.setIsMobileCartOpen(false);
   };
 
   return (
@@ -95,8 +83,8 @@ const SellPage = () => {
       )}
 
       <PosHeaderBanner
-        onOpenScanModal={() => setIsCameraScanOpen(true)}
-        onOpenReceiptHistory={() => setIsOrderHistoryOpen(true)}
+        onOpenScanModal={() => cart.setIsCameraScanOpen(true)}
+        onOpenReceiptHistory={() => cart.setIsOrderHistoryOpen(true)}
       />
 
       <div className='flex flex-col gap-6 lg:flex-row relative'>
@@ -112,17 +100,17 @@ const SellPage = () => {
             playScanSound();
             cart.addItem(p);
           }}
-          onOpenScanModal={() => setIsCameraScanOpen(true)}
+          onOpenScanModal={() => cart.setIsCameraScanOpen(true)}
         />
 
         <PosCartPanel
           items={cart.items}
-          subtotal={cart.subtotal}
-          tax={cart.tax}
-          discount={discount.amount}
+          subtotal={subtotal}
+          tax={tax}
+          discount={cart.discount.amount}
           totalAmount={finalTotal}
-          itemCount={cart.itemCount}
-          onOpenDiscount={() => setIsDiscountOpen(true)}
+          itemCount={itemCount}
+          onOpenDiscount={() => cart.setIsDiscountOpen(true)}
           onUpdateQty={cart.updateQuantity}
           onSetExactQty={cart.setExactQuantity}
           onUpdatePrice={cart.updateUnitPrice}
@@ -130,7 +118,6 @@ const SellPage = () => {
           onRemoveItem={cart.removeItem}
           onClearCart={() => {
             cart.clearCart();
-            setDiscount({ type: 'PERCENT', value: 0, amount: 0 });
           }}
           onCheckout={() => checkout.setIsCheckoutOpen(true)}
           onStockExceeded={handleStockExceeded}
@@ -138,36 +125,36 @@ const SellPage = () => {
       </div>
 
       <PosMobileCartBar
-        itemCount={cart.itemCount}
+        itemCount={itemCount}
         totalAmount={finalTotal}
-        onOpenCartDrawer={() => setIsMobileCartOpen(true)}
-        onOpenScanModal={() => setIsCameraScanOpen(true)}
+        onOpenCartDrawer={() => cart.setIsMobileCartOpen(true)}
+        onOpenScanModal={() => cart.setIsCameraScanOpen(true)}
       />
 
       <PosDiscountModal
-        open={isDiscountOpen}
-        subtotal={cart.subtotal}
-        onClose={() => setIsDiscountOpen(false)}
-        onApplyDiscount={setDiscount}
+        open={cart.isDiscountOpen}
+        subtotal={subtotal}
+        onClose={() => cart.setIsDiscountOpen(false)}
+        onApplyDiscount={cart.setDiscount}
       />
 
       <PosModals
         cartItems={cart.items}
-        subtotal={cart.subtotal}
-        tax={cart.tax}
+        subtotal={subtotal}
+        tax={tax}
         totalAmount={finalTotal}
-        itemCount={cart.itemCount}
+        itemCount={itemCount}
         movements={movements}
-        isMobileCartOpen={isMobileCartOpen}
-        isCameraScanOpen={isCameraScanOpen}
+        isMobileCartOpen={cart.isMobileCartOpen}
+        isCameraScanOpen={cart.isCameraScanOpen}
         isCheckoutOpen={checkout.isCheckoutOpen}
-        isOrderHistoryOpen={isOrderHistoryOpen}
+        isOrderHistoryOpen={cart.isOrderHistoryOpen}
         checkoutPending={checkout.isPending}
         receiptData={checkout.receiptData}
-        onCloseMobileCart={() => setIsMobileCartOpen(false)}
-        onCloseCameraScan={() => setIsCameraScanOpen(false)}
+        onCloseMobileCart={() => cart.setIsMobileCartOpen(false)}
+        onCloseCameraScan={() => cart.setIsCameraScanOpen(false)}
         onCloseCheckout={() => checkout.setIsCheckoutOpen(false)}
-        onCloseOrderHistory={() => setIsOrderHistoryOpen(false)}
+        onCloseOrderHistory={() => cart.setIsOrderHistoryOpen(false)}
         onCloseReceipt={() => checkout.setReceiptData(null)}
         onBarcodeScanned={handleBarcodeScanned}
         onConfirmPayment={handleConfirmPayment}
@@ -178,7 +165,6 @@ const SellPage = () => {
         onRemoveItem={cart.removeItem}
         onClearCart={() => {
           cart.clearCart();
-          setDiscount({ type: 'PERCENT', value: 0, amount: 0 });
         }}
         onCheckout={() => checkout.setIsCheckoutOpen(true)}
         onStockExceeded={handleStockExceeded}
