@@ -4,6 +4,7 @@ import { useLanguage } from '../../../i18n/language-context';
 export type StockFilterType = 'ALL' | 'IN_STOCK' | 'LOW_STOCK' | 'OUT_OF_STOCK';
 
 interface Props {
+  readonly searchValue: string;
   readonly onSearchChange: (value: string) => void;
   readonly stockFilter: StockFilterType;
   readonly onStockFilterChange: (filter: StockFilterType) => void;
@@ -13,6 +14,7 @@ interface Props {
 }
 
 export function ProductTableHeader({
+  searchValue,
   onSearchChange,
   stockFilter,
   onStockFilterChange,
@@ -56,6 +58,7 @@ export function ProductTableHeader({
           <input
             type='text'
             placeholder={t('products.searchProduct')}
+            value={searchValue}
             onChange={(e) => onSearchChange(e.target.value)}
             className='w-full rounded-2xl border border-slate-200 bg-white pl-10 pr-4 py-2 text-xs sm:text-sm text-slate-800 focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 shadow-2xs'
           />

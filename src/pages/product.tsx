@@ -7,22 +7,22 @@ import { useDebounce } from '../hooks/use-debounce';
 import { useNavigate } from 'react-router-dom';
 import Toast from '../components/ui/alert';
 import { PageContainer } from '../components/layout/page-container';
+import { useProductStore } from '../features/product/store/use-product-store';
 
 const ProductPage = () => {
   const { useGetProducts, handleSearchChange, search } = useProduct(false);
   const navigate = useNavigate();
 
-  const [stockFilter, setStockFilter] = useState<StockFilterType>('ALL');
+  const stockFilter = useProductStore((state) => state.stockFilter);
+  const setStockFilter = useProductStore((state) => state.setStockFilter);
+  const pagination = useProductStore((state) => state.pagination);
+  const setPagination = useProductStore((state) => state.setPagination);
+
   const [isExporting, setIsExporting] = useState(false);
   const [toast, setToast] = useState<{
     type: 'success' | 'error';
     message: string;
   } | null>(null);
-
-  const [pagination, setPagination] = useState({
-    pageIndex: 0,
-    pageSize: 20,
-  });
 
   const debouncedSearch = useDebounce(search);
 
@@ -106,6 +106,7 @@ const ProductPage = () => {
         onPaginationChange={setPagination}
         stockFilter={stockFilter}
         onStockFilterChange={handleStockFilterChange}
+        searchValue={search}
         onSearchChange={handleSearch}
         onRowClick={(productId) => navigate(`/products/${productId}`)}
         onAddProduct={() => navigate('/products/create')}

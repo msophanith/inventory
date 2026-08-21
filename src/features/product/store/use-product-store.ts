@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import type { PaginationState, SortingState } from '@tanstack/react-table';
-
+import type { StockFilterType } from '../components/product-table-header';
 export type AlertState = {
   type: 'success' | 'error';
   message: string;
@@ -13,6 +13,7 @@ interface ProductState {
   
   // --- Filter State ---
   search: string;
+  stockFilter: StockFilterType;
 
   // --- UI State ---
   isCameraScanOpen: boolean;
@@ -22,6 +23,7 @@ interface ProductState {
   setSorting: (sorting: SortingState | ((old: SortingState) => SortingState)) => void;
   setPagination: (pagination: PaginationState | ((old: PaginationState) => PaginationState)) => void;
   setSearch: (search: string) => void;
+  setStockFilter: (filter: StockFilterType) => void;
   setIsCameraScanOpen: (open: boolean) => void;
   setAlert: (alert: AlertState | null) => void;
 }
@@ -29,8 +31,9 @@ interface ProductState {
 export const useProductStore = create<ProductState>()((set) => ({
   // Initial State
   sorting: [],
-  pagination: { pageIndex: 0, pageSize: 10 },
+  pagination: { pageIndex: 0, pageSize: 20 },
   search: '',
+  stockFilter: 'ALL',
   isCameraScanOpen: false,
   alert: null,
 
@@ -44,6 +47,7 @@ export const useProductStore = create<ProductState>()((set) => ({
       pagination: typeof updater === 'function' ? updater(state.pagination) : updater,
     })),
   setSearch: (search) => set({ search }),
+  setStockFilter: (stockFilter) => set({ stockFilter }),
   setIsCameraScanOpen: (open) => set({ isCameraScanOpen: open }),
   setAlert: (alert) => set({ alert }),
 }));

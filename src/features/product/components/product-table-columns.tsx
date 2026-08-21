@@ -9,7 +9,7 @@ export const productColumns: ColumnDef<Product>[] = [
     cell: ({ row }) => {
       const product = row.original;
       return (
-        <div className='flex items-center gap-3.5 min-w-[200px]'>
+        <div className='flex items-center gap-3.5 min-w-50 max-w-50 sm:max-w-75'>
           <div className='h-12 w-12 overflow-hidden rounded-2xl border border-slate-200 bg-slate-100 shrink-0 flex items-center justify-center'>
             {product.imageUrl ? (
               <img
@@ -25,7 +25,9 @@ export const productColumns: ColumnDef<Product>[] = [
             <p className='font-bold text-slate-900 text-sm truncate'>
               {product.name}
             </p>
-            <p className='text-xs text-slate-400 font-mono'>{product.barcode || `#${product.id}`}</p>
+            <p className='text-xs text-slate-400 font-mono'>
+              {product.barcode || `#${product.id}`}
+            </p>
           </div>
         </div>
       );
@@ -58,7 +60,9 @@ export const productColumns: ColumnDef<Product>[] = [
 
       return (
         <div className='space-y-1 whitespace-nowrap'>
-          <span className={`inline-block rounded-full px-2.5 py-0.5 text-xs font-bold ${style}`}>
+          <span
+            className={`inline-block rounded-full px-2.5 py-0.5 text-xs font-bold ${style}`}
+          >
             {status}
           </span>
           <p className='text-xs text-slate-500 font-medium'>
@@ -76,10 +80,16 @@ export const productColumns: ColumnDef<Product>[] = [
       return (
         <div className='whitespace-nowrap'>
           <p className='font-extrabold text-slate-900 text-sm'>
-            ${product.sellPrice.toLocaleString('en-US', { minimumFractionDigits: 2 })}
+            $
+            {product.sellPrice.toLocaleString('en-US', {
+              minimumFractionDigits: 2,
+            })}
           </p>
           <p className='text-[11px] text-slate-400 font-medium'>
-            Cost: ${product.buyPrice.toLocaleString('en-US', { minimumFractionDigits: 2 })}
+            Cost: $
+            {product.buyPrice.toLocaleString('en-US', {
+              minimumFractionDigits: 2,
+            })}
           </p>
         </div>
       );

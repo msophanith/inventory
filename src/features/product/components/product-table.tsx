@@ -23,6 +23,7 @@ interface Props {
   readonly totalRows: number;
   readonly stockFilter: StockFilterType;
   readonly onStockFilterChange: (filter: StockFilterType) => void;
+  readonly searchValue: string;
   readonly onSearchChange: (value: string) => void;
   readonly onRowClick?: (productId: string) => void;
   readonly onAddProduct: () => void;
@@ -39,6 +40,7 @@ export default function ProductTable({
   totalRows,
   stockFilter,
   onStockFilterChange,
+  searchValue,
   onSearchChange,
   onRowClick,
   onAddProduct,
@@ -101,6 +103,7 @@ export default function ProductTable({
     <div className='space-y-6 rounded-3xl border border-slate-200/80 bg-white p-4 sm:p-6 shadow-xs min-w-0 w-full max-w-full overflow-hidden'>
       {/* Search, Actions & Export Header */}
       <ProductTableHeader
+        searchValue={searchValue}
         onSearchChange={onSearchChange}
         stockFilter={stockFilter}
         onStockFilterChange={onStockFilterChange}
