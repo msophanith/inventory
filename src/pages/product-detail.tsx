@@ -19,8 +19,10 @@ import {
 } from '../features/movement/components';
 import { Toast } from '../components/ui/alert';
 import { PageContainer } from '../components/layout/page-container';
+import { useLanguage } from '../i18n/language-context';
 
 const ProductDetailsPage = () => {
+  const { t } = useLanguage();
   const { productId } = useParams();
   const navigate = useNavigate();
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
@@ -86,11 +88,11 @@ const ProductDetailsPage = () => {
   const handleDeleteProduct = async () => {
     try {
       await deleteProductMutation.mutateAsync(productId!);
-      setAlert({ type: 'success', message: 'Product deleted successfully' });
+      setAlert({ type: 'success', message: t('products.productDeleted') });
       setIsDeleteDialogOpen(false);
       setTimeout(() => navigate('/products'), 1000);
     } catch {
-      setAlert({ type: 'error', message: 'Failed to delete product' });
+      setAlert({ type: 'error', message: t('products.productDeleteError') });
     }
   };
 
@@ -102,7 +104,7 @@ const ProductDetailsPage = () => {
           className='inline-flex items-center gap-2 text-xs font-bold text-slate-600 hover:text-slate-900 bg-white border border-slate-200 px-3.5 py-2 rounded-xl shadow-2xs transition cursor-pointer'
           onClick={() => navigate('/products')}
         >
-          <ArrowLeft size={16} /> Back to Products
+          <ArrowLeft size={16} /> {t('products.backToProducts')}
         </button>
       </div>
 

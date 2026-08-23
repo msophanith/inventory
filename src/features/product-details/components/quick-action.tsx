@@ -1,28 +1,35 @@
 import { ArrowDownToLine, ArrowUpFromLine, RotateCcw } from 'lucide-react';
+import { useLanguage } from '../../../i18n/language-context';
 
-interface Props {
+interface QuickActionProps {
   readonly onStockIn: () => void;
   readonly onStockOut: () => void;
   readonly onReturn: () => void;
   readonly isLoading?: boolean;
 }
 
-const QuickActions = ({ onStockIn, onStockOut, onReturn, isLoading }: Props) => {
+export default function QuickActions({
+  onStockIn,
+  onStockOut,
+  onReturn,
+  isLoading,
+}: QuickActionProps) {
+  const { t } = useLanguage();
   const actions = [
     {
-      label: 'Stock In',
+      label: t('movement.in'),
       icon: ArrowDownToLine,
       className: 'bg-emerald-600 hover:bg-emerald-700 shadow-emerald-600/20',
       action: onStockIn,
     },
     {
-      label: 'Stock Out',
+      label: t('movement.out'),
       icon: ArrowUpFromLine,
       className: 'bg-orange-500 hover:bg-orange-600 shadow-orange-500/20',
       action: onStockOut,
     },
     {
-      label: 'Return',
+      label: t('movement.return'),
       icon: RotateCcw,
       className: 'bg-purple-600 hover:bg-purple-700 shadow-purple-600/20',
       action: onReturn,
@@ -31,13 +38,14 @@ const QuickActions = ({ onStockIn, onStockOut, onReturn, isLoading }: Props) => 
 
   return (
     <div className='rounded-3xl border border-slate-200/80 bg-white p-5 sm:p-6 shadow-sm space-y-4 min-w-0 w-full'>
-      <h2 className='font-bold text-slate-900 text-base'>Quick Stock Actions</h2>
+      <h2 className='font-bold text-slate-900 text-base'>{t('movement.quickStockActions')}</h2>
 
       <div className='grid grid-cols-1 sm:grid-cols-3 gap-3'>
         {actions.map((item) => {
           const Icon = item.icon;
           return (
             <button
+              type='button'
               key={item.label}
               disabled={isLoading}
               onClick={item.action}
@@ -53,4 +61,4 @@ const QuickActions = ({ onStockIn, onStockOut, onReturn, isLoading }: Props) => 
   );
 };
 
-export default QuickActions;
+

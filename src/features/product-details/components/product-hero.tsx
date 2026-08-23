@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Barcode, Box, Check, Layers, MapPin, Pencil, Trash2 } from 'lucide-react';
 import type { Product } from '../../../services/product';
 import { useNavigate } from 'react-router-dom';
+import { useLanguage } from '../../../i18n/language-context';
 
 interface Props {
   readonly product: Product;
@@ -9,6 +10,7 @@ interface Props {
 }
 
 const ProductHero = ({ product, onDeleteClick }: Props) => {
+  const { t } = useLanguage();
   const navigate = useNavigate();
   const [copied, setCopied] = useState(false);
 
@@ -52,7 +54,7 @@ const ProductHero = ({ product, onDeleteClick }: Props) => {
                 <button
                   type='button'
                   onClick={handleCopyBarcode}
-                  title='Copy barcode'
+                  title={t('common.copy')}
                   className='inline-flex items-center gap-1.5 rounded-xl bg-slate-100 px-3 py-1 text-slate-700 hover:bg-slate-200 transition cursor-pointer'
                 >
                   {copied ? (
@@ -72,7 +74,7 @@ const ProductHero = ({ product, onDeleteClick }: Props) => {
               {product.shelf && (
                 <span className='inline-flex items-center gap-1.5 rounded-xl bg-amber-50 px-3 py-1 text-amber-800'>
                   <MapPin size={14} />
-                  Shelf: {product.shelf}
+                  {t('products.shelf')}: {product.shelf}
                 </span>
               )}
             </div>
@@ -87,7 +89,7 @@ const ProductHero = ({ product, onDeleteClick }: Props) => {
             onClick={() => navigate(`/products/edit/${product.id}`)}
           >
             <Pencil size={16} />
-            <span>Edit</span>
+            <span>{t('common.edit')}</span>
           </button>
 
           <button
@@ -96,7 +98,7 @@ const ProductHero = ({ product, onDeleteClick }: Props) => {
             className='flex-1 sm:flex-initial inline-flex items-center justify-center gap-2 rounded-2xl bg-rose-500 px-4 py-2.5 text-sm font-extrabold text-white hover:bg-rose-600 shadow-md shadow-rose-500/20 transition cursor-pointer'
           >
             <Trash2 size={16} />
-            <span>Delete</span>
+            <span>{t('common.delete')}</span>
           </button>
         </div>
       </div>

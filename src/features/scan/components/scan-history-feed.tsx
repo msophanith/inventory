@@ -1,5 +1,6 @@
 import { ArrowRight, CheckCircle2, History, PlusCircle } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { useLanguage } from '../../../i18n/language-context';
 
 export interface ScanHistoryItem {
   id: string;
@@ -16,6 +17,7 @@ interface Props {
 }
 
 export function ScanHistoryFeed({ history, onClearHistory }: Props) {
+  const { t } = useLanguage();
   const navigate = useNavigate();
 
   if (history.length === 0) return null;
@@ -26,16 +28,18 @@ export function ScanHistoryFeed({ history, onClearHistory }: Props) {
         <div className='flex items-center gap-2'>
           <History size={18} className='text-indigo-600' />
           <h2 className='font-extrabold text-slate-900 text-sm'>
-            Recent Scan Audit Feed
+            {t('scan.recentScans')}
           </h2>
         </div>
-        <button
-          type='button'
-          onClick={onClearHistory}
-          className='text-xs font-bold text-slate-400 hover:text-slate-600 transition cursor-pointer'
-        >
-          Clear feed
-        </button>
+        {history.length > 0 && (
+          <button
+            type='button'
+            onClick={onClearHistory}
+            className='text-xs font-bold text-slate-400 hover:text-slate-600 transition cursor-pointer'
+          >
+            {t('scan.clearHistory')}
+          </button>
+        )}
       </div>
 
       <div className='space-y-2 max-h-64 overflow-y-auto pr-1'>
@@ -69,13 +73,14 @@ export function ScanHistoryFeed({ history, onClearHistory }: Props) {
 
             <div className='flex items-center gap-1 shrink-0'>
               <span
-                className={`rounded-full px-2 py-0.5 text-[10px] font-extrabold ${
+                className={`font-bold px-2 py-0.5 rounded-full text-[10px] uppercase tracking-wider
+                ${
                   item.found
                     ? 'bg-emerald-100 text-emerald-700'
                     : 'bg-amber-100 text-amber-700'
                 }`}
               >
-                {item.found ? 'Found' : 'Create'}
+                {item.found ? t('scan.found') : t('scan.create')}
               </span>
               <ArrowRight size={14} className='text-slate-400' />
             </div>

@@ -14,6 +14,7 @@ import { BarChart3 } from 'lucide-react';
 import { formatCurrencyKhr, formatCurrencyUsd } from '../../../utils/currency';
 import { aggregateSalesAndMargin } from '../../dashboard/utils/sales-margin-calculator';
 import type { Movement } from '../../../services/movement';
+import { useLanguage } from '../../../i18n/language-context';
 
 ChartJS.register(
   CategoryScale,
@@ -30,6 +31,7 @@ interface Props {
 }
 
 export function ReportRevenueCOGSChart({ rawMovements, isLoading }: Props) {
+  const { t } = useLanguage();
   const groups = useMemo(
     () => aggregateSalesAndMargin(rawMovements, 'monthly'),
     [rawMovements],
@@ -43,7 +45,7 @@ export function ReportRevenueCOGSChart({ rawMovements, isLoading }: Props) {
     return (
       <div className='rounded-3xl border border-dashed border-slate-200 bg-white/60 p-8 text-center shadow-xs'>
         <p className='text-sm font-bold text-slate-400'>
-          No monthly revenue data found.
+          {t('reports.noRevenueData')}
         </p>
       </div>
     );
@@ -54,7 +56,7 @@ export function ReportRevenueCOGSChart({ rawMovements, isLoading }: Props) {
     labels,
     datasets: [
       {
-        label: 'Revenue',
+        label: t('reports.revenue'),
         data: groups.map((g) => g.totalSales),
         backgroundColor: 'rgba(16, 185, 129, 0.80)',
         borderColor: 'rgb(5, 150, 105)',
@@ -63,7 +65,7 @@ export function ReportRevenueCOGSChart({ rawMovements, isLoading }: Props) {
         stack: 'combined',
       },
       {
-        label: 'Cost of Goods',
+        label: t('reports.costOfGoods'),
         data: groups.map((g) => g.totalCost),
         backgroundColor: 'rgba(99, 102, 241, 0.75)',
         borderColor: 'rgb(79, 70, 229)',
@@ -72,7 +74,7 @@ export function ReportRevenueCOGSChart({ rawMovements, isLoading }: Props) {
         stack: 'combined',
       },
       {
-        label: 'Damage / Loss',
+        label: t('reports.damageLoss'),
         data: groups.map((g) => g.totalDamage),
         backgroundColor: 'rgba(244, 63, 94, 0.75)',
         borderColor: 'rgb(225, 29, 72)',
@@ -138,10 +140,10 @@ export function ReportRevenueCOGSChart({ rawMovements, isLoading }: Props) {
         </div>
         <div>
           <h2 className='font-extrabold text-slate-900 text-base'>
-            Revenue vs Cost of Goods
+            {t('reports.revenueVsCogs')}
           </h2>
           <p className='text-xs text-slate-500 font-medium'>
-            Monthly stacked breakdown — Revenue · COGS · Damage
+            {t('reports.revenueVsCogsDesc')}
           </p>
         </div>
       </div>

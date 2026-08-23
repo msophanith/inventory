@@ -1,7 +1,9 @@
 import { useState } from 'react';
+import { useLanguage } from '../i18n/language-context';
 import { useReport } from '../features/report/hooks/use-report';
 import {
   ExportPasswordModal,
+  ExportCenterModal,
   ReportHeader,
   ReportSummary,
   ReportTable,
@@ -34,19 +36,23 @@ const ReportPage = () => {
     handleExportExcel,
     handleExportCsv,
     handleExportTodayCsv,
+    handleExportProductInExcel,
+    handleExportNewProductExcel,
   } = useReport();
 
   const { data: movements, isLoading: isMovementLoading } = useMovement();
+  const { t } = useLanguage();
 
+  const [isExportCenterOpen, setIsExportCenterOpen] = useState(false);
   const [exportModalState, setExportModalState] = useState<{
     isOpen: boolean;
-    type: 'EXCEL' | 'MONTH_CSV' | 'TODAY_CSV';
+    type: 'EXCEL' | 'MONTH_CSV' | 'TODAY_CSV' | 'PRODUCT_IN_EXCEL' | 'NEW_PRODUCT_EXCEL';
   }>({
     isOpen: false,
     type: 'EXCEL',
   });
 
-  const handleOpenExportModal = (type: 'EXCEL' | 'MONTH_CSV' | 'TODAY_CSV') => {
+  const handleOpenExportModal = (type: 'EXCEL' | 'MONTH_CSV' | 'TODAY_CSV' | 'PRODUCT_IN_EXCEL' | 'NEW_PRODUCT_EXCEL') => {
     setExportModalState({ isOpen: true, type });
   };
 
@@ -57,6 +63,10 @@ const ReportPage = () => {
       handleExportCsv(password);
     } else if (exportModalState.type === 'TODAY_CSV') {
       handleExportTodayCsv(password);
+    } else if (exportModalState.type === 'PRODUCT_IN_EXCEL') {
+      handleExportProductInExcel(password);
+    } else if (exportModalState.type === 'NEW_PRODUCT_EXCEL') {
+      handleExportNewProductExcel(password);
     }
   };
 
@@ -74,10 +84,10 @@ const ReportPage = () => {
             <span className='absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75' />
             <span className='relative inline-flex h-2 w-2 rounded-full bg-emerald-500' />
           </span>
-          <span>Financial Analytics & Profit Intelligence</span>
+          <span>{t('reports.financialAnalytics')}</span>
         </div>
         <span className='text-xs font-medium text-slate-400 hidden sm:inline-block'>
-          Period: <strong className='text-slate-700'>{activeMonthLabel}</strong>
+          {t('reports.period')}: <strong className='text-slate-700'>{activeMonthLabel}</strong>
         </span>
       </div>
 
@@ -87,9 +97,7 @@ const ReportPage = () => {
           selectedMonth={selectedMonth}
           onSelectMonth={setSelectedMonth}
           monthOptions={monthOptions}
-          onExportExcel={() => handleOpenExportModal('EXCEL')}
-          onExportCsv={() => handleOpenExportModal('MONTH_CSV')}
-          onExportTodayCsv={() => handleOpenExportModal('TODAY_CSV')}
+          onOpenExportCenter={() => setIsExportCenterOpen(true)}
           onRefresh={() => refetch()}
           isRefreshing={isLoading}
           dateMode={dateMode}
@@ -100,6 +108,13 @@ const ReportPage = () => {
           onCustomEndChange={setCustomEnd}
         />
       </div>
+
+      {/* Export Center Modal */}
+      <ExportCenterModal
+        isOpen={isExportCenterOpen}
+        onClose={() => setIsExportCenterOpen(false)}
+        onSelectExport={(type) => handleOpenExportModal(type)}
+      />
 
       {/* Export Password Modal */}
       <ExportPasswordModal

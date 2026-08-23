@@ -1,6 +1,7 @@
 import { useMemo, useRef, useState, useLayoutEffect } from 'react';
 import { Camera, Search, Sparkles } from 'lucide-react';
 import { useWindowVirtualizer } from '@tanstack/react-virtual';
+import { useLanguage } from '../../../i18n/language-context';
 import type { Product } from '../../../services/product';
 import type { CartItem } from '../types/sell.types';
 import { PosProductCard } from './pos-product-card';
@@ -29,12 +30,13 @@ export function PosProductGrid({
   onAddToCart,
   onOpenScanModal,
 }: Props) {
+  const { t } = useLanguage();
   const { useGetCategories } = useProduct();
   const { data: dynamicCategories = [] } = useGetCategories();
 
   const categories = useMemo(() => {
-    return ['ALL', ...dynamicCategories];
-  }, [dynamicCategories]);
+    return [t('common.all'), ...dynamicCategories];
+  }, [dynamicCategories, t]);
 
   const cartMap = useMemo(() => {
     const map = new Map<string, number>();
@@ -99,10 +101,10 @@ export function PosProductGrid({
         <div className='flex h-64 flex-col items-center justify-center rounded-3xl border border-dashed border-slate-200 bg-white p-8 text-center text-slate-400 space-y-2'>
           <Sparkles size={32} className='text-slate-300' />
           <p className='font-bold text-slate-700 text-sm'>
-            No matching products found
+            {t('pos.noProductsFound')}
           </p>
           <p className='text-xs text-slate-400'>
-            Try adjusting your search query or category selection.
+            {t('pos.tryAdjusting')}
           </p>
         </div>
       );
@@ -160,18 +162,19 @@ export function PosProductGrid({
               type='text'
               value={search}
               onChange={(e) => onSearchChange(e.target.value)}
-              placeholder='Search 2,000+ products by name or barcode...'
+              placeholder={t('pos.searchPlaceholder')}
               className='w-full rounded-2xl border border-slate-200 bg-white pl-10 pr-4 py-2.5 text-xs sm:text-sm font-semibold text-slate-800 focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 shadow-xs transition-all'
             />
           </div>
 
           <button
+            type='button'
             onClick={onOpenScanModal}
-            title='Scan with Camera'
+            title={t('pos.cameraScanner')}
             className='flex items-center gap-1.5 rounded-2xl bg-linear-to-r from-emerald-600 to-teal-600 px-4 py-2.5 text-xs font-black text-white shadow-md hover:from-emerald-700 hover:to-teal-700 transition cursor-pointer shrink-0 active:scale-95'
           >
             <Camera size={16} />
-            <span className='hidden sm:inline'>Scan Camera</span>
+            <span className='hidden sm:inline'>{t('pos.cameraScanner')}</span>
           </button>
         </div>
 

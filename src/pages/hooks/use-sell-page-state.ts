@@ -3,9 +3,11 @@ import { productService } from '../../services';
 import { playScanSound } from '../../features/sell/utils/scan-sound';
 import type { Product } from '../../services/product';
 import { usePosStore } from '../../features/sell/store/use-pos-store';
+import { useLanguage } from '../../i18n/language-context';
 
 export function useSellPageState(products: Product[]) {
   const addItem = usePosStore((state) => state.addItem);
+  const { t } = useLanguage();
 
   const [alert, setAlert] = useState<{
     type: 'success' | 'error';
@@ -27,10 +29,10 @@ export function useSellPageState(products: Product[]) {
     (productName: string, maxStock: number) => {
       setAlert({
         type: 'error',
-        message: `Stock limit reached! Only ${maxStock} units of "${productName}" available in stock.`,
+        message: t('pos.stockLimitReached', { maxStock, productName }),
       });
     },
-    [],
+    [t],
   );
 
   const handleBarcodeScanned = useCallback(
@@ -49,7 +51,7 @@ export function useSellPageState(products: Product[]) {
         if (target.quantity <= 0) {
           setAlert({
             type: 'error',
-            message: `"${target.name}" is out of stock!`,
+            message: t('pos.itemOutOfStock', { name: target.name }),
           });
           return;
         }
@@ -57,16 +59,16 @@ export function useSellPageState(products: Product[]) {
         addItem(target);
         setAlert({
           type: 'success',
-          message: `Added "${target.name}" to cart`,
+          message: t('pos.addedToCart', { name: target.name }),
         });
       } else {
         setAlert({
           type: 'error',
-          message: `No product found for barcode: "${code}"`,
+          message: t('pos.noProductFound', { code }),
         });
       }
     },
-    [productMap, addItem],
+    [productMap, addItem, t],
   );
 
   return {

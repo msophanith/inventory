@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
-import { Camera, Search, X, Zap, ZapOff } from 'lucide-react';
+import { useLanguage } from '../../../i18n/language-context';
+import { Camera, CameraOff, Search, X, Zap, ZapOff } from 'lucide-react';
 import { Html5Qrcode } from 'html5-qrcode';
 import { playScanSound } from '../utils/scan-sound';
 import { BARCODE_FORMATS } from '../constants/barcode-formats';
@@ -11,6 +12,7 @@ interface Props {
 }
 
 export function PosCameraScannerModal({ open, onClose, onDetectedBarcode }: Props) {
+  const { t } = useLanguage();
   const [manualCode, setManualCode] = useState('');
   const [cameraError, setCameraError] = useState<string | null>(null);
   const [isTorchOn, setIsTorchOn] = useState(false);
@@ -93,7 +95,7 @@ export function PosCameraScannerModal({ open, onClose, onDetectedBarcode }: Prop
         <div className='flex items-center justify-between border-b border-slate-100 pb-3'>
           <div className='flex items-center gap-2'>
             <div className='flex h-9 w-9 items-center justify-center rounded-xl bg-emerald-50 text-emerald-600'><Camera size={20} /></div>
-            <h3 className='font-extrabold text-slate-900 text-base'>Scan Barcode</h3>
+            <h3 className='font-extrabold text-slate-900 text-base'>{t('pos.scanBarcode')}</h3>
           </div>
 
           <div className='flex items-center gap-2'>
@@ -114,15 +116,16 @@ export function PosCameraScannerModal({ open, onClose, onDetectedBarcode }: Prop
         <div className='relative flex h-60 w-full items-center justify-center overflow-hidden rounded-2xl bg-black shadow-inner'>
           <div id='pos-camera-viewfinder' className='h-full w-full' />
           {cameraError && (
-            <div className='absolute inset-0 flex flex-col items-center justify-center bg-slate-900/90 p-4 text-center text-rose-400 text-xs'>
-              <p className='font-bold mb-1'>Camera Error</p>
-              <p className='text-slate-300'>{cameraError}</p>
+            <div className='absolute inset-0 bg-slate-900/90 flex flex-col items-center justify-center p-6 text-center backdrop-blur-sm'>
+              <CameraOff size={48} className='text-rose-500 mb-4 opacity-80' />
+              <p className='font-bold mb-1 text-white'>{t('pos.cameraError')}</p>
+              <p className='text-xs text-slate-400 max-w-xs'>{cameraError}</p>
             </div>
           )}
         </div>
 
         <form onSubmit={handleManualSubmit} className='space-y-2'>
-          <label className='block text-xs font-semibold text-slate-600'>Or type barcode manually:</label>
+          <label className='block text-xs font-semibold text-slate-600'>{t('pos.orTypeManually')}</label>
           <div className='relative'>
             <input
               type='text'

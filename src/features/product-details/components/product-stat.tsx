@@ -1,44 +1,58 @@
-import { AlertTriangle, DollarSign, Package, Percent, TrendingUp } from 'lucide-react';
+import {
+  AlertTriangle,
+  DollarSign,
+  Package,
+  Percent,
+  TrendingUp,
+} from 'lucide-react';
 import type { Product } from '../../../services/product';
 import { calculateMargin } from '../../../utils/helper';
+import { useLanguage } from '../../../i18n/language-context';
 
-interface Props {
+export default function ProductStats({
+  product,
+}: {
   readonly product: Product;
-}
-
-const ProductStats = ({ product }: Props) => {
+}) {
+  const { t } = useLanguage();
   const margin = calculateMargin(product.buyPrice, product.sellPrice);
 
   const stats = [
     {
-      title: 'Current Stock',
+      title: t('products.currentStock'),
       value: `${product.quantity} ${product.unit}`,
       icon: Package,
       className: 'bg-indigo-50 text-indigo-600',
     },
     {
-      title: 'Buy Price',
+      title: t('products.buyPrice'),
       value: `$${product.buyPrice.toFixed(2)}`,
       icon: DollarSign,
       className: 'bg-slate-100 text-slate-700',
     },
     {
-      title: 'Sell Price',
+      title: t('products.sellPrice'),
       value: `$${product.sellPrice.toFixed(2)}`,
       icon: DollarSign,
       className: 'bg-emerald-50 text-emerald-600',
     },
     {
-      title: 'Profit Margin',
+      title: t('products.profitMargin'),
       value: `${margin.toFixed(1)}%`,
       icon: Percent,
-      className: margin >= 0 ? 'bg-emerald-50 text-emerald-600' : 'bg-rose-50 text-rose-600',
+      className:
+        margin >= 0
+          ? 'bg-emerald-50 text-emerald-600'
+          : 'bg-rose-50 text-rose-600',
     },
     {
-      title: 'Min Stock Alert',
+      title: t('products.minStockAlert'),
       value: `${product.minStock} ${product.unit}`,
       icon: product.quantity <= product.minStock ? AlertTriangle : TrendingUp,
-      className: product.quantity <= product.minStock ? 'bg-rose-50 text-rose-600' : 'bg-purple-50 text-purple-600',
+      className:
+        product.quantity <= product.minStock
+          ? 'bg-rose-50 text-rose-600'
+          : 'bg-purple-50 text-purple-600',
     },
   ];
 
@@ -55,7 +69,9 @@ const ProductStats = ({ product }: Props) => {
               <p className='text-xs font-semibold text-slate-500 uppercase tracking-wider'>
                 {item.title}
               </p>
-              <div className={`flex h-9 w-9 items-center justify-center rounded-2xl ${item.className}`}>
+              <div
+                className={`flex h-9 w-9 items-center justify-center rounded-2xl ${item.className}`}
+              >
                 <Icon size={18} />
               </div>
             </div>
@@ -67,6 +83,4 @@ const ProductStats = ({ product }: Props) => {
       })}
     </div>
   );
-};
-
-export default ProductStats;
+}

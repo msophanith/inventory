@@ -1,24 +1,27 @@
 import { Calendar, Folder, Hash, Info, Layers, Package } from 'lucide-react';
 import type { Product } from '../../../services/product';
+import { useLanguage } from '../../../i18n/language-context';
 import { formatDate } from '../../../utils/date';
 
 interface Props {
   readonly product: Product;
 }
 
-const ProductInfoCard = ({ product }: Props) => {
+export default function ProductInfoCard({ product }: Props) {
+  const { t } = useLanguage();
+
   const items = [
-    { label: 'Barcode', value: product.barcode || '-', icon: Hash },
-    { label: 'Category', value: product.category || 'General', icon: Folder },
-    { label: 'Unit', value: product.unit || 'pcs', icon: Package },
-    { label: 'Shelf Storage', value: product.shelf || 'N/A', icon: Layers },
+    { label: t('products.barcode'), value: product.barcode || '-', icon: Hash },
+    { label: t('products.category'), value: product.category || 'General', icon: Folder },
+    { label: t('products.unit'), value: product.unit || 'pcs', icon: Package },
+    { label: t('products.shelfStorage'), value: product.shelf || 'N/A', icon: Layers },
     {
-      label: 'Created Date',
+      label: t('products.createdDate'),
       value: formatDate(product.createdAt, 'MMM dd, yyyy', '-'),
       icon: Calendar,
     },
     {
-      label: 'Last Updated',
+      label: t('products.lastUpdated'),
       value: formatDate(product.updatedAt, 'MMM dd, yyyy', '-'),
       icon: Calendar,
     },
@@ -30,7 +33,7 @@ const ProductInfoCard = ({ product }: Props) => {
         <div className='flex h-8 w-8 items-center justify-center rounded-xl bg-slate-100 text-slate-700'>
           <Info size={18} />
         </div>
-        <h2 className='font-bold text-slate-900 text-base'>Product Specification</h2>
+        <h2 className='font-bold text-slate-900 text-base'>{t('products.productInformation')}</h2>
       </div>
 
       <div className='grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3.5'>
@@ -55,5 +58,3 @@ const ProductInfoCard = ({ product }: Props) => {
     </div>
   );
 };
-
-export default ProductInfoCard;

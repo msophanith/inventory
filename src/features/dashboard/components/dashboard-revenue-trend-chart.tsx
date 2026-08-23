@@ -1,5 +1,6 @@
 import { useMemo, useState } from 'react';
 import { TrendingUp } from 'lucide-react';
+import { useLanguage } from '../../../i18n/language-context';
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -17,7 +18,16 @@ import { formatCurrencyKhr, formatCurrencyUsd } from '../../../utils/currency';
 import type { Movement } from '../../../services/movement';
 import { formatDate } from '../../../utils/date';
 
-ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend, Filler);
+ChartJS.register(
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  LineElement,
+  Title,
+  Tooltip,
+  Legend,
+  Filler,
+);
 
 interface Props {
   readonly movements?: Movement[];
@@ -39,18 +49,36 @@ function buildDailyRevenue(movements: Movement[], days: Range) {
     labels.push(label);
 
     const dayTotal = movements
-      .filter((m) => m.type === 'OUT' && !m.isDamaged && formatDate(m.createdAt, 'yyyy-MM-dd', '') === key)
-      .reduce((sum, m) => sum + Math.abs(m.quantity || 0) * (m.unitPrice ?? m.product?.sellPrice ?? 0), 0);
+      .filter(
+        (m) =>
+          m.type === 'OUT' &&
+          !m.isDamaged &&
+          formatDate(m.createdAt, 'yyyy-MM-dd', '') === key,
+      )
+      .reduce(
+        (sum, m) =>
+          sum +
+          Math.abs(m.quantity || 0) *
+            (m.unitPrice ?? m.product?.sellPrice ?? 0),
+        0,
+      );
 
     values.push(dayTotal);
   }
   return { labels, values };
 }
 
-export function DashboardRevenueTrendChart({ movements = [], isLoading }: Props) {
-  const [range, setRange] = useState<Range>(7);
+export function DashboardRevenueTrendChart({
+  movements = [],
+  isLoading,
+}: Props) {
+  const { t } = useLanguage();
+  const [range, setRange] = useState<7 | 30>(7);
 
-  const { labels, values } = useMemo(() => buildDailyRevenue(movements, range), [movements, range]);
+  const { labels, values } = useMemo(
+    () => buildDailyRevenue(movements, range as Range),
+    [movements, range],
+  );
 
   const totalInRange = values.reduce((a, b) => a + b, 0);
   const avgPerDay = values.length > 0 ? totalInRange / values.length : 0;
@@ -61,19 +89,21 @@ export function DashboardRevenueTrendChart({ movements = [], isLoading }: Props)
 
   const chartData = {
     labels,
-    datasets: [{
-      label: 'Revenue',
-      data: values,
-      borderColor: 'rgb(79, 70, 229)',
-      backgroundColor: 'rgba(99, 102, 241, 0.08)',
-      borderWidth: 2.5,
-      pointRadius: 4,
-      pointBackgroundColor: 'rgb(79, 70, 229)',
-      pointBorderColor: '#fff',
-      pointBorderWidth: 2,
-      fill: true,
-      tension: 0.4,
-    }],
+    datasets: [
+      {
+        label: t('reports.totalSales'),
+        data: values,
+        borderColor: 'rgb(79, 70, 229)',
+        backgroundColor: 'rgba(99, 102, 241, 0.08)',
+        borderWidth: 2.5,
+        pointRadius: 4,
+        pointBackgroundColor: 'rgb(79, 70, 229)',
+        pointBorderColor: '#fff',
+        pointBorderWidth: 2,
+        fill: true,
+        tension: 0.4,
+      },
+    ],
   };
 
   const options: ChartOptions<'line'> = {
@@ -95,10 +125,20 @@ export function DashboardRevenueTrendChart({ movements = [], isLoading }: Props)
       },
     },
     scales: {
-      x: { grid: { display: false }, ticks: { font: { family: "'Inter',sans-serif", size: 11 }, color: '#94a3b8' } },
+      x: {
+        grid: { display: false },
+        ticks: {
+          font: { family: "'Inter',sans-serif", size: 11 },
+          color: '#94a3b8',
+        },
+      },
       y: {
         grid: { color: 'rgba(226,232,240,0.5)' },
-        ticks: { font: { family: "'Inter',sans-serif", size: 11 }, color: '#94a3b8', callback: (v) => `$${v}` },
+        ticks: {
+          font: { family: "'Inter',sans-serif", size: 11 },
+          color: '#94a3b8',
+          callback: (v) => `$${v}`,
+        },
       },
     },
   };
@@ -111,17 +151,26 @@ export function DashboardRevenueTrendChart({ movements = [], isLoading }: Props)
             <TrendingUp size={18} />
           </div>
           <div>
-            <h2 className='font-extrabold text-slate-900 text-sm'>Revenue Trend</h2>
+            <h2 className='font-extrabold text-slate-900 text-sm'>
+              {t('reports.revenueTrend')}
+            </h2>
             <p className='text-[11px] text-slate-500'>
-              Total <span className='font-black text-slate-800'>{formatCurrencyUsd(totalInRange)}</span>
-              {' '}· Avg <span className='font-bold text-indigo-600'>{formatCurrencyUsd(avgPerDay)}/day</span>
+              {t('reports.total')}{' '}
+              <span className='font-black text-slate-800'>
+                {formatCurrencyUsd(totalInRange)}
+              </span>{' '}
+              · {t('reports.avgPerDay', { avg: formatCurrencyUsd(avgPerDay) })}
             </p>
           </div>
         </div>
         <div className='flex items-center gap-1 rounded-xl bg-slate-100 p-1 border border-slate-200/60'>
           {([7, 30] as Range[]).map((r) => (
-            <button key={r} type='button' onClick={() => setRange(r)}
-              className={`rounded-lg px-3 py-1 text-xs font-extrabold transition-all ${range === r ? 'bg-white text-indigo-600 shadow-sm' : 'text-slate-500 hover:text-slate-800'}`}>
+            <button
+              key={r}
+              type='button'
+              onClick={() => setRange(r)}
+              className={`rounded-lg px-3 py-1 text-xs font-extrabold transition-all ${range === r ? 'bg-white text-indigo-600 shadow-sm' : 'text-slate-500 hover:text-slate-800'}`}
+            >
               {r}D
             </button>
           ))}

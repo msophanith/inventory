@@ -11,6 +11,7 @@ import {
 import { Bar } from 'react-chartjs-2';
 import { formatCurrencyKhr, formatCurrencyUsd } from '../../../utils/currency';
 import type { SalesMarginGroup } from '../utils/sales-margin-calculator';
+import { useLanguage } from '../../../i18n/language-context';
 
 ChartJS.register(
   CategoryScale,
@@ -26,6 +27,7 @@ interface Props {
 }
 
 export function SalesMarginBarChart({ groups }: Props) {
+  const { t } = useLanguage();
   const labels = groups.map((g) => g.label);
   const salesData = groups.map((g) => g.totalSales);
   const marginData = groups.map((g) => g.totalMargin);
@@ -35,7 +37,7 @@ export function SalesMarginBarChart({ groups }: Props) {
     labels,
     datasets: [
       {
-        label: 'Total Sales',
+        label: t('reports.totalSales'),
         data: salesData,
         backgroundColor: 'rgba(99, 102, 241, 0.85)',
         borderColor: 'rgb(79, 70, 229)',
@@ -43,7 +45,7 @@ export function SalesMarginBarChart({ groups }: Props) {
         borderRadius: 8,
       },
       {
-        label: 'Total Margin',
+        label: t('reports.totalMargin'),
         data: marginData,
         backgroundColor: 'rgba(16, 185, 129, 0.85)',
         borderColor: 'rgb(5, 150, 105)',
@@ -51,7 +53,7 @@ export function SalesMarginBarChart({ groups }: Props) {
         borderRadius: 8,
       },
       {
-        label: 'Total Damage',
+        label: t('reports.totalDamage'),
         data: damageData,
         backgroundColor: 'rgba(244, 63, 94, 0.85)',
         borderColor: 'rgb(225, 29, 72)',

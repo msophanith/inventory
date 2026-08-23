@@ -5,7 +5,7 @@ interface Props {
   readonly isOpen: boolean;
   readonly onClose: () => void;
   readonly onExport: (password?: string) => void;
-  readonly exportType: 'EXCEL' | 'MONTH_CSV' | 'TODAY_CSV';
+  readonly exportType: 'EXCEL' | 'MONTH_CSV' | 'TODAY_CSV' | 'PRODUCT_IN_EXCEL' | 'NEW_PRODUCT_EXCEL';
 }
 
 export function ExportPasswordModal({
@@ -23,6 +23,8 @@ export function ExportPasswordModal({
     EXCEL: 'Excel Report (.xlsx)',
     MONTH_CSV: 'Monthly Sales Report (.csv)',
     TODAY_CSV: "Today's Sales & Net Profit (.csv)",
+    PRODUCT_IN_EXCEL: 'Product Stock In (.xlsx)',
+    NEW_PRODUCT_EXCEL: 'New Product Registration (.xlsx)',
   };
 
   const handleExportWithPassword = () => {
@@ -42,6 +44,7 @@ export function ExportPasswordModal({
       <div className='relative w-full max-w-md rounded-3xl border border-slate-200 bg-white p-6 shadow-2xl transition-all animate-in zoom-in-95 duration-200'>
         {/* Close Button */}
         <button
+          type='button'
           onClick={onClose}
           className='absolute right-4 top-4 p-1.5 text-slate-400 hover:bg-slate-100 hover:text-slate-600 rounded-full transition'
         >

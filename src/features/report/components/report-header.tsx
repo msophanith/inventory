@@ -1,4 +1,4 @@
-import { Calendar, CalendarRange, Download, FileSpreadsheet, RefreshCw, Zap } from 'lucide-react';
+import { Calendar, CalendarRange, Download, FileSpreadsheet, RefreshCw } from 'lucide-react';
 import type { MonthOption } from '../types/report.types';
 import type { DateMode } from '../hooks/use-report';
 import { useLanguage } from '../../../i18n/language-context';
@@ -7,9 +7,7 @@ interface Props {
   readonly selectedMonth: string;
   readonly onSelectMonth: (month: string) => void;
   readonly monthOptions: MonthOption[];
-  readonly onExportExcel: () => void;
-  readonly onExportCsv: () => void;
-  readonly onExportTodayCsv: () => void;
+  readonly onOpenExportCenter: () => void;
   readonly onRefresh: () => void;
   readonly isRefreshing?: boolean;
   readonly dateMode: DateMode;
@@ -24,9 +22,7 @@ export function ReportHeader({
   selectedMonth,
   onSelectMonth,
   monthOptions,
-  onExportExcel,
-  onExportCsv,
-  onExportTodayCsv,
+  onOpenExportCenter,
   onRefresh,
   isRefreshing,
   dateMode,
@@ -66,13 +62,13 @@ export function ReportHeader({
             className={`flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-extrabold transition-all ${
               dateMode === 'MONTH' ? 'bg-white text-emerald-600 shadow-sm' : 'text-slate-500 hover:text-slate-800'
             }`}>
-            <Calendar size={13} /> Month
+            <Calendar size={13} /> {t('reports.month')}
           </button>
           <button type='button' onClick={() => onDateModeChange('RANGE')}
             className={`flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-extrabold transition-all ${
               dateMode === 'RANGE' ? 'bg-white text-indigo-600 shadow-sm' : 'text-slate-500 hover:text-slate-800'
             }`}>
-            <CalendarRange size={13} /> Range
+            <CalendarRange size={13} /> {t('reports.range')}
           </button>
         </div>
 
@@ -112,35 +108,14 @@ export function ReportHeader({
           <RefreshCw size={18} className={isRefreshing ? 'animate-spin text-emerald-600' : 'transition-transform hover:rotate-45'} />
         </button>
 
-        {/* Export Today CSV Action */}
+        {/* Export Data Button */}
         <button
           type='button'
-          onClick={onExportTodayCsv}
-          title={t('reports.todayExportExcel')}
-          className='flex h-11 items-center gap-1.5 rounded-xl border border-amber-300/90 bg-linear-to-r from-amber-50 to-orange-50 px-3.5 text-xs sm:text-sm font-black text-amber-900 shadow-xs transition hover:from-amber-100 hover:to-orange-100 active:scale-95 cursor-pointer'
+          onClick={onOpenExportCenter}
+          className='flex h-11 items-center gap-2 rounded-xl bg-slate-900 px-5 text-sm font-bold text-white shadow-md transition-all hover:bg-slate-800 hover:shadow-lg hover:shadow-slate-500/20 active:scale-95 cursor-pointer'
         >
-          <Zap size={16} className='text-amber-600 fill-amber-500 animate-pulse' />
-          <span>{t('reports.todayExportExcel')}</span>
-        </button>
-
-        {/* Download Monthly CSV */}
-        <button
-          type='button'
-          onClick={onExportCsv}
-          className='flex h-11 items-center gap-1.5 rounded-xl border border-slate-200 bg-white px-3.5 text-xs sm:text-sm font-bold text-slate-700 shadow-xs transition hover:bg-slate-50 hover:border-slate-300 active:scale-95 cursor-pointer'
-        >
-          <Download size={16} className='text-slate-500' />
-          <span>{t('reports.monthlyExportExcel')}</span>
-        </button>
-
-        {/* Download Excel */}
-        <button
-          type='button'
-          onClick={onExportExcel}
-          className='flex h-11 items-center gap-2 rounded-xl bg-linear-to-r from-emerald-600 via-teal-600 to-emerald-700 px-4 text-xs sm:text-sm font-extrabold text-white shadow-md shadow-emerald-600/20 transition-all hover:from-emerald-500 hover:to-teal-500 hover:shadow-lg hover:shadow-emerald-600/30 active:scale-95 cursor-pointer'
-        >
-          <FileSpreadsheet size={18} />
-          <span>{t('reports.exportExcel')} (.xlsx)</span>
+          <Download size={18} className='text-emerald-400' />
+          <span>{t('reports.exportData')}</span>
         </button>
       </div>
     </div>

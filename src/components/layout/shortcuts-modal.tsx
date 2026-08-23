@@ -1,5 +1,6 @@
 import { Keyboard, X } from 'lucide-react';
 import { SHORTCUT_LIST } from '../../hooks/use-keyboard-shortcuts';
+import { useLanguage } from '../../i18n/language-context';
 
 interface Props {
   readonly open: boolean;
@@ -7,6 +8,7 @@ interface Props {
 }
 
 export function ShortcutsModal({ open, onClose }: Props) {
+  const { t } = useLanguage();
   if (!open) return null;
 
   return (
@@ -25,7 +27,7 @@ export function ShortcutsModal({ open, onClose }: Props) {
               <Keyboard size={22} />
             </div>
             <div>
-              <h3 className='text-lg font-bold text-slate-900'>Single Key Shortcuts</h3>
+              <h3 className='text-lg font-bold text-slate-900'>{t('common.shortcutsGuide')}</h3>
               <p className='text-xs text-slate-400 font-medium'>Press key anytime (when not typing)</p>
             </div>
           </div>
@@ -53,7 +55,7 @@ export function ShortcutsModal({ open, onClose }: Props) {
             </div>
           ))}
           <div className='flex items-center justify-between rounded-2xl bg-slate-50/80 border border-slate-100 px-4 py-3 text-xs font-semibold'>
-            <span className='text-slate-700 font-bold'>Toggle Shortcuts Guide</span>
+            <span className='text-slate-700 font-bold'>{t('common.shortcutsGuide')}</span>
             <kbd className='rounded-xl bg-white px-3 py-1 font-mono text-[11px] font-black text-indigo-600 border border-slate-200 shadow-2xs'>
               ?
             </kbd>
@@ -67,7 +69,7 @@ export function ShortcutsModal({ open, onClose }: Props) {
             onClick={onClose}
             className='w-full rounded-2xl bg-slate-900 py-3 text-xs font-bold text-white shadow-md hover:bg-slate-800 cursor-pointer transition'
           >
-            Got it, Close
+            {t('common.confirm')}
           </button>
         </div>
       </div>

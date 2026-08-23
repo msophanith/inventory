@@ -1,9 +1,10 @@
 import { useState } from 'react';
 import { CheckCircle2, FileText, PackageCheck, Printer } from 'lucide-react';
+import { useLanguage } from '../../../i18n/language-context';
 import type { ReceiptData } from '../types/sell.types';
 import { formatDateTime } from '../../../utils/date';
 import { generatePdfInvoiceBlob } from '../utils/pdf-generator';
-import { formatCurrencyKhr, formatCurrencyUsd } from '../../../utils/currency';
+import { formatCurrencyUsd } from '../../../utils/currency';
 import { printThermalReceipt, printThermalReceiptWebUSB } from '../utils/thermal-printer';
 
 interface Props {
@@ -12,6 +13,7 @@ interface Props {
 }
 
 export function PosReceiptModal({ receipt, onClose }: Props) {
+  const { t } = useLanguage();
   const [isGeneratingPdf, setIsGeneratingPdf] = useState(false);
   const [isPrintingThermal, setIsPrintingThermal] = useState(false);
   const [isPrintingUSB, setIsPrintingUSB] = useState(false);
@@ -37,7 +39,6 @@ export function PosReceiptModal({ receipt, onClose }: Props) {
       await printThermalReceiptWebUSB(receipt);
     } catch (err) {
       console.error('Failed to print thermal receipt via WebUSB:', err);
-      // Very basic fallback alert
       alert(err instanceof Error ? err.message : 'USB Print failed');
     } finally {
       setIsPrintingUSB(false);
@@ -66,10 +67,10 @@ export function PosReceiptModal({ receipt, onClose }: Props) {
             <CheckCircle2 size={32} />
           </div>
           <h3 className='text-lg font-extrabold text-slate-900'>
-            Sale Successful!
+            {t('pos.saleSuccessful')}
           </h3>
           <p className='text-xs text-slate-400 font-mono'>
-            Order #{receipt.orderId} • {formatDateTime(receipt.createdAt)}
+            {t('pos.order')} #{receipt.orderId} • {formatDateTime(receipt.createdAt)}
           </p>
         </div>
 
@@ -93,12 +94,12 @@ export function PosReceiptModal({ receipt, onClose }: Props) {
                 </div>
                 <div className='flex items-center justify-between text-[11px] text-slate-500 font-medium'>
                   <span className='flex items-center gap-1 text-slate-400'>
-                    <PackageCheck size={12} /> Remaining Stock:
+                    <PackageCheck size={12} /> {t('pos.remainingStock')}:
                   </span>
                   <span
                     className={`font-bold rounded-full px-2 py-0.5 text-[10px] ${isLow ? 'bg-amber-100 text-amber-800' : 'bg-emerald-100 text-emerald-800'}`}
                   >
-                    {remainingStock} {i.product.unit || 'units'} left
+                    {remainingStock} {i.product.unit || 'units'}
                   </span>
                 </div>
               </div>
@@ -107,45 +108,33 @@ export function PosReceiptModal({ receipt, onClose }: Props) {
         </div>
 
         <div className='border-t border-slate-100 pt-3 space-y-1.5 text-xs text-slate-600 font-medium'>
-          <div className='flex justify-between'>
-            <span>Payment Method</span>
-            <span className='font-bold text-slate-900 uppercase'>
-              {receipt.paymentMethod}
-            </span>
+          <div className='flex justify-between py-2 border-t border-slate-100 mt-2'>
+            <span className='font-bold text-slate-900'>{t('pos.paymentMethod')}</span>
+            <span className='font-bold text-slate-700'>{receipt.paymentMethod}</span>
           </div>
           <div className='flex justify-between'>
-            <span>Cashier / Sold By</span>
+            <span>{t('pos.cashier')}</span>
             <span className='font-bold text-slate-900'>
               {receipt.soldBy || 'Admin'}
             </span>
           </div>
           {receipt.discount > 0 && (
-            <div className='flex justify-between text-emerald-600 font-bold'>
-              <span>Discount</span>
+            <div className='flex justify-between font-bold text-rose-500'>
+              <span>{t('pos.discount')}</span>
               <span>-{formatCurrencyUsd(receipt.discount)}</span>
             </div>
           )}
-          <div className='flex justify-between items-baseline text-sm font-extrabold text-slate-900 pt-1'>
-            <span>Total Amount</span>
-            <div className='text-right'>
-              <span className='text-emerald-600 block'>
-                {formatCurrencyUsd(receipt.total)}
-              </span>
-              <span className='text-[10px] text-indigo-600 block'>
-                {formatCurrencyKhr(receipt.total)}
-              </span>
-            </div>
+          <div className='flex justify-between text-base font-black text-slate-900 pt-2 border-t border-slate-100 mt-1'>
+            <span>{t('pos.totalAmount')}</span>
+            <span>{formatCurrencyUsd(receipt.total)}</span>
           </div>
-          <div className='flex justify-between text-slate-500'>
-            <span>Amount Paid</span>
+          <div className='flex justify-between pt-1 border-t border-slate-200 border-dashed'>
+            <span>{t('pos.amountPaid')}</span>
             <span>{formatCurrencyUsd(receipt.amountPaid)}</span>
           </div>
-          <div className='flex justify-between text-slate-500'>
-            <span>Change</span>
-            <span>
-              {formatCurrencyUsd(receipt.change)} (
-              {formatCurrencyKhr(receipt.change)})
-            </span>
+          <div className='flex justify-between'>
+            <span>{t('pos.change')}</span>
+            <span>{formatCurrencyUsd(receipt.change)}</span>
           </div>
         </div>
 

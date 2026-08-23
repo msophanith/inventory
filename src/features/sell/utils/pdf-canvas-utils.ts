@@ -76,7 +76,7 @@ export function drawText(
   }
 
   const fontFamily =
-    '"Suwannaphum", "Noto Sans Khmer", "Kantumruy Pro", "Khmer OS Siemreap", sans-serif';
+    '"Kantumruy Pro", "Suwannaphum", "Noto Sans Khmer", "Khmer OS Siemreap", sans-serif';
   ctx.font = `${fontWeight} ${fontSizePx}px ${fontFamily}`;
 
   let textToRender = text;

@@ -1,5 +1,6 @@
 import { formatCurrencyKhr, formatCurrencyUsd } from '../../../utils/currency';
 import type { SalesMarginGroup } from '../utils/sales-margin-calculator';
+import { useLanguage } from '../../../i18n/language-context';
 
 interface Props {
   readonly group: SalesMarginGroup;
@@ -7,6 +8,7 @@ interface Props {
 }
 
 export function SalesMarginBarItem({ group, maxVal }: Props) {
+  const { t } = useLanguage();
   const salesPct = maxVal > 0 ? Math.min(100, Math.max(4, (group.totalSales / maxVal) * 100)) : 0;
   const marginPctOfMax = maxVal > 0 ? Math.min(100, Math.max(0, (group.totalMargin / maxVal) * 100)) : 0;
   const damagePctOfMax = maxVal > 0 ? Math.min(100, Math.max(0, (group.totalDamage / maxVal) * 100)) : 0;
@@ -21,7 +23,7 @@ export function SalesMarginBarItem({ group, maxVal }: Props) {
             {group.label}
           </span>
           <span className='rounded-full bg-slate-200/70 px-2 py-0.5 text-[11px] font-bold text-slate-600'>
-            {group.transactionCount} txns
+            {group.transactionCount} {t('reports.txns')}
           </span>
         </div>
 
@@ -33,7 +35,7 @@ export function SalesMarginBarItem({ group, maxVal }: Props) {
                 : 'bg-rose-50 text-rose-700 border border-rose-200/60'
             }`}
           >
-            {group.marginPct.toFixed(1)}% Margin
+            {group.marginPct.toFixed(1)}% {t('reports.margin')}
           </span>
         </div>
       </div>
@@ -44,7 +46,7 @@ export function SalesMarginBarItem({ group, maxVal }: Props) {
           <div className='flex items-center justify-between text-xs font-semibold'>
             <span className='text-indigo-600 font-extrabold flex items-center gap-1.5'>
               <span className='h-2 w-2 rounded-full bg-indigo-500 inline-block' />
-              Total Sales
+              {t('reports.totalSales')}
             </span>
             <div className='text-right'>
               <span className='font-black text-slate-900'>
@@ -69,7 +71,7 @@ export function SalesMarginBarItem({ group, maxVal }: Props) {
           <div className='flex items-center justify-between text-xs font-semibold'>
             <span className='text-emerald-600 font-extrabold flex items-center gap-1.5'>
               <span className='h-2 w-2 rounded-full bg-emerald-500 inline-block' />
-              Total Margin
+              {t('reports.totalMargin')}
             </span>
             <div className='text-right'>
               <span className={`font-black ${isPositiveMargin ? 'text-emerald-700' : 'text-rose-600'}`}>
@@ -99,7 +101,7 @@ export function SalesMarginBarItem({ group, maxVal }: Props) {
             <div className='flex items-center justify-between text-xs font-semibold'>
               <span className='text-rose-600 font-extrabold flex items-center gap-1.5'>
                 <span className='h-2 w-2 rounded-full bg-rose-500 inline-block' />
-                Total Damage
+                {t('reports.totalDamage')}
               </span>
               <div className='text-right'>
                 <span className='font-black text-rose-600'>

@@ -1,11 +1,12 @@
 import {
-  ArrowUpRight,
+  ArrowDownCircle,
+  ArrowRightCircle,
+  ArrowUpCircle,
   Activity,
-  ArrowDownLeft,
-  ArrowUpRight as ArrowUpRightIcon,
   RotateCcw,
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { useLanguage } from '../../../i18n/language-context';
 import type { Movement } from '../../../services/movement';
 import { formatDateTime } from '../../../utils/date';
 import { formatCurrencyKhr, formatCurrencyUsd } from '../../../utils/currency';
@@ -19,13 +20,13 @@ function getMovementBadge(type: string) {
   if (type === 'IN') {
     return {
       style: 'bg-emerald-100 text-emerald-700',
-      Icon: ArrowDownLeft,
+      Icon: ArrowDownCircle,
     };
   }
   if (type === 'OUT') {
     return {
       style: 'bg-blue-100 text-blue-700',
-      Icon: ArrowUpRightIcon,
+      Icon: ArrowUpCircle,
     };
   }
   return {
@@ -38,6 +39,7 @@ export function DashboardRecentActivity({
   movements = [],
   isLoading = false,
 }: Props) {
+  const { t } = useLanguage();
   const recentMovements = movements.slice(0, 6);
 
   let content;
@@ -55,7 +57,7 @@ export function DashboardRecentActivity({
   } else if (recentMovements.length === 0) {
     content = (
       <p className='p-6 text-center text-xs text-slate-400 font-semibold'>
-        No recent movement logged.
+        {t('reports.noSalesDataYet')}
       </p>
     );
   } else {
@@ -80,15 +82,15 @@ export function DashboardRecentActivity({
                 <div>
                   <div className='flex items-center gap-2'>
                     <span className='font-bold text-xs text-slate-900'>
-                      {m.product?.name || 'Stock Movement'}
+                      {m.product?.name || t('reports.stockMovement')}
                     </span>
                     <span className='text-[10px] font-extrabold px-2 py-0.5 rounded-full bg-slate-100 text-slate-600 uppercase'>
-                      {m.type} ({m.quantity})
+                      {m.type === 'IN' ? t('movement.in') : m.type === 'OUT' ? t('movement.out') : t('movement.adjustment')} ({m.quantity})
                     </span>
                   </div>
                   <p className='text-[10px] font-mono text-slate-400 mt-0.5'>
                     {formatDateTime(m.createdAt, 'dd MMM, HH:mm')} •{' '}
-                    {m.reference || 'POS Terminal'}
+                    {m.reference || t('reports.posTerminal')}
                   </p>
                 </div>
               </div>
@@ -117,10 +119,10 @@ export function DashboardRecentActivity({
           </div>
           <div>
             <h3 className='text-base font-extrabold text-slate-900'>
-              Recent Stock Activity
+              {t('reports.recentActivity')}
             </h3>
             <p className='text-xs text-slate-500 font-medium'>
-              Live store transaction audit log
+              {t('reports.analyticsDesc')}
             </p>
           </div>
         </div>
@@ -128,8 +130,8 @@ export function DashboardRecentActivity({
           to='/reports'
           className='flex items-center gap-1 rounded-xl bg-slate-50 px-3 py-1.5 text-xs font-extrabold text-slate-700 hover:bg-indigo-50 hover:text-indigo-600 transition cursor-pointer'
         >
-          <span>View All</span>
-          <ArrowUpRight size={14} />
+          <span>{t('common.viewDetails')}</span>
+          <ArrowRightCircle size={14} />
         </Link>
       </div>
 

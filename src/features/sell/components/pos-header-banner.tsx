@@ -2,6 +2,7 @@ import { useQuery } from '@tanstack/react-query';
 import { DollarSign, History, Scan, ShoppingBag, Sparkles } from 'lucide-react';
 import { movementService } from '../../../services';
 import { formatCurrencyKhr, formatCurrencyUsd } from '../../../utils/currency';
+import { useLanguage } from '../../../i18n/language-context';
 
 interface PosHeaderBannerProps {
   onOpenScanModal?: () => void;
@@ -12,6 +13,7 @@ export function PosHeaderBanner({
   onOpenScanModal,
   onOpenReceiptHistory,
 }: PosHeaderBannerProps = {}) {
+  const { t } = useLanguage();
   const { data: todaySummary } = useQuery({
     queryKey: ['today-sales'],
     queryFn: () => movementService.getTodaySale(),
@@ -30,10 +32,10 @@ export function PosHeaderBanner({
         <div>
           <div className='flex flex-wrap items-center gap-2'>
             <h2 className='text-base sm:text-lg font-black tracking-wide'>
-              POS Terminal
+              {t('pos.posTerminal')}
             </h2>
             <span className='rounded-full bg-emerald-500/20 border border-emerald-500/40 px-2 py-0.5 text-[10px] font-extrabold text-emerald-400 uppercase tracking-wider'>
-              Live Ready
+              {t('pos.liveReady')}
             </span>
             {onOpenScanModal && (
               <button
@@ -41,7 +43,7 @@ export function PosHeaderBanner({
                 onClick={onOpenScanModal}
                 className='flex items-center gap-1 rounded-lg bg-indigo-600/80 hover:bg-indigo-600 border border-indigo-400/30 px-2 py-0.5 text-[11px] font-bold text-white transition cursor-pointer'
               >
-                <Scan size={12} /> Camera Scan
+                <Scan size={12} /> {t('pos.cameraScanner')}
               </button>
             )}
             {onOpenReceiptHistory && (
@@ -50,12 +52,12 @@ export function PosHeaderBanner({
                 onClick={onOpenReceiptHistory}
                 className='flex items-center gap-1 rounded-lg bg-emerald-600/80 hover:bg-emerald-600 border border-emerald-400/30 px-2 py-0.5 text-[11px] font-bold text-white transition cursor-pointer'
               >
-                <History size={12} /> Receipt History
+                <History size={12} /> {t('pos.receiptHistory')}
               </button>
             )}
           </div>
           <p className='text-xs text-slate-300 font-medium mt-0.5'>
-            Scan or click products to ring up sales
+            {t('pos.scanToRingUp')}
           </p>
         </div>
       </div>
@@ -67,7 +69,7 @@ export function PosHeaderBanner({
           </div>
           <div>
             <p className='text-[10px] uppercase font-bold text-slate-300 tracking-wider'>
-              Today Revenue
+              {t('pos.todayRevenue')}
             </p>
             <p className='text-xs sm:text-sm font-black text-emerald-400 leading-tight'>
               {formatCurrencyUsd(salesUsd)}{' '}
@@ -86,10 +88,10 @@ export function PosHeaderBanner({
           </div>
           <div>
             <p className='text-[10px] uppercase font-bold text-slate-300 tracking-wider'>
-              Today Orders
+              {t('pos.todayOrders')}
             </p>
             <p className='text-xs sm:text-sm font-black text-white leading-tight'>
-              {ordersCount} Sales
+              {t('pos.salesCount').replace('{count}', ordersCount.toString())}
             </p>
           </div>
         </div>

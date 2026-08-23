@@ -2,6 +2,7 @@ import * as XLSX from 'xlsx';
 import { formatDateTime } from '../../../utils/date';
 import type { Movement } from '../../../services/movement';
 import type { MonthlyReportSummary, ProductReportItem } from '../types/report.types';
+import type { Product } from '../../../services/product';
 import { calculateMovementItem } from './report-calculator';
 import { downloadFileWithOptionalPassword } from './export-helper';
 import { exportReportToCsv } from './csv-export';
@@ -127,6 +128,110 @@ export async function exportReportToExcel(
 
   const cleanMonth = monthLabel.replace(/[^a-zA-Z0-9]/g, '_');
   const filename = `Sales_Margin_Report_${cleanMonth}.xlsx`;
+
+  const excelBuffer = XLSX.write(wb, { bookType: 'xlsx', type: 'array' });
+  await downloadFileWithOptionalPassword(
+    excelBuffer,
+    filename,
+    'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+    password,
+  );
+}
+
+/**
+ * Download Monthly Product In (Stock In / Purchases) as Excel (.xlsx) file
+ */
+export async function exportProductInToExcel(
+  movements: Movement[],
+  monthLabel: string,
+  password?: string,
+) {
+  const wb = XLSX.utils.book_new();
+  const dateStr = formatDateTime(new Date(), 'yyyy-MM-dd HH:mm');
+
+  // filter only 'IN'
+  const inMovements = movements.filter(m => m.type === 'IN');
+
+  const txHeader = [
+    'Transaction ID',
+    'Date & Time',
+    'Product Name',
+    'Quantity',
+    'Unit Cost',
+    'Total Cost',
+    'Reason / Note',
+  ];
+
+  const txRows = inMovements.map((m) => {
+    const dateFormatted = formatDateTime(m.createdAt, 'yyyy-MM-dd HH:mm:ss', '');
+    const unitCost = m.unitPrice ?? m.product?.buyPrice ?? 0;
+    const totalCost = unitCost * m.quantity;
+    return [
+      m.id,
+      dateFormatted,
+      m.product?.name || m.productId,
+      m.quantity,
+      unitCost,
+      totalCost,
+      m.reference || m.note || '',
+    ];
+  });
+
+  const txSheet = XLSX.utils.aoa_to_sheet([['MONTHLY PRODUCT IN REPORT'], [`Period: ${monthLabel}`], [`Generated Date: ${dateStr}`], [''], txHeader, ...txRows]);
+  XLSX.utils.book_append_sheet(wb, txSheet, 'Product In');
+
+  const cleanMonth = monthLabel.replace(/[^a-zA-Z0-9]/g, '_');
+  const filename = `Product_In_Report_${cleanMonth}.xlsx`;
+
+  const excelBuffer = XLSX.write(wb, { bookType: 'xlsx', type: 'array' });
+  await downloadFileWithOptionalPassword(
+    excelBuffer,
+    filename,
+    'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+    password,
+  );
+}
+
+/**
+ * Download New Products as Excel (.xlsx) file
+ */
+export async function exportNewProductToExcel(
+  products: Product[],
+  monthLabel: string,
+  password?: string,
+) {
+  const wb = XLSX.utils.book_new();
+  const dateStr = formatDateTime(new Date(), 'yyyy-MM-dd HH:mm');
+
+  const header = [
+    'Product ID',
+    'Barcode',
+    'Product Name',
+    'Category',
+    'Buy Price',
+    'Sell Price',
+    'Current Stock',
+    'Created At',
+  ];
+
+  const rows = products.map((p) => {
+    return [
+      p.id,
+      p.barcode || '',
+      p.name,
+      p.category,
+      p.buyPrice,
+      p.sellPrice,
+      p.quantity,
+      formatDateTime(p.createdAt, 'yyyy-MM-dd HH:mm:ss', ''),
+    ];
+  });
+
+  const sheet = XLSX.utils.aoa_to_sheet([['NEW PRODUCTS REPORT'], [`Period: ${monthLabel}`], [`Generated Date: ${dateStr}`], [''], header, ...rows]);
+  XLSX.utils.book_append_sheet(wb, sheet, 'New Products');
+
+  const cleanMonth = monthLabel.replace(/[^a-zA-Z0-9]/g, '_');
+  const filename = `New_Products_Report_${cleanMonth}.xlsx`;
 
   const excelBuffer = XLSX.write(wb, { bookType: 'xlsx', type: 'array' });
   await downloadFileWithOptionalPassword(

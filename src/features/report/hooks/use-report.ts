@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { movementService } from '../../../services';
+import { movementService, productService } from '../../../services';
 import { formatDate } from '../../../utils/date';
 import {
   calculateProductReport,
@@ -8,13 +8,22 @@ import {
   filterMovementsByMonth,
   getAvailableMonths,
 } from '../utils/report-calculator';
-import { exportReportToCsv, exportReportToExcel } from '../utils/excel-export';
+import {
+  exportReportToCsv,
+  exportReportToExcel,
+  exportProductInToExcel,
+  exportNewProductToExcel,
+} from '../utils/excel-export';
 import { exportTodaySalesToCsv } from '../utils/today-sales-export';
 import type { Movement } from '../../../services/movement';
 
 export type DateMode = 'MONTH' | 'RANGE';
 
-function filterByDateRange(movements: Movement[], start: string, end: string): Movement[] {
+function filterByDateRange(
+  movements: Movement[],
+  start: string,
+  end: string,
+): Movement[] {
   if (!start || !end) return movements;
   const from = new Date(start).getTime();
   const to = new Date(end + 'T23:59:59').getTime();
@@ -56,7 +65,8 @@ export function useReport() {
   }, [selectedMonth, monthOptions]);
 
   const monthlyMovements = useMemo(() => {
-    if (dateMode === 'RANGE') return filterByDateRange(rawMovements, customStart, customEnd);
+    if (dateMode === 'RANGE')
+      return filterByDateRange(rawMovements, customStart, customEnd);
     return filterMovementsByMonth(rawMovements, activeMonth);
   }, [rawMovements, activeMonth, dateMode, customStart, customEnd]);
 
@@ -79,7 +89,8 @@ export function useReport() {
   }, [allProductReports, searchQuery]);
 
   const activeMonthLabel = useMemo(() => {
-    if (dateMode === 'RANGE' && customStart && customEnd) return `${customStart} → ${customEnd}`;
+    if (dateMode === 'RANGE' && customStart && customEnd)
+      return `${customStart} → ${customEnd}`;
     const found = monthOptions.find((m) => m.value === activeMonth);
     return found ? found.label : activeMonth;
   }, [monthOptions, activeMonth, dateMode, customStart, customEnd]);
@@ -100,6 +111,34 @@ export function useReport() {
 
   const handleExportTodayCsv = (password?: string) => {
     exportTodaySalesToCsv(rawMovements, password);
+  };
+
+  const handleExportProductInExcel = (password?: string) => {
+    exportProductInToExcel(monthlyMovements, activeMonthLabel, password);
+  };
+
+  const handleExportNewProductExcel = async (password?: string) => {
+    try {
+      const response = await productService.getAll({ limit: 10000 });
+      const products = response.data || [];
+      let filtered = products;
+      if (dateMode === 'RANGE' && customStart && customEnd) {
+        const from = new Date(customStart).getTime();
+        const to = new Date(customEnd + 'T23:59:59').getTime();
+        filtered = products.filter((p) => {
+          if (!p.createdAt) return false;
+          const t = new Date(p.createdAt).getTime();
+          return t >= from && t <= to;
+        });
+      } else if (activeMonth !== 'ALL') {
+        filtered = products.filter(
+          (p) => p.createdAt && p.createdAt.startsWith(activeMonth),
+        );
+      }
+      await exportNewProductToExcel(filtered, activeMonthLabel, password);
+    } catch (err) {
+      console.error('Error exporting new products:', err);
+    }
   };
 
   return {
@@ -125,5 +164,7 @@ export function useReport() {
     handleExportExcel,
     handleExportCsv,
     handleExportTodayCsv,
+    handleExportProductInExcel,
+    handleExportNewProductExcel,
   };
 }

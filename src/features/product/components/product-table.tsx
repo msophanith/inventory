@@ -11,6 +11,7 @@ import {
   type StockFilterType,
 } from './product-table-header';
 import { ProductTablePagination } from './product-table-pagination';
+import { useLanguage } from '../../../i18n/language-context';
 
 interface Props {
   readonly products: Product[];
@@ -47,6 +48,8 @@ export default function ProductTable({
   onExportCsv,
   isExporting,
 }: Props) {
+  const { t } = useLanguage();
+
   const table = useReactTable({
     data: products,
     columns: productColumns,
@@ -65,7 +68,7 @@ export default function ProductTable({
             colSpan={5}
             className='p-10 text-center text-slate-400 font-medium'
           >
-            Loading products...
+            {t('products.loadingProducts')}
           </td>
         </tr>
       );
@@ -78,7 +81,7 @@ export default function ProductTable({
             colSpan={5}
             className='p-12 text-center text-slate-500 font-medium'
           >
-            No products found for selected filter.
+            {t('products.noProductsFound')}
           </td>
         </tr>
       );

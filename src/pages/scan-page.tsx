@@ -1,5 +1,6 @@
 import { useCallback, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useLanguage } from '../i18n/language-context';
 import { productService } from '../services';
 import { useHardwareScanner } from '../features/sell/hooks/use-hardware-scanner';
 import { playScanSound } from '../features/sell/utils/scan-sound';
@@ -12,6 +13,7 @@ import { ScanViewfinder } from '../features/scan/components/scan-viewfinder';
 import { ScanHistoryFeed, type ScanHistoryItem } from '../features/scan/components/scan-history-feed';
 
 const ScanPage = () => {
+  const { t } = useLanguage();
   const navigate = useNavigate();
   const [manualCode, setManualCode] = useState('');
   const [isCameraOpen, setIsCameraOpen] = useState(false);
@@ -30,7 +32,7 @@ const ScanPage = () => {
       setIsSearching(true);
       setAlert({
         type: 'info',
-        message: `Searching database for barcode "${clean}"...`,
+        message: t('scan.searchingBarcode', { barcode: clean }),
       });
 
       try {
@@ -39,7 +41,7 @@ const ScanPage = () => {
           playScanSound();
           setAlert({
             type: 'success',
-            message: `Found "${product.name}"! Redirecting...`,
+            message: t('scan.foundProduct', { name: product.name }),
           });
 
           setHistory((prev) => [
@@ -60,7 +62,7 @@ const ScanPage = () => {
         } else {
           setAlert({
             type: 'error',
-            message: `Barcode "${clean}" not found! Redirecting to Create Product...`,
+            message: t('scan.barcodeNotFound', { barcode: clean }),
           });
 
           setHistory((prev) => [
@@ -79,7 +81,7 @@ const ScanPage = () => {
         }
       } catch (err) {
         console.error('Scan error:', err);
-        setAlert({ type: 'error', message: 'Error querying database' });
+        setAlert({ type: 'error', message: t('scan.errorQuerying') });
       } finally {
         setIsSearching(false);
       }

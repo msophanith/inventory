@@ -1,10 +1,12 @@
 import { QrCode, Wifi } from 'lucide-react';
+import { useLanguage } from '../../../i18n/language-context';
 
 interface Props {
   readonly isListening: boolean;
 }
 
 export function ScanStatusHeader({ isListening }: Props) {
+  const { t } = useLanguage();
   return (
     <div className='rounded-3xl bg-linear-to-r from-slate-900 via-indigo-950 to-slate-900 p-5 text-white shadow-xl border border-indigo-500/20 flex flex-col sm:flex-row sm:items-center justify-between gap-4'>
       <div className='flex items-center gap-3.5'>
@@ -12,9 +14,9 @@ export function ScanStatusHeader({ isListening }: Props) {
           <QrCode size={24} className='animate-pulse' />
         </div>
         <div>
-          <h1 className='text-xl font-black tracking-wide'>Scan Lookup Terminal</h1>
+          <h1 className='text-xl font-black tracking-wide'>{t('scan.scanLookupTerminal')}</h1>
           <p className='text-xs text-slate-300 font-medium mt-0.5'>
-            Scan barcode with phone camera, hardware barcode reader, or type manually.
+            {t('scan.liveHardwareScanner')}
           </p>
         </div>
       </div>
@@ -29,7 +31,7 @@ export function ScanStatusHeader({ isListening }: Props) {
         </span>
         <Wifi size={14} className='text-indigo-400' />
         <span className='text-slate-200'>
-          {isListening ? 'Hardware Scanner Ready' : 'Scanner Paused'}
+          {isListening ? t('scan.hardwareScannerReady') : t('scan.scannerPaused')}
         </span>
       </div>
     </div>

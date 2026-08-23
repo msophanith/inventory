@@ -90,18 +90,17 @@ export function PosCartFooter({
           type='button'
           disabled={!hasItems || isGeneratingPdf}
           onClick={onPreviewPdf}
-          title={t('pos.downloadPdf')}
-          className='flex items-center justify-center gap-1.5 rounded-2xl border border-indigo-200 bg-indigo-50 px-3 py-3 text-xs font-bold text-indigo-700 hover:bg-indigo-100 disabled:opacity-40 transition cursor-pointer'
+          className='flex-1 flex items-center justify-center gap-1 rounded-xl border border-indigo-200 bg-indigo-50 px-3 py-2.5 text-xs font-bold text-indigo-700 shadow-xs hover:bg-indigo-100 transition'
         >
           <FileText size={16} />
-          <span>PDF</span>
+          <span>{t('pos.downloadPdf')}</span>
         </button>
 
         <button
           type='button'
           disabled={!hasItems}
           onClick={onCheckout}
-          className='flex-1 flex items-center justify-center gap-2 rounded-2xl bg-linear-to-r from-emerald-600 to-teal-600 py-3.5 text-sm font-extrabold text-white shadow-lg shadow-emerald-600/20 transition hover:from-emerald-700 hover:to-teal-700 disabled:opacity-50 cursor-pointer active:scale-98'
+          className='flex-2 flex items-center justify-center gap-2 rounded-2xl bg-linear-to-r from-emerald-600 to-teal-600 py-3.5 text-sm font-extrabold text-white shadow-lg shadow-emerald-600/20 transition hover:from-emerald-700 hover:to-teal-700 disabled:opacity-50 cursor-pointer active:scale-98'
         >
           <CreditCard size={18} />
           <span>{t('pos.checkout')}</span>

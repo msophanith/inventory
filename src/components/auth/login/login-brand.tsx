@@ -1,6 +1,8 @@
 import { PackageCheck, ShieldCheck } from 'lucide-react';
+import { useLanguage } from '../../../i18n/language-context';
 
 export function LoginBrand() {
+  const { t } = useLanguage();
   return (
     <div className='mb-8 text-center space-y-3'>
       {/* Icon badge */}
@@ -13,11 +15,11 @@ export function LoginBrand() {
 
       <div>
         <h1 className='text-2xl sm:text-3xl font-black text-slate-900 tracking-tight'>
-          មានលាភ
+          {t('common.appName')}
         </h1>
         <p className='mt-1 text-xs sm:text-sm font-semibold text-slate-500 flex items-center justify-center gap-1.5'>
           <ShieldCheck size={15} className='text-emerald-600' />
-          Smart Inventory Manager
+          {t('common.appTagline')}
         </p>
       </div>
     </div>

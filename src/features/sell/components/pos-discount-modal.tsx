@@ -1,5 +1,6 @@
 import { useState } from 'react';
-import { Tag, Ticket, X } from 'lucide-react';
+import { useLanguage } from '../../../i18n/language-context';
+import { Tag, X, Sparkles } from 'lucide-react';
 import { formatCurrencyKhr, formatCurrencyUsd } from '../../../utils/currency';
 
 interface Props {
@@ -25,6 +26,7 @@ export function PosDiscountModal({
   onClose,
   onApplyDiscount,
 }: Props) {
+  const { t } = useLanguage();
   const [discType, setDiscType] = useState<'PERCENT' | 'FIXED'>('PERCENT');
   const [inputValue, setInputValue] = useState<string>('');
 
@@ -47,10 +49,10 @@ export function PosDiscountModal({
   return (
     <div className='fixed inset-0 z-110 flex items-end sm:items-center justify-center bg-slate-950/70 p-0 sm:p-4 backdrop-blur-md animate-in fade-in duration-200'>
       <div className='w-full max-w-md rounded-t-3xl sm:rounded-3xl bg-white p-5 sm:p-6 shadow-2xl space-y-4 animate-in slide-in-from-bottom sm:zoom-in-95 duration-200'>
-        <div className='flex items-center justify-between border-b border-slate-100 pb-3'>
-          <div className='flex items-center gap-2 text-slate-900'>
-            <Tag className='h-5 w-5 text-indigo-600' />
-            <h3 className='text-lg font-extrabold'>Apply Discount</h3>
+        <div className='flex items-center justify-between border-b border-slate-100 p-4'>
+          <div className='flex items-center gap-2'>
+            <div className='flex h-9 w-9 items-center justify-center rounded-xl bg-purple-50 text-purple-600'><Tag size={20} /></div>
+            <h3 className='text-lg font-extrabold'>{t('pos.applyDiscount')}</h3>
           </div>
           <button
             type='button'
@@ -62,11 +64,11 @@ export function PosDiscountModal({
         </div>
 
         {/* Promo Codes */}
-        <div className='space-y-1.5'>
-          <p className='text-xs font-extrabold uppercase tracking-wider text-slate-500 flex items-center gap-1'>
-            <Ticket size={14} className='text-indigo-500' />
-            <span>Featured Promos</span>
-          </p>
+        <div className='pt-2'>
+          <div className='flex items-center gap-1.5 text-xs font-bold text-slate-400 uppercase tracking-wider mb-2'>
+            <Sparkles size={14} className='text-amber-500' />
+            <span>{t('pos.featuredPromos')}</span>
+          </div>
           <div className='grid grid-cols-3 gap-2'>
             {PROMO_CODES.map((item) => (
               <button

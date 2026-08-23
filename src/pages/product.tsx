@@ -1,4 +1,5 @@
 import { useMemo, useState } from 'react';
+import { useLanguage } from '../i18n/language-context';
 import ProductTable from '../features/product/components/product-table';
 import type { StockFilterType } from '../features/product/components/product-table-header';
 import { useProduct } from '../features/product/hooks/use-product';
@@ -12,6 +13,7 @@ import { useProductStore } from '../features/product/store/use-product-store';
 const ProductPage = () => {
   const { useGetProducts, handleSearchChange, search } = useProduct(false);
   const navigate = useNavigate();
+  const { t } = useLanguage();
 
   const stockFilter = useProductStore((state) => state.stockFilter);
   const setStockFilter = useProductStore((state) => state.setStockFilter);
@@ -74,13 +76,13 @@ const ProductPage = () => {
       await exportAllProductsToCsv();
       setToast({
         type: 'success',
-        message: 'Product catalog CSV exported successfully!',
+        message: t('products.exportSuccess'),
       });
     } catch (err) {
       console.error('Export error:', err);
       setToast({
         type: 'error',
-        message: 'Failed to export products CSV',
+        message: t('products.exportError'),
       });
     } finally {
       setIsExporting(false);

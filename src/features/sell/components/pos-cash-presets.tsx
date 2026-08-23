@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useLanguage } from '../../../i18n/language-context';
 import { Banknote, Calculator, PenLine } from 'lucide-react';
 import { formatCurrencyKhr, formatCurrencyUsd } from '../../../utils/currency';
 
@@ -17,6 +18,7 @@ const KHR_DENOMINATIONS = [
 ];
 
 export function PosCashPresets({ total, amountPaid, onSelectAmount }: Props) {
+  const { t } = useLanguage();
   const [customAmt, setCustomAmt] = useState('');
   const changeUsd = Math.max(0, amountPaid - total);
 
@@ -44,9 +46,9 @@ export function PosCashPresets({ total, amountPaid, onSelectAmount }: Props) {
       </div>
 
       <div className='flex items-center justify-between text-xs font-bold text-slate-700'>
-        <div className='flex items-center gap-1.5'>
-          <Banknote size={15} className='text-emerald-600' />
-          <span>Quick Cash Presets</span>
+        <div className='flex items-center gap-1.5 text-xs font-bold text-slate-500 uppercase tracking-wider'>
+          <Banknote size={14} className='text-emerald-500' />
+          <span>{t('pos.quickCashPresets')}</span>
         </div>
         <button
           type='button'

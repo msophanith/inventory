@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useLanguage } from '../../../i18n/language-context';
 import { Banknote, QrCode, User, X } from 'lucide-react';
 import type { PaymentMethod } from '../types/sell.types';
 import { formatCurrencyKhr, formatCurrencyUsd } from '../../../utils/currency';
@@ -23,6 +24,7 @@ export function PosCheckoutModal({
   onClose,
   onConfirm,
 }: Props) {
+  const { t } = useLanguage();
   const [method, setMethod] = useState<PaymentMethod>('CASH');
   const [amountPaidStr, setAmountPaidStr] = useState<string>('');
   const [customerNote, setCustomerNote] = useState('');
@@ -45,7 +47,7 @@ export function PosCheckoutModal({
       <div className='w-full max-w-md max-h-[92vh] overflow-y-auto rounded-t-3xl sm:rounded-3xl bg-white p-4 pb-8 sm:p-6 shadow-2xl space-y-4 animate-in slide-in-from-bottom sm:zoom-in-95 duration-200'>
         {/* Header */}
         <div className='flex items-center justify-between border-b border-slate-100 pb-3'>
-          <h3 className='text-lg font-bold text-slate-900'>Complete Payment</h3>
+          <h3 className='text-lg font-bold text-slate-900'>{t('pos.completePayment')}</h3>
           <button
             type='button'
             onClick={onClose}
@@ -71,12 +73,12 @@ export function PosCheckoutModal({
         {/* Payment Method Selector */}
         <div>
           <label className='block text-xs font-bold text-slate-700 mb-2 uppercase tracking-wider'>
-            Select Payment Method
+            {t('pos.paymentMethod')}
           </label>
           <div className='grid grid-cols-2 gap-2'>
             {[
-              { id: 'CASH', label: 'Cash', icon: Banknote },
-              { id: 'QR', label: 'KHQR Pay', icon: QrCode },
+              { id: 'CASH', label: t('pos.cash'), icon: Banknote },
+              { id: 'QR', label: t('pos.khqr'), icon: QrCode },
             ].map((m) => {
               const Icon = m.icon;
               const active = method === m.id;
@@ -120,11 +122,11 @@ export function PosCheckoutModal({
           {/* Customer Note */}
           <div>
             <label className='block text-xs font-bold text-slate-700 mb-1.5 uppercase tracking-wider flex items-center gap-1'>
-              <User size={12} /> Customer / Note <span className='text-slate-400 font-normal normal-case'>(optional)</span>
+              <User size={12} /> {t('pos.customer')} / {t('pos.note')} <span className='text-slate-400 font-normal normal-case'>({t('pos.optional')})</span>
             </label>
             <input
               type='text'
-              placeholder='e.g. John Doe, Table 3, wholesale...'
+              placeholder={t('pos.customerNotePlaceholder')}
               value={customerNote}
               onChange={(e) => setCustomerNote(e.target.value)}
               className='w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-xs font-semibold text-slate-800 focus:border-indigo-400 focus:bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500/20 transition'
@@ -145,7 +147,7 @@ export function PosCheckoutModal({
               disabled={isPending || (method === 'CASH' && amountPaid < total)}
               className='flex-1 rounded-xl bg-emerald-600 py-3 text-sm font-extrabold text-white shadow-md hover:bg-emerald-700 disabled:opacity-50 cursor-pointer'
             >
-              {isPending ? 'Processing...' : 'Confirm Sale'}
+              {isPending ? t('pos.processing') : t('pos.confirmPayment')}
             </button>
           </div>
         </form>

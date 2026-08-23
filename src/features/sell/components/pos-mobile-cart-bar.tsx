@@ -1,4 +1,6 @@
 import { Camera, ChevronRight, ShoppingCart } from 'lucide-react';
+import { useLanguage } from '../../../i18n/language-context';
+import { formatCurrencyUsd } from '../../../utils/currency';
 
 interface Props {
   readonly itemCount: number;
@@ -7,15 +9,13 @@ interface Props {
   readonly onOpenScanModal: () => void;
 }
 
-const formatCurrency = (val: number) =>
-  new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(val);
-
 export function PosMobileCartBar({
   itemCount,
   totalAmount,
   onOpenCartDrawer,
   onOpenScanModal,
 }: Props) {
+  const { t } = useLanguage();
   return (
     <div className='lg:hidden fixed bottom-16 sm:bottom-6 left-3 right-3 z-40 flex items-center gap-2 max-w-lg mx-auto'>
       {/* Quick Camera Barcode Scanner FAB */}
@@ -45,16 +45,16 @@ export function PosMobileCartBar({
 
             <div className='text-left min-w-0'>
               <p className='text-[11px] uppercase tracking-wider text-emerald-100 font-bold'>
-                View Cart
+                {t('pos.cart')}
               </p>
               <p className='text-base font-black truncate'>
-                {formatCurrency(totalAmount)}
+                {formatCurrencyUsd(totalAmount)}
               </p>
             </div>
           </div>
 
           <div className='flex items-center gap-1 text-xs font-black uppercase tracking-wider bg-white/20 px-3 py-1.5 rounded-xl shrink-0'>
-            <span>Checkout</span>
+            <span>{t('pos.checkout')}</span>
             <ChevronRight size={16} />
           </div>
         </button>
@@ -66,9 +66,9 @@ export function PosMobileCartBar({
         >
           <div className='flex items-center gap-2.5 text-xs font-bold text-slate-500'>
             <ShoppingCart size={18} className='text-slate-400' />
-            <span>Cart is empty</span>
+            <span>{t('pos.cartEmpty')}</span>
           </div>
-          <span className='text-xs font-extrabold text-indigo-600'>Open Cart</span>
+          <span className='text-xs font-extrabold text-indigo-600'>{t('pos.openCart')}</span>
         </button>
       )}
     </div>

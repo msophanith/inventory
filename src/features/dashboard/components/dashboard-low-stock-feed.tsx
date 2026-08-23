@@ -2,28 +2,30 @@ import { AlertTriangle, PackageSearch, ArrowRight } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useProduct } from '../../product/hooks/use-product';
 import type { Product } from '../../../services/product';
+import { useLanguage } from '../../../i18n/language-context';
 
 function StockBadge({ product }: { product: Product }) {
   const qty = product.quantity ?? 0;
-  const min = product.minStock ?? 0;
+  const { t } = useLanguage();
 
   if (qty <= 0) {
     return (
       <span className='inline-flex items-center gap-1 rounded-full bg-rose-100 px-2 py-0.5 text-[10px] font-extrabold text-rose-700'>
         <span className='h-1.5 w-1.5 rounded-full bg-rose-500 animate-pulse inline-block' />
-        Out of Stock
+        {t('products.outOfStock')}
       </span>
     );
   }
   return (
     <span className='inline-flex items-center gap-1 rounded-full bg-amber-100 px-2 py-0.5 text-[10px] font-extrabold text-amber-800'>
       <span className='h-1.5 w-1.5 rounded-full bg-amber-400 inline-block' />
-      Low ({qty}/{min})
+      {t('products.lowStock')}
     </span>
   );
 }
 
 export function DashboardLowStockFeed() {
+  const { t } = useLanguage();
   const navigate = useNavigate();
   const { useGetOutOfStockProducts, useGetLowStockProducts } = useProduct(true);
   const { data: outOfStock = [], isLoading: loadOut } = useGetOutOfStockProducts(5);
@@ -44,8 +46,8 @@ export function DashboardLowStockFeed() {
             <AlertTriangle size={18} />
           </div>
           <div>
-            <h2 className='font-extrabold text-slate-900 text-sm'>Restock Needed</h2>
-            <p className='text-[11px] text-slate-500'>Products requiring immediate attention</p>
+            <h2 className='font-extrabold text-slate-900 text-sm'>{t('reports.restockNeeded')}</h2>
+            <p className='text-[11px] text-slate-500'>{t('reports.productsRequiringAttention')}</p>
           </div>
         </div>
         <button
@@ -53,7 +55,7 @@ export function DashboardLowStockFeed() {
           onClick={() => navigate('/movement')}
           className='flex items-center gap-1 rounded-xl bg-rose-600 px-3 py-1.5 text-xs font-extrabold text-white shadow-sm hover:bg-rose-700 transition active:scale-95 cursor-pointer'
         >
-          Add Stock <ArrowRight size={13} />
+          <span>{t('reports.restockItems')}</span> <ArrowRight size={13} />
         </button>
       </div>
 
@@ -75,7 +77,7 @@ export function DashboardLowStockFeed() {
       ) : combined.length === 0 ? (
         <div className='flex flex-col items-center justify-center py-8 gap-2'>
           <PackageSearch size={32} className='text-emerald-400' />
-          <p className='text-xs font-bold text-emerald-700'>All products are well-stocked!</p>
+          <p className='text-xs font-bold text-emerald-700'>{t('reports.allProductsWellStocked')}</p>
         </div>
       ) : (
         <div className='space-y-2'>

@@ -77,9 +77,15 @@ export function PosCartItem({
   return (
     <div className='flex items-center justify-between gap-2 rounded-2xl border border-slate-100 bg-slate-50/60 p-2.5 transition hover:bg-slate-100/80'>
       <div className='flex-1 min-w-0'>
-        <h4 className='font-bold text-slate-900 text-xs truncate'>
-          {item.product.name}
-        </h4>
+        <div className='group relative'>
+          <h4 className='font-bold text-slate-900 text-xs truncate cursor-help'>
+            {item.product.name}
+          </h4>
+          <div className='pointer-events-none absolute top-full left-0 mt-2 hidden w-max max-w-[250px] z-[100] rounded-lg bg-slate-800 px-3 py-2 text-xs font-medium text-white shadow-xl group-hover:block'>
+            {item.product.name}
+            <div className='absolute -top-1 left-4 h-2 w-2 rotate-45 bg-slate-800'></div>
+          </div>
+        </div>
 
         <div className='flex items-center gap-1 mt-1 text-[11px]'>
           {isEditingPrice ? (

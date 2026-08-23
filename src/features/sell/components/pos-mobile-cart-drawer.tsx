@@ -1,4 +1,5 @@
-import { CreditCard, ShoppingCart, Trash2, X } from 'lucide-react';
+import { Trash2, X, ReceiptText, CreditCard } from 'lucide-react';
+import { useLanguage } from '../../../i18n/language-context';
 import type { CartItem } from '../types/sell.types';
 import { PosCartItem } from './pos-cart-item';
 
@@ -20,7 +21,7 @@ interface Props {
   readonly onStockExceeded?: (productName: string, maxStock: number) => void;
 }
 
-const formatCurrency = (val: number) =>
+const formatCurrencyUsd = (val: number) =>
   new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(val);
 
 export function PosMobileCartDrawer({
@@ -29,7 +30,6 @@ export function PosMobileCartDrawer({
   subtotal,
   tax,
   totalAmount,
-  itemCount,
   onClose,
   onUpdateQty,
   onSetExactQty,
@@ -40,6 +40,7 @@ export function PosMobileCartDrawer({
   onCheckout,
   onStockExceeded,
 }: Props) {
+  const { t } = useLanguage();
   if (!open) return null;
 
   return (
@@ -53,16 +54,9 @@ export function PosMobileCartDrawer({
 
       <div className='relative z-10 w-full max-h-[85vh] rounded-t-3xl bg-white p-5 shadow-2xl space-y-4 flex flex-col animate-in slide-in-from-bottom duration-200'>
         <div className='flex items-center justify-between border-b border-slate-100 pb-3.5'>
-          <div className='flex items-center gap-2.5'>
-            <div className='flex h-10 w-10 items-center justify-center rounded-2xl bg-emerald-50 text-emerald-600'>
-              <ShoppingCart size={20} />
-            </div>
-            <div>
-              <h2 className='font-extrabold text-slate-900 text-base'>Current Order</h2>
-              <p className='text-xs text-slate-400 font-semibold'>
-                {itemCount} {itemCount === 1 ? 'item' : 'items'} in cart
-              </p>
-            </div>
+          <div className='flex items-center gap-2'>
+            <div className='flex h-8 w-8 items-center justify-center rounded-lg bg-slate-100 text-slate-600'><ReceiptText size={18} /></div>
+            <h2 className='font-extrabold text-slate-900 text-base'>{t('pos.currentOrder')}</h2>
           </div>
 
           <div className='flex items-center gap-3'>
@@ -85,12 +79,9 @@ export function PosMobileCartDrawer({
 
         <div className='flex-1 overflow-y-auto space-y-2.5 max-h-90 pr-1'>
           {items.length === 0 ? (
-            <div className='flex h-40 flex-col items-center justify-center text-center text-slate-400'>
-              <ShoppingCart size={32} className='text-slate-300 mb-2' />
-              <p className='text-xs font-bold text-slate-500'>Cart is empty</p>
-              <p className='text-[11px] text-slate-400 mt-1'>
-                Tap products or scan barcode to add items.
-              </p>
+            <div className='flex flex-col items-center justify-center py-10 opacity-50'>
+              <ReceiptText size={48} className='text-slate-300 mb-3' />
+              <p className='text-xs font-bold text-slate-500'>{t('pos.cartEmpty')}</p>
             </div>
           ) : (
             items.map((item) => (
@@ -110,19 +101,19 @@ export function PosMobileCartDrawer({
 
         <div className='border-t border-slate-100 pt-3.5 space-y-3'>
           <div className='space-y-1 text-xs text-slate-600 font-semibold'>
-            <div className='flex justify-between'>
-              <span>Subtotal</span>
-              <span>{formatCurrency(subtotal)}</span>
+            <div className='flex justify-between font-bold text-slate-600'>
+              <span>{t('pos.subtotal')}</span>
+              <span>{formatCurrencyUsd(subtotal)}</span>
             </div>
             {tax > 0 && (
-              <div className='flex justify-between'>
-                <span>Tax</span>
-                <span>{formatCurrency(tax)}</span>
+              <div className='flex justify-between font-bold text-rose-500'>
+                <span>{t('pos.tax')}</span>
+                <span>+{formatCurrencyUsd(tax)}</span>
               </div>
             )}
-            <div className='flex justify-between text-base font-black text-slate-900 pt-1.5 border-t border-slate-100'>
-              <span>Total Payable</span>
-              <span className='text-emerald-600'>{formatCurrency(totalAmount)}</span>
+            <div className='flex justify-between text-base font-black text-slate-900 pt-2 border-t border-slate-200 mt-2'>
+              <span>{t('pos.totalPayable')}</span>
+              <span className='text-emerald-600'>{formatCurrencyUsd(totalAmount)}</span>
             </div>
           </div>
 
@@ -135,7 +126,7 @@ export function PosMobileCartDrawer({
             className='flex w-full items-center justify-center gap-2 rounded-2xl bg-linear-to-r from-emerald-600 to-teal-600 py-3.5 text-sm font-black text-white shadow-xl shadow-emerald-600/20 active:scale-98 transition disabled:opacity-50 cursor-pointer'
           >
             <CreditCard size={18} />
-            <span>Proceed to Checkout ({formatCurrency(totalAmount)})</span>
+            <span>Proceed to Checkout ({formatCurrencyUsd(totalAmount)})</span>
           </button>
         </div>
       </div>

@@ -175,7 +175,7 @@ export async function printThermalReceipt(receipt: ReceiptData) {
           <meta charset="utf-8">
           <title>Receipt ${receipt.orderId}</title>
           <style>
-            @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700;800&family=Suwannaphum:wght@400;700&display=swap');
+            @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700;800&family=Kantumruy+Pro:ital,wght@0,100..700;1,100..700&display=swap');
             
             @page {
               margin: 0;
@@ -186,7 +186,7 @@ export async function printThermalReceipt(receipt: ReceiptData) {
               width: 58mm;
               margin: 0;
               padding: 4mm;
-              font-family: 'Inter', 'Suwannaphum', sans-serif;
+              font-family: 'Inter', 'Kantumruy Pro', sans-serif;
               font-size: 12px;
               color: #000;
               background: #fff;

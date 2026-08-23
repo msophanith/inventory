@@ -4,6 +4,7 @@ import { productsEn } from './products';
 import { movementEn } from './movement';
 import { reportsEn } from './reports';
 import { authEn } from './auth';
+import { scanEn } from './scan';
 
 export const en = {
   common: commonEn,
@@ -12,4 +13,5 @@ export const en = {
   movement: movementEn,
   reports: reportsEn,
   auth: authEn,
+  scan: scanEn,
 };
