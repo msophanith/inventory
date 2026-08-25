@@ -1,4 +1,5 @@
 import { useMemo, useState } from 'react';
+import { PageMeta } from '../components/seo/page-meta';
 import { useLanguage } from '../i18n/language-context';
 import ProductTable from '../features/product/components/product-table';
 import type { StockFilterType } from '../features/product/components/product-table-header';
@@ -91,6 +92,10 @@ const ProductPage = () => {
 
   return (
     <PageContainer>
+      <PageMeta
+        title='Products'
+        description='Browse, search, filter, and manage your full product catalog.'
+      />
       {toast && (
         <Toast
           type={toast.type}

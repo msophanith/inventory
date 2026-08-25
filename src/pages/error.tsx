@@ -1,4 +1,5 @@
 import { AlertTriangle, ArrowLeft, Home, RefreshCw } from 'lucide-react';
+import { PageMeta } from '../components/seo/page-meta';
 import {
   Link,
   isRouteErrorResponse,
@@ -27,6 +28,7 @@ function ErrorPage() {
 
   return (
     <div className='flex min-h-screen items-center justify-center bg-slate-100 p-6'>
+      <PageMeta title='Error' />
       <div className='w-full max-w-lg rounded-3xl bg-white p-10 text-center shadow-xl'>
         <div className='mx-auto flex h-20 w-20 items-center justify-center rounded-full bg-red-100'>
           <AlertTriangle className='text-red-500' size={40} />
@@ -38,6 +40,7 @@ function ErrorPage() {
 
         <div className='mt-8 flex justify-center gap-4'>
           <button
+            type='button'
             onClick={() => navigate(-1)}
             className='flex items-center gap-2 rounded-xl border px-5 py-3 hover:bg-slate-100 cursor-pointer'
           >
@@ -46,6 +49,7 @@ function ErrorPage() {
           </button>
 
           <button
+            type='button'
             onClick={() => window.location.reload()}
             className='flex items-center gap-2 rounded-xl bg-indigo-600 px-5 py-3 text-white hover:bg-indigo-700 cursor-pointer'
           >

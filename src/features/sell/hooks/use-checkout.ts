@@ -8,7 +8,7 @@ import { usePosStore } from '../store/use-pos-store';
 export function useCheckout() {
   const queryClient = useQueryClient();
   const { user, role } = useAuth();
-  
+
   const isCheckoutOpen = usePosStore((state) => state.isCheckoutOpen);
   const setIsCheckoutOpen = usePosStore((state) => state.setIsCheckoutOpen);
 
@@ -42,38 +42,44 @@ export function useCheckout() {
         user?.fullName ||
         (role ? role.charAt(0).toUpperCase() + role.slice(1) : 'Admin');
 
-      for (const item of items) {
-        await movementService.addMovement(
-          {
-            productId: item.product.id,
-            type: 'OUT',
-            quantity: item.quantity,
-            unitPrice: item.unitPrice,
-            isDamaged: false,
-            reference: `POS Sale #${orderId}`,
-            note: [
-              `Payment via ${paymentMethod}`,
-              `(${item.quantity} ${item.unit || item.product.unit || 'units'})`,
-              customerNote ? `| Customer: ${customerNote}` : '',
-            ]
-              .filter(Boolean)
-              .join(' '),
-          },
-          true,
-        );
+      // Process all items in parallel — eliminates N×3 sequential DB round-trips
+      await Promise.all(
+        items.map((item) =>
+          movementService.addMovement(
+            {
+              productId: item.product.id,
+              type: 'OUT',
+              quantity: item.quantity,
+              unitPrice: item.unitPrice,
+              isDamaged: false,
+              reference: `POS Sale #${orderId}`,
+              note: [
+                `Payment via ${paymentMethod}`,
+                `(${item.quantity} ${item.unit || item.product.unit || 'units'})`,
+                customerNote ? `| Customer: ${customerNote}` : '',
+              ]
+                .filter(Boolean)
+                .join(' '),
+            },
+            true,
+          ),
+        ),
+      );
 
+      // Fire low-stock alerts without blocking checkout completion
+      items.forEach((item) => {
         const remainingQty = item.product.quantity - item.quantity;
         if (remainingQty <= (item.product.minStock || 0)) {
-          try {
-            await telegramService.sendLowStockAlert({
+          telegramService
+            .sendLowStockAlert({
               ...item.product,
               quantity: Math.max(0, remainingQty),
-            });
-          } catch (err) {
-            console.error('[useCheckout] Low stock alert failed:', err);
-          }
+            })
+            .catch((err) =>
+              console.error('[useCheckout] Low stock alert failed:', err),
+            );
         }
-      }
+      });
 
       const receipt: ReceiptData = {
         orderId,

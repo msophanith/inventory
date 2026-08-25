@@ -54,4 +54,10 @@ export const posKm = {
   todayOrders: 'ការបញ្ជាទិញថ្ងៃនេះ',
   salesCount: '{count} ការបញ្ជាទិញ',
   searchPlaceholder: 'ស្វែងរកទំនិញតាមឈ្មោះ ឬបារកូដ...',
+  noProductsFound: 'រកមិនឃើញទេ',
+  tryAdjusting: 'រកតាមវិធីផ្សេងវិញ',
+  saleSuccessful: 'លក់បានជោគជ័យ',
+  totalAmount: 'តម្លៃសរុប',
+  cashier: 'អ្នកគិតលុយ',
+  remainingStock: 'ស្តុកនៅសល់'
 };

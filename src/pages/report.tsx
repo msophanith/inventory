@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { PageMeta } from '../components/seo/page-meta';
 import { useLanguage } from '../i18n/language-context';
 import { useReport } from '../features/report/hooks/use-report';
 import {
@@ -72,6 +73,10 @@ const ReportPage = () => {
 
   return (
     <PageContainer className='relative space-y-8 pb-24 lg:pb-12 overflow-hidden'>
+      <PageMeta
+        title='Reports'
+        description='Financial analytics, revenue vs COGS, sales margins, and detailed movement reports.'
+      />
       {/* Decorative Ambient Background Glows */}
       <div className='pointer-events-none absolute -top-24 -left-20 h-96 w-96 rounded-full bg-emerald-500/10 blur-3xl' />
       <div className='pointer-events-none absolute top-1/3 -right-20 h-96 w-96 rounded-full bg-teal-500/10 blur-3xl' />

@@ -1,4 +1,5 @@
 import { useCallback, useState } from 'react';
+import { PageMeta } from '../components/seo/page-meta';
 import { useNavigate } from 'react-router-dom';
 import { useLanguage } from '../i18n/language-context';
 import { productService } from '../services';
@@ -98,6 +99,10 @@ const ScanPage = () => {
 
   return (
     <PageContainer className='space-y-5 max-w-3xl mx-auto py-4 pb-24 lg:pb-6'>
+      <PageMeta
+        title='Barcode Scan'
+        description='Scan barcodes via hardware scanner or camera to quickly look up products.'
+      />
       {alert && (
         <Toast
           type={alert.type === 'info' ? 'info' : alert.type}

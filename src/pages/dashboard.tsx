@@ -1,3 +1,4 @@
+import { PageMeta } from '../components/seo/page-meta';
 import ProductInfoSkeleton from '../features/product/components/product-skeleton';
 import { useMovement } from '../features/movement/hooks/use-movement';
 import { useProduct } from '../features/product/hooks/use-product';
@@ -16,6 +17,10 @@ const DashboardPage = () => {
 
   return (
     <PageContainer className='space-y-6 sm:space-y-8 pb-24 lg:pb-6'>
+      <PageMeta
+        title='Dashboard'
+        description='Overview of inventory KPIs, sales analytics, top sellers, and stock alerts.'
+      />
       {/* 1. Header Banner with Greeting & Quick Launchers */}
       <DashboardHeader />
 

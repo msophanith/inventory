@@ -1,4 +1,5 @@
 import { useMemo, useState } from 'react';
+import { PageMeta } from '../components/seo/page-meta';
 import { useProduct } from '../features/product/hooks/use-product';
 import { usePosStore, usePosCartTotals } from '../features/sell/store/use-pos-store';
 import { useCheckout } from '../features/sell/hooks/use-checkout';
@@ -74,6 +75,10 @@ const SellPage = () => {
 
   return (
     <PageContainer className='space-y-5 pb-24 lg:pb-0'>
+      <PageMeta
+        title='POS — Sell'
+        description='Point-of-sale terminal: add items to cart, apply discounts, and process payments.'
+      />
       {alert && (
         <Toast
           type={alert.type}

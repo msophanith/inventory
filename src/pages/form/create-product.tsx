@@ -1,4 +1,5 @@
 import { ArrowLeft } from 'lucide-react';
+import { PageMeta } from '../../components/seo/page-meta';
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { v4 as uuidv4 } from 'uuid';
 
@@ -82,6 +83,12 @@ const CreateProductPage = () => {
 
   return (
     <PageContainer className='space-y-6'>
+      <PageMeta
+        title={isEditing ? 'Edit Product' : 'Create Product'}
+        description={isEditing
+          ? 'Update product information, pricing, and stock limits.'
+          : 'Add a new product to your inventory catalog.'}
+      />
       {/* Header & Back Button */}
       <div className='flex flex-col sm:flex-row sm:items-center justify-between gap-4'>
         <div>

@@ -1,4 +1,5 @@
 import { Navigate } from 'react-router-dom';
+import { PageMeta } from '../components/seo/page-meta';
 
 import { useAuth } from '../features/auth/use-auth';
 import { useLogin } from '../features/auth/hooks/use-login';
@@ -23,6 +24,10 @@ const LoginPage = () => {
 
   return (
     <div className='relative flex min-h-screen items-center justify-center overflow-hidden bg-slate-50 px-4 py-12 selection:bg-indigo-600 selection:text-white'>
+      <PageMeta
+        title='Login'
+        description='Sign in to manage your inventory and point of sale system.'
+      />
       {/* Subtle Background Lighting & Mesh Accents */}
       <div className='pointer-events-none absolute -left-40 -top-40 h-125 w-125 rounded-full bg-linear-to-tr from-indigo-200/40 via-blue-200/30 to-transparent blur-[100px]' />
       <div className='pointer-events-none absolute -bottom-40 -right-40 h-125 w-125 rounded-full bg-linear-to-br from-purple-200/40 via-indigo-100/50 to-transparent blur-[100px]' />

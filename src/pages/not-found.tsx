@@ -1,10 +1,12 @@
 import { Link } from 'react-router-dom';
+import { PageMeta } from '../components/seo/page-meta';
 import { useLanguage } from '../i18n/language-context';
 
 export default function NotFoundPage() {
   const { t } = useLanguage();
   return (
     <div className='flex min-h-[70vh] flex-col items-center justify-center'>
+      <PageMeta title='404 Not Found' />
       <h1 className='text-6xl font-bold'>404</h1>
 
       <p className='mt-4 text-gray-500'>{t('common.pageNotFound')}</p>

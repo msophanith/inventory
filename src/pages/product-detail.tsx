@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { PageMeta } from '../components/seo/page-meta';
 import { ArrowLeft } from 'lucide-react';
 import { useNavigate, useParams } from 'react-router-dom';
 
@@ -98,6 +99,10 @@ const ProductDetailsPage = () => {
 
   return (
     <PageContainer className='space-y-6'>
+      <PageMeta
+        title={`${product.name} — Product Details`}
+        description={`View stock levels, movement history, and details for ${product.name}.`}
+      />
       <div>
         <button
           type='button'

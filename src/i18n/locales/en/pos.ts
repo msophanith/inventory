@@ -29,7 +29,8 @@ export const posEn = {
   thankYou: 'Thank you for your purchase!',
   outOfStock: 'Out of Stock',
   lowStock: 'Stock {qty} left',
-  stockLimitReached: 'Stock limit reached! Only {maxStock} units of "{productName}" available in stock.',
+  stockLimitReached:
+    'Stock limit reached! Only {maxStock} units of "{productName}" available in stock.',
   itemOutOfStock: '"{name}" is out of stock!',
   addedToCart: 'Added "{name}" to cart',
   noProductFound: 'No product found for barcode: "{code}"',
@@ -54,4 +55,10 @@ export const posEn = {
   todayOrders: 'Today Orders',
   salesCount: '{count} Sales',
   searchPlaceholder: 'Search product by name or barcode...',
+  noProductsFound: 'No product found',
+  tryAdjusting: 'Please try with another way to find the product',
+  saleSuccessful: 'Sale Completed',
+  totalAmount: 'Total Amount',
+  cashier: 'Cashier',
+  remainingStock: 'Remaining Stock'
 };

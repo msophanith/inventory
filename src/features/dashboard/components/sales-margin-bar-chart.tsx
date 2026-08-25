@@ -114,7 +114,7 @@ export function SalesMarginBarChart({ groups }: Props) {
   };
 
   return (
-    <div className='w-full h-[320px] sm:h-[360px] p-2'>
+    <div className='w-full h-80 sm:h-90 p-2'>
       <Bar options={options} data={data} />
     </div>
   );
