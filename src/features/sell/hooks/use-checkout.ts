@@ -5,6 +5,17 @@ import type { CartItem, PaymentMethod, ReceiptData } from '../types/sell.types';
 import { useAuth } from '../../auth/use-auth';
 import { usePosStore } from '../store/use-pos-store';
 
+const STORAGE_KEY = 'pos_order_counter';
+
+function generateOrderId(): string {
+  const today = new Date().toISOString().slice(0, 10).replace(/-/g, ''); // YYYYMMDD
+  const raw = localStorage.getItem(STORAGE_KEY);
+  const saved = raw ? (JSON.parse(raw) as { date: string; seq: number }) : null;
+  const seq = saved?.date === today ? saved.seq + 1 : 1;
+  localStorage.setItem(STORAGE_KEY, JSON.stringify({ date: today, seq }));
+  return `POS-${today}-${String(seq).padStart(4, '0')}`;
+}
+
 export function useCheckout() {
   const queryClient = useQueryClient();
   const { user, role } = useAuth();
@@ -36,7 +47,7 @@ export function useCheckout() {
       soldBy?: string;
       customerNote?: string;
     }) => {
-      const orderId = `POS-${Date.now().toString().slice(-6)}`;
+      const orderId = generateOrderId();
       const cashierName =
         soldBy ||
         user?.fullName ||
