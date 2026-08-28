@@ -14,7 +14,6 @@ import {
 } from '../features/sell/components';
 import { PosHeaderBanner } from '../features/sell/components/pos-header-banner';
 import { PosModals } from '../features/sell/components/pos-modals';
-import Toast from '../components/ui/alert';
 import { PageContainer } from '../components/layout/page-container';
 import { useSellPageState } from './hooks/use-sell-page-state';
 import type { PaymentMethod } from '../features/sell/types/sell.types';
@@ -38,8 +37,6 @@ const SellPage = () => {
   const checkout = useCheckout();
 
   const {
-    alert,
-    setAlert,
     handleStockExceeded,
     handleBarcodeScanned,
   } = useSellPageState(products);
@@ -79,13 +76,6 @@ const SellPage = () => {
         title='POS — Sell'
         description='Point-of-sale terminal: add items to cart, apply discounts, and process payments.'
       />
-      {alert && (
-        <Toast
-          type={alert.type}
-          message={alert.message}
-          onClose={() => setAlert(null)}
-        />
-      )}
 
       <PosHeaderBanner
         onOpenScanModal={() => cart.setIsCameraScanOpen(true)}

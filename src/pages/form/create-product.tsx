@@ -3,7 +3,6 @@ import { PageMeta } from '../../components/seo/page-meta';
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { v4 as uuidv4 } from 'uuid';
 
-import Toast from '../../components/ui/alert';
 import ProductForm from '../../features/product/components/product-form';
 import { useProductAction } from '../../features/product/hooks/use-product-action';
 import { useProduct } from '../../features/product/hooks/use-product';
@@ -21,8 +20,6 @@ const CreateProductPage = () => {
   const {
     onCreateProduct: onCreateProductAction,
     isCreatingProduct,
-    alert,
-    setAlert,
     updateProduct,
     isUpdatingProduct,
   } = useProductAction();
@@ -122,15 +119,6 @@ const CreateProductPage = () => {
         onSubmit={onSubmit}
         defaultValues={getDefaultValue()}
       />
-
-      {/* Top Right Floating Toast */}
-      {alert && (
-        <Toast
-          type={alert.type}
-          message={alert.message}
-          onClose={() => setAlert(null)}
-        />
-      )}
     </PageContainer>
   );
 };

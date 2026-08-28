@@ -1,5 +1,6 @@
 import { useMemo, useState } from 'react';
 import { PageMeta } from '../components/seo/page-meta';
+import { gooeyToast } from 'goey-toast';
 import { useLanguage } from '../i18n/language-context';
 import ProductTable from '../features/product/components/product-table';
 import type { StockFilterType } from '../features/product/components/product-table-header';
@@ -7,7 +8,6 @@ import { useProduct } from '../features/product/hooks/use-product';
 import { exportAllProductsToCsv } from '../features/product/utils/product-csv-export';
 import { useDebounce } from '../hooks/use-debounce';
 import { useNavigate } from 'react-router-dom';
-import Toast from '../components/ui/alert';
 import { PageContainer } from '../components/layout/page-container';
 import { useProductStore } from '../features/product/store/use-product-store';
 
@@ -22,10 +22,6 @@ const ProductPage = () => {
   const setPagination = useProductStore((state) => state.setPagination);
 
   const [isExporting, setIsExporting] = useState(false);
-  const [toast, setToast] = useState<{
-    type: 'success' | 'error';
-    message: string;
-  } | null>(null);
 
   const debouncedSearch = useDebounce(search);
 
@@ -75,16 +71,10 @@ const ProductPage = () => {
     try {
       setIsExporting(true);
       await exportAllProductsToCsv();
-      setToast({
-        type: 'success',
-        message: t('products.exportSuccess'),
-      });
+      gooeyToast.success(t('products.exportSuccess'));
     } catch (err) {
       console.error('Export error:', err);
-      setToast({
-        type: 'error',
-        message: t('products.exportError'),
-      });
+      gooeyToast.error(t('products.exportError'));
     } finally {
       setIsExporting(false);
     }
@@ -96,13 +86,6 @@ const ProductPage = () => {
         title='Products'
         description='Browse, search, filter, and manage your full product catalog.'
       />
-      {toast && (
-        <Toast
-          type={toast.type}
-          message={toast.message}
-          onClose={() => setToast(null)}
-        />
-      )}
 
       <ProductTable
         products={pagedProducts}

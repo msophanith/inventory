@@ -1,4 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { gooeyToast } from 'goey-toast';
 
 import { movementService } from '../../../services';
 import type {
@@ -20,9 +21,6 @@ const useMovement = (filters?: MovementFilter) => {
   
   const type = useMovementStore((state) => state.movementFormType);
   const setType = useMovementStore((state) => state.setMovementFormType);
-  
-  const alert = useMovementStore((state) => state.alert);
-  const setAlert = useMovementStore((state) => state.setAlert);
 
   const useGetMovementById = (id: string) => {
     const { data, isLoading } = useQuery({
@@ -59,16 +57,10 @@ const useMovement = (filters?: MovementFilter) => {
         queryClient.invalidateQueries({
           queryKey: ['product'],
         });
-        setAlert({
-          type: 'success',
-          message: `Stock ${type}!`,
-        });
+        gooeyToast.success(`Stock ${type}!`);
       },
       onError: (error) => {
-        setAlert({
-          type: 'error',
-          message: error?.message || 'Failed to update movement',
-        });
+        gooeyToast.error(error?.message || 'Failed to update movement');
       },
     });
 
@@ -91,9 +83,6 @@ const useMovement = (filters?: MovementFilter) => {
     setType,
     updateMovement,
     isUpdatingMovement,
-    alert,
-    setAlert,
-
   };
 };
 

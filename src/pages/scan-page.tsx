@@ -1,12 +1,12 @@
 import { useCallback, useState } from 'react';
 import { PageMeta } from '../components/seo/page-meta';
 import { useNavigate } from 'react-router-dom';
+import { gooeyToast } from 'goey-toast';
 import { useLanguage } from '../i18n/language-context';
 import { productService } from '../services';
 import { useHardwareScanner } from '../features/sell/hooks/use-hardware-scanner';
 import { playScanSound } from '../features/sell/utils/scan-sound';
 import { PosCameraScannerModal } from '../features/sell/components/pos-camera-scanner-modal';
-import Toast from '../components/ui/alert';
 import { PageContainer } from '../components/layout/page-container';
 
 import { ScanStatusHeader } from '../features/scan/components/scan-status-header';
@@ -20,10 +20,6 @@ const ScanPage = () => {
   const [isCameraOpen, setIsCameraOpen] = useState(false);
   const [isSearching, setIsSearching] = useState(false);
   const [history, setHistory] = useState<ScanHistoryItem[]>([]);
-  const [alert, setAlert] = useState<{
-    type: 'success' | 'error' | 'info';
-    message: string;
-  } | null>(null);
 
   const handleScanCode = useCallback(
     async (rawCode: string) => {
@@ -31,19 +27,13 @@ const ScanPage = () => {
       if (!clean || isSearching) return;
 
       setIsSearching(true);
-      setAlert({
-        type: 'info',
-        message: t('scan.searchingBarcode', { barcode: clean }),
-      });
+      gooeyToast.info(t('scan.searchingBarcode', { barcode: clean }));
 
       try {
         const product = await productService.getByBarcodeOrSearch(clean);
         if (product) {
           playScanSound();
-          setAlert({
-            type: 'success',
-            message: t('scan.foundProduct', { name: product.name }),
-          });
+          gooeyToast.success(t('scan.foundProduct', { name: product.name }));
 
           setHistory((prev) => [
             {
@@ -61,10 +51,7 @@ const ScanPage = () => {
             navigate(`/products/${product.id}`);
           }, 800);
         } else {
-          setAlert({
-            type: 'error',
-            message: t('scan.barcodeNotFound', { barcode: clean }),
-          });
+          gooeyToast.error(t('scan.barcodeNotFound', { barcode: clean }));
 
           setHistory((prev) => [
             {
@@ -82,12 +69,12 @@ const ScanPage = () => {
         }
       } catch (err) {
         console.error('Scan error:', err);
-        setAlert({ type: 'error', message: t('scan.errorQuerying') });
+        gooeyToast.error(t('scan.errorQuerying'));
       } finally {
         setIsSearching(false);
       }
     },
-    [navigate, isSearching],
+    [navigate, isSearching, t],
   );
 
   const isHardwareListening = !isCameraOpen && !isSearching;
@@ -103,13 +90,6 @@ const ScanPage = () => {
         title='Barcode Scan'
         description='Scan barcodes via hardware scanner or camera to quickly look up products.'
       />
-      {alert && (
-        <Toast
-          type={alert.type === 'info' ? 'info' : alert.type}
-          message={alert.message}
-          onClose={() => setAlert(null)}
-        />
-      )}
 
       {/* Header Banner & Live Hardware Scanner Status Badge */}
       <ScanStatusHeader isListening={isHardwareListening} />

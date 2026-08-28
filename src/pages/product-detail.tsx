@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { PageMeta } from '../components/seo/page-meta';
 import { ArrowLeft } from 'lucide-react';
 import { useNavigate, useParams } from 'react-router-dom';
+import { gooeyToast } from 'goey-toast';
 
 import ProductHero from '../features/product-details/components/product-hero';
 import ProductStats from '../features/product-details/components/product-stat';
@@ -18,7 +19,6 @@ import {
   StockMovementModal,
   type FormValues,
 } from '../features/movement/components';
-import { Toast } from '../components/ui/alert';
 import { PageContainer } from '../components/layout/page-container';
 import { useLanguage } from '../i18n/language-context';
 
@@ -31,8 +31,6 @@ const ProductDetailsPage = () => {
   const deleteProductMutation = useDeleteProduct();
   const {
     useGetMovementById,
-    alert,
-    setAlert,
     isCreatingMovement,
     open,
     setOpen,
@@ -89,11 +87,11 @@ const ProductDetailsPage = () => {
   const handleDeleteProduct = async () => {
     try {
       await deleteProductMutation.mutateAsync(productId!);
-      setAlert({ type: 'success', message: t('products.productDeleted') });
+      gooeyToast.success(t('products.productDeleted'));
       setIsDeleteDialogOpen(false);
       setTimeout(() => navigate('/products'), 1000);
     } catch {
-      setAlert({ type: 'error', message: t('products.productDeleteError') });
+      gooeyToast.error(t('products.productDeleteError'));
     }
   };
 
@@ -142,14 +140,6 @@ const ProductDetailsPage = () => {
           await onUpdateStock(values);
         }}
       />
-
-      {alert && (
-        <Toast
-          type={alert.type}
-          message={alert.message}
-          onClose={() => setAlert(null)}
-        />
-      )}
 
       <ConfirmDeleteModal
         open={isDeleteDialogOpen}

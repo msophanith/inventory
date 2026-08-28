@@ -3,6 +3,8 @@ import ReactDOM from "react-dom/client";
 import { RouterProvider } from "react-router-dom";
 import { HelmetProvider } from "react-helmet-async";
 import "./index.css";
+import "goey-toast/styles.css";
+import { GooeyToaster } from "goey-toast";
 import { router } from "./routes";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { AuthProvider } from "./features/auth/context/auth-context";
@@ -20,6 +22,7 @@ ReactDOM.createRoot(
         <AuthProvider>
           <CurrencyProvider>
             <LanguageProvider>
+              <GooeyToaster position="top-right" />
               <RouterProvider router={router} />
             </LanguageProvider>
           </CurrencyProvider>

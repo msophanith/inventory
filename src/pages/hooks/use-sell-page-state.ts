@@ -1,4 +1,5 @@
-import { useCallback, useMemo, useState } from 'react';
+import { useCallback, useMemo } from 'react';
+import { gooeyToast } from 'goey-toast';
 import { productService } from '../../services';
 import { playScanSound } from '../../features/sell/utils/scan-sound';
 import type { Product } from '../../services/product';
@@ -8,11 +9,6 @@ import { useLanguage } from '../../i18n/language-context';
 export function useSellPageState(products: Product[]) {
   const addItem = usePosStore((state) => state.addItem);
   const { t } = useLanguage();
-
-  const [alert, setAlert] = useState<{
-    type: 'success' | 'error';
-    message: string;
-  } | null>(null);
 
   // O(1) indexed lookup map for fast barcode/ID scanning
   const productMap = useMemo(() => {
@@ -27,10 +23,7 @@ export function useSellPageState(products: Product[]) {
 
   const handleStockExceeded = useCallback(
     (productName: string, maxStock: number) => {
-      setAlert({
-        type: 'error',
-        message: t('pos.stockLimitReached', { maxStock, productName }),
-      });
+      gooeyToast.error(t('pos.stockLimitReached', { maxStock, productName }));
     },
     [t],
   );
@@ -49,31 +42,20 @@ export function useSellPageState(products: Product[]) {
 
       if (target) {
         if (target.quantity <= 0) {
-          setAlert({
-            type: 'error',
-            message: t('pos.itemOutOfStock', { name: target.name }),
-          });
+          gooeyToast.error(t('pos.itemOutOfStock', { name: target.name }));
           return;
         }
         playScanSound();
         addItem(target);
-        setAlert({
-          type: 'success',
-          message: t('pos.addedToCart', { name: target.name }),
-        });
+        gooeyToast.success(t('pos.addedToCart', { name: target.name }));
       } else {
-        setAlert({
-          type: 'error',
-          message: t('pos.noProductFound', { code }),
-        });
+        gooeyToast.error(t('pos.noProductFound', { code }));
       }
     },
     [productMap, addItem, t],
   );
 
   return {
-    alert,
-    setAlert,
     handleStockExceeded,
     handleBarcodeScanned,
   };

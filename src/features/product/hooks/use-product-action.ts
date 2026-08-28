@@ -1,20 +1,17 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { v4 as uuidv4 } from 'uuid';
 import { useNavigate } from 'react-router-dom';
+import { gooeyToast } from 'goey-toast';
 
 import { productService } from '../../../services';
 import { useMovement } from '../../movement/hooks/use-movement';
 import type { ProductFormValues } from '../schema/product.schema';
-import { useProductStore } from '../store/use-product-store';
 
 const useProductAction = () => {
   const queryClient = useQueryClient();
   const navigate = useNavigate();
 
   const { createMovement } = useMovement();
-
-  const alert = useProductStore((state) => state.alert);
-  const setAlert = useProductStore((state) => state.setAlert);
 
   const { mutate: onCreateProduct, isPending: isCreatingProduct } = useMutation(
     {
@@ -37,11 +34,7 @@ const useProductAction = () => {
             });
           }
         } catch (err: any) {
-          setAlert({
-            type: 'error',
-            message: err.message,
-          });
-
+          gooeyToast.error(err.message);
           return;
         }
 
@@ -56,10 +49,7 @@ const useProductAction = () => {
       },
 
       onError: (error) => {
-        setAlert({
-          type: 'error',
-          message: error.message,
-        });
+        gooeyToast.error(error.message);
       },
     },
   );
@@ -80,10 +70,7 @@ const useProductAction = () => {
     },
 
     onError: (error) => {
-      setAlert({
-        type: 'error',
-        message: error.message,
-      });
+      gooeyToast.error(error.message);
     },
   });
 
@@ -92,8 +79,6 @@ const useProductAction = () => {
     isCreatingProduct,
     updateProduct,
     isUpdatingProduct,
-    alert,
-    setAlert,
   };
 };
 
