@@ -66,9 +66,9 @@ export function calculateMovementItem(item: Movement): CalculatedMovementItem {
 
   if (item.type === 'OUT') {
     if (isDamaged) {
-      effectiveSaleAmount = -(quantity * unitPrice);
+      effectiveSaleAmount = 0;
       effectiveCostAmount = quantity * buyPrice;
-      effectiveMarginAmount = effectiveSaleAmount - effectiveCostAmount;
+      effectiveMarginAmount = -effectiveCostAmount;
     } else {
       effectiveSaleAmount = quantity * unitPrice;
       effectiveCostAmount = quantity * buyPrice;
@@ -77,7 +77,7 @@ export function calculateMovementItem(item: Movement): CalculatedMovementItem {
   } else if (item.type === 'RETURN') {
     if (isDamaged) {
       effectiveSaleAmount = -(quantity * unitPrice);
-      effectiveCostAmount = quantity * buyPrice;
+      effectiveCostAmount = 0;
       effectiveMarginAmount = effectiveSaleAmount - effectiveCostAmount;
     } else {
       effectiveSaleAmount = -(quantity * unitPrice);

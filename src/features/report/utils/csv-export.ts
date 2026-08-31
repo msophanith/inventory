@@ -17,6 +17,7 @@ export async function exportReportToCsv(
     'Units Sold',
     'Units Returned',
     'Units Damaged',
+    'Total Damage Amount',
     'Total Sales',
     'Total Cost',
     'Net Margin',
@@ -31,9 +32,10 @@ export async function exportReportToCsv(
     p.quantitySold,
     p.quantityReturned,
     p.quantityDamaged,
-    p.totalSales,
-    p.totalCost,
-    p.netMargin,
+    (p.totalDamage ?? (p.quantityDamaged * p.buyPrice)).toFixed(2),
+    p.totalSales.toFixed(2),
+    p.totalCost.toFixed(2),
+    p.netMargin.toFixed(2),
     `"${p.marginPercentage.toFixed(2)}%"`,
   ]);
 

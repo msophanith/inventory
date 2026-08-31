@@ -21,7 +21,7 @@ export const reportsEn = {
   totalItems: 'Total Products',
   lowStockCount: 'Low Stock Items',
   outOfStockCount: 'Out of Stock Items',
-  todaySales: "Today's Sales",
+  todaysSales: "Today's Sales",
   recentActivity: 'Recent Stock Activity',
   salesVsMargin: 'Sales & Profit Margin Analysis',
   financialAnalytics: 'Financial Analytics & Profit Intelligence',

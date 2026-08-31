@@ -23,7 +23,7 @@ export function aggregateSalesAndMargin(
     string,
     {
       label: string;
-      grossSales: number;
+      sales: number;
       cost: number;
       damage: number;
       count: number;
@@ -55,24 +55,22 @@ export function aggregateSalesAndMargin(
     const isDamaged = Boolean(
       item.isDamaged || item.reference?.toLowerCase() === 'damage',
     );
-    const damageValue = isDamaged
-      ? quantity * (item.unitPrice ?? item.product?.sellPrice ?? 0)
+    const damageCost = isDamaged
+      ? quantity * (item.product?.buyPrice ?? 0)
       : 0;
 
     const existing = map.get(key) || {
       label,
-      grossSales: 0,
+      sales: 0,
       cost: 0,
       damage: 0,
       count: 0,
     };
 
+    existing.sales += calc.effectiveSaleAmount;
+    existing.cost += calc.effectiveCostAmount;
     if (isDamaged) {
-      existing.damage += damageValue;
-      existing.cost += calc.effectiveCostAmount;
-    } else {
-      existing.grossSales += calc.effectiveSaleAmount;
-      existing.cost += calc.effectiveCostAmount;
+      existing.damage += damageCost;
     }
     existing.count += 1;
 
@@ -90,15 +88,15 @@ export function aggregateSalesAndMargin(
 
   return selectedKeys.map((k) => {
     const data = map.get(k)!;
-    const totalSales = Math.max(0, data.grossSales - data.damage);
-    const totalCost = Math.max(0, data.cost);
+    const totalSales = data.sales;
+    const totalCost = data.cost;
     const totalMargin = totalSales - totalCost;
     const marginPct = totalSales > 0 ? (totalMargin / totalSales) * 100 : 0;
     return {
       key: k,
       label: data.label,
-      totalSales,
-      totalCost,
+      totalSales: Math.max(0, totalSales),
+      totalCost: Math.max(0, totalCost),
       totalMargin,
       totalDamage: data.damage,
       marginPct,

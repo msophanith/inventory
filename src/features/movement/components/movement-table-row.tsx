@@ -36,7 +36,11 @@ export function MovementTableRow({ item }: Props) {
 
       {/* Movement Quantity */}
       <td className='px-5 py-3.5 text-center font-extrabold text-slate-900'>
-        {item.type === 'OUT' ? `-${item.quantity}` : `+${item.quantity}`}
+        {item.type === 'OUT'
+          ? `-${item.quantity}`
+          : item.type === 'RETURN'
+            ? `${item.quantity} (Ret)`
+            : `+${item.quantity}`}
       </td>
 
       {/* Remaining Stock Column */}

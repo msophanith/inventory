@@ -19,16 +19,15 @@ export function calculateReportSummary(
     const isDamaged = Boolean(
       rawItem.isDamaged || rawItem.reference?.toLowerCase() === 'damage',
     );
-    const itemDamageValue =
-      quantity * (rawItem.unitPrice ?? rawItem.product?.sellPrice ?? 0);
+    const itemDamageCost = quantity * (rawItem.product?.buyPrice ?? 0);
 
     if (rawItem.type === 'OUT') {
-      orderCount++;
       if (isDamaged) {
         totalItemsDamaged += quantity;
-        totalLosses += itemDamageValue;
+        totalLosses += itemDamageCost;
       } else {
         totalItemsSold += quantity;
+        orderCount++;
       }
       totalCost += calc.effectiveCostAmount;
       totalSales += calc.effectiveSaleAmount;
@@ -36,7 +35,7 @@ export function calculateReportSummary(
       totalItemsReturned += quantity;
       if (isDamaged) {
         totalItemsDamaged += quantity;
-        totalLosses += itemDamageValue;
+        totalLosses += itemDamageCost;
       }
       totalCost += calc.effectiveCostAmount;
       totalSales += calc.effectiveSaleAmount;
@@ -87,6 +86,7 @@ export function calculateProductReport(
         quantitySold: 0,
         quantityReturned: 0,
         quantityDamaged: 0,
+        totalDamage: 0,
         totalSales: 0,
         totalCost: 0,
         netMargin: 0,
@@ -115,11 +115,13 @@ export function calculateProductReport(
   });
 
   const results = Array.from(productMap.values()).map((p) => {
+    const totalDamage = p.quantityDamaged * p.buyPrice;
     const netMargin = p.totalSales - p.totalCost;
     const marginPercentage =
       p.totalSales > 0 ? (netMargin / p.totalSales) * 100 : 0;
     return {
       ...p,
+      totalDamage,
       netMargin,
       marginPercentage,
     };

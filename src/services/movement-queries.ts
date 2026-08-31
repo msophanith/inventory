@@ -120,7 +120,6 @@ export async function fetchTodaySaleSummary(): Promise<TodaySaleSummary> {
       item.isDamaged || item.reference?.toLowerCase() === 'damage',
     );
     const qty = Math.abs(item.quantity || 0);
-    const buyPrice = item.product?.buyPrice ?? 0;
     const sellPrice = item.unitPrice ?? item.product?.sellPrice ?? 0;
 
     if (item.type === 'OUT') {
@@ -130,11 +129,7 @@ export async function fetchTodaySaleSummary(): Promise<TodaySaleSummary> {
         totalOrders += 1;
       }
     } else if (item.type === 'RETURN') {
-      if (isDamaged) {
-        totalSales -= qty * buyPrice;
-      } else {
-        totalSales -= qty * sellPrice;
-      }
+      totalSales -= qty * sellPrice;
       totalItemsSold -= qty;
     }
   }

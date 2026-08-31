@@ -29,11 +29,13 @@ export async function exportTodaySalesToCsv(
     unitsSold: number;
     totalSales: number;
     totalCost: number;
+    damage: number;
     netProfit: number;
   }>();
 
   let totalSales = 0;
   let totalCost = 0;
+  let totalDamage = 0;
   const processedOrders = new Set<string>();
 
   todayMovements.forEach((m) => {
@@ -41,28 +43,38 @@ export async function exportTodaySalesToCsv(
       processedOrders.add(m.reference);
     }
 
+    const isDamaged = Boolean(
+      m.isDamaged || m.reference?.toLowerCase() === 'damage',
+    );
+    const qty = Math.abs(m.quantity || 0);
+    const buyPrice = m.product?.buyPrice || 0;
+    const damageCost = isDamaged ? qty * buyPrice : 0;
+
     const calc = calculateMovementItem(m);
     const key = m.productId || m.product?.name || 'unknown';
     const existing = productMap.get(key) || {
       productName: m.product?.name || `Product #${m.productId}`,
       category: m.product?.category || 'General',
-      buyPrice: m.product?.buyPrice || 0,
+      buyPrice,
       sellPrice: m.unitPrice || m.product?.sellPrice || 0,
       unitsSold: 0,
       totalSales: 0,
       totalCost: 0,
+      damage: 0,
       netProfit: 0,
     };
 
-    if (m.type === 'OUT' && !(m.isDamaged || m.reference?.toLowerCase() === 'damage')) {
-      existing.unitsSold += Math.abs(m.quantity || 0);
+    if (m.type === 'OUT' && !isDamaged) {
+      existing.unitsSold += qty;
     }
     existing.totalSales += calc.effectiveSaleAmount;
     existing.totalCost += calc.effectiveCostAmount;
-    existing.netProfit += calc.effectiveMarginAmount;
+    existing.damage += damageCost;
+    existing.netProfit = existing.totalSales - existing.totalCost;
 
     totalSales += calc.effectiveSaleAmount;
     totalCost += calc.effectiveCostAmount;
+    totalDamage += damageCost;
 
     productMap.set(key, existing);
   });
@@ -79,6 +91,7 @@ export async function exportTodaySalesToCsv(
     ['Metric', 'Value'],
     ['Today Total Sales Amount', `$${totalSales.toFixed(2)}`],
     ['Today Total Cost (COGS)', `$${totalCost.toFixed(2)}`],
+    ['Today Damage Losses', `$${totalDamage.toFixed(2)}`],
     ['Today Net Profit', `$${netProfit.toFixed(2)}`],
     ['Today Net Margin %', `${marginPercent.toFixed(2)}%`],
     ['Today Transactions', orderCount],

@@ -22,6 +22,7 @@ export interface ProductReportItem {
   quantitySold: number;
   quantityReturned: number;
   quantityDamaged: number;
+  totalDamage: number;
   totalSales: number;
   totalCost: number;
   netMargin: number;

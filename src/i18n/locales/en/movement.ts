@@ -23,4 +23,5 @@ export const movementEn = {
   condition: 'Condition',
   referenceNote: 'Reference / Note',
   dateTime: 'Date & Time',
+  auditTrail: 'Audit Trail',
 };

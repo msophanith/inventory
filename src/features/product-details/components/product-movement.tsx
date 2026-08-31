@@ -1,15 +1,14 @@
 import { useMemo, useState } from 'react';
 import { ChevronLeft, ChevronRight, History, Search } from 'lucide-react';
-import { formatDateTime } from '../../../utils/date';
 import type { Movement, MovementType } from '../../../services/movement';
-import MovementBadge from '../../movement/components/movement-badge';
 import { useLanguage } from '../../../i18n/language-context';
+import { ProductMovementRow } from './product-movement-row';
 
-export default function ProductMovementHistory({
-  movements,
-}: {
-  movements: Movement[];
-}) {
+interface Props {
+  readonly movements: Movement[];
+}
+
+export default function ProductMovementHistory({ movements }: Props) {
   const { t } = useLanguage();
   const [search, setSearch] = useState('');
   const [filter, setFilter] = useState<'ALL' | MovementType>('ALL');
@@ -32,7 +31,6 @@ export default function ProductMovementHistory({
 
   return (
     <section className='rounded-3xl border border-slate-200/80 bg-white p-5 sm:p-6 shadow-sm space-y-4 min-w-0 w-full'>
-      {/* Header & Controls */}
       <div className='flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between'>
         <div className='flex items-center gap-2'>
           <div className='flex h-8 w-8 items-center justify-center rounded-xl bg-indigo-50 text-indigo-600'>
@@ -55,39 +53,30 @@ export default function ProductMovementHistory({
         </div>
       </div>
 
-      {/* Filter Tabs */}
       <div className='flex items-center gap-2 overflow-x-auto pb-1 scrollbar-hide'>
         {(['ALL', 'IN', 'OUT', 'RETURN'] as const).map((type) => (
           <button
+            type='button'
             key={type}
-            onClick={() => {
-              setFilter(type);
-              setPage(1);
-            }}
+            onClick={() => { setFilter(type); setPage(1); }}
             className={`rounded-xl px-3.5 py-1.5 text-xs font-bold whitespace-nowrap transition cursor-pointer ${
-              filter === type
-                ? 'bg-slate-900 text-white shadow-xs'
-                : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+              filter === type ? 'bg-slate-900 text-white shadow-xs' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
             }`}
           >
-            {type === 'ALL'
-              ? t('common.all')
-              : type === 'IN'
-                ? t('movement.in')
-                : type === 'OUT'
-                  ? t('movement.out')
-                  : t('movement.return')}
+            {type === 'ALL' ? t('common.all') : type === 'IN' ? t('movement.in') : type === 'OUT' ? t('movement.out') : t('movement.return')}
           </button>
         ))}
       </div>
 
-      {/* Responsive Table */}
       <div className='overflow-x-auto rounded-2xl border border-slate-100 min-w-0 w-full'>
         <table className='w-full border-collapse text-left text-xs'>
           <thead>
             <tr className='border-b border-slate-200 bg-slate-50/80 font-bold uppercase tracking-wider text-slate-500'>
               <th className='px-4 py-3'>Type</th>
-              <th className='px-4 py-3'>Qty</th>
+              <th className='px-4 py-3'>
+                {filter === 'RETURN' ? 'Return Qty' : t('movement.quantity')}
+              </th>
+              <th className='px-4 py-3'>{t('products.sellPrice')}</th>
               <th className='px-4 py-3'>Reference / Note</th>
               <th className='px-4 py-3 text-right'>Date</th>
             </tr>
@@ -95,7 +84,7 @@ export default function ProductMovementHistory({
           <tbody className='divide-y divide-slate-100'>
             {paginatedData.length === 0 ? (
               <tr>
-                <td colSpan={4} className='p-8 text-center text-slate-400 font-medium'>
+                <td colSpan={5} className='p-8 text-center text-slate-400 font-medium'>
                   <div className='flex flex-col items-center justify-center p-8 sm:p-12 text-center'>
                     <div className='flex h-12 w-12 items-center justify-center rounded-full bg-slate-50 text-slate-400'>
                       <History size={24} />
@@ -108,38 +97,17 @@ export default function ProductMovementHistory({
                 </td>
               </tr>
             ) : (
-              paginatedData.map((item) => (
-                <tr key={item.id} className='hover:bg-slate-50/70 transition-colors'>
-                  <td className='px-4 py-3'>
-                    <MovementBadge type={item.type} />
-                  </td>
-                  <td className='px-4 py-3'>
-                    <span className='font-bold text-slate-700 text-sm'>
-                      {item.type === 'OUT' ? '-' : '+'}
-                      {item.quantity}
-                    </span>
-                    <span className='ml-1 text-[10px] text-slate-400 uppercase tracking-wider font-semibold'>
-                      {t('products.units')}
-                    </span>
-                  </td>
-                  <td className='px-4 py-3 text-slate-600 font-medium max-w-xs truncate'>
-                    {item.reference || item.note || '-'}
-                  </td>
-                  <td className='px-4 py-3 text-right text-slate-400 font-mono'>
-                    {formatDateTime(item.createdAt, 'MMM dd, yyyy HH:mm', '-')}
-                  </td>
-                </tr>
-              ))
+              paginatedData.map((item) => <ProductMovementRow key={item.id} item={item} />)
             )}
           </tbody>
         </table>
       </div>
 
-      {/* Pagination */}
       <div className='flex items-center justify-between text-xs font-semibold text-slate-500 pt-1'>
         <span>Showing {paginatedData.length} of {filteredData.length} entries</span>
         <div className='flex items-center gap-2'>
           <button
+            type='button'
             disabled={page <= 1}
             onClick={() => setPage(page - 1)}
             className='flex h-8 w-8 items-center justify-center rounded-xl border border-slate-200 bg-white text-slate-600 hover:bg-slate-50 disabled:opacity-40 cursor-pointer'
@@ -148,6 +116,7 @@ export default function ProductMovementHistory({
           </button>
           <span>{page} / {totalPage}</span>
           <button
+            type='button'
             disabled={page >= totalPage}
             onClick={() => setPage(page + 1)}
             className='flex h-8 w-8 items-center justify-center rounded-xl border border-slate-200 bg-white text-slate-600 hover:bg-slate-50 disabled:opacity-40 cursor-pointer'
@@ -158,6 +127,4 @@ export default function ProductMovementHistory({
       </div>
     </section>
   );
-};
-
-
+}

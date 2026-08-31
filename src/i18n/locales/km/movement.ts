@@ -23,4 +23,5 @@ export const movementKm = {
   condition: 'ស្ថានភាព',
   referenceNote: 'ឯកសារយោង / ចំណាំ',
   dateTime: 'កាលបរិច្ឆេទ & ម៉ោង',
+  auditTrail: 'ប្រវត្តិការផ្លាស់ប្តូរស្ដុក',
 };

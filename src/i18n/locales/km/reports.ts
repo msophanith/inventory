@@ -21,7 +21,7 @@ export const reportsKm = {
   totalItems: 'ទំនិញសរុប',
   lowStockCount: 'ទំនិញជិតអស់ពីស្ដុក',
   outOfStockCount: 'ទំនិញអស់ពីស្ដុក',
-  todaySales: 'ចំណូលលក់ថ្ងៃនេះ',
+  todaysSales: 'ចំណូលលក់ថ្ងៃនេះ',
   recentActivity: 'សកម្មភាពផ្លាស់ប្ដូរស្ដុកថ្មីៗ',
   salesVsMargin: 'ការវិភាគចំណូលលក់ និងប្រាក់ចំណេញ',
   financialAnalytics: 'ការវិភាគហិរញ្ញវត្ថុ និងប្រាក់ចំណេញ',
