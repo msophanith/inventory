@@ -25,7 +25,9 @@ export type {
 export class ProductService {
   private readonly TABLE_NAME = 'Product';
 
-  async getAll(params?: ProductQueryParams): Promise<PaginatedResponse<Product>> {
+  async getAll(
+    params?: ProductQueryParams,
+  ): Promise<PaginatedResponse<Product>> {
     return fetchAllProducts(params);
   }
 
@@ -121,13 +123,22 @@ export class ProductService {
   }
 
   async delete(id: string): Promise<boolean> {
-    const { error } = await supabase
+    await supabase.from('StockMovement').delete().eq('productId', id);
+
+    const { data, error } = await supabase
       .from(this.TABLE_NAME)
       .delete()
-      .eq('id', id);
+      .eq('id', id)
+      .select();
 
     if (error) {
       throw new Error(error.message);
+    }
+
+    if (!data || data.length === 0) {
+      throw new Error(
+        'Product not found or delete permission denied by RLS policy.',
+      );
     }
 
     return true;

@@ -59,6 +59,7 @@ const useProduct = (enableSummary?: boolean) => {
       onSuccess: () => {
         queryClient.invalidateQueries({ queryKey: ['products'] });
         queryClient.invalidateQueries({ queryKey: ['productSummary'] });
+        queryClient.invalidateQueries({ queryKey: ['product'] });
       },
     });
   };

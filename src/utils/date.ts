@@ -1,126 +1,98 @@
-import { addHours, format, parseISO, subMonths } from 'date-fns';
+import moment from 'moment';
 
-/**
- * Standard offset in hours from UTC/Ireland server response to Phnom Penh local time (UTC+7).
- */
+export const PHNOM_PENH_TZ_OFFSET = '+07:00';
 export const PHNOM_PENH_TZ_OFFSET_HOURS = 7;
 
-/**
- * Safely parse a date value (Date, ISO string, timestamp) into a Date instance.
- */
+function toMomentPattern(pattern: string): string {
+  return pattern
+    .replace(/\byyyy\b/g, 'YYYY')
+    .replace(/\byy\b/g, 'YY')
+    .replace(/\bEEEE\b/g, 'dddd')
+    .replace(/\bEEE\b/g, 'ddd')
+    .replace(/\bdd\b/g, 'DD')
+    .replace(/\bd\b/g, 'D');
+}
+
+export function getMoment(
+  value?: Date | string | number | null,
+): moment.Moment | null {
+  if (!value) return null;
+
+  let m: moment.Moment;
+  if (value instanceof Date) {
+    m = moment(value);
+  } else if (typeof value === 'string') {
+    const str = value.trim();
+    if (/[Zz]|[+-]\d{2}:?\d{2}$/.test(str)) {
+      m = moment(str);
+    } else {
+      m = moment.utc(str);
+    }
+  } else {
+    m = moment(value);
+  }
+
+  return m.isValid() ? m.utcOffset(PHNOM_PENH_TZ_OFFSET) : null;
+}
+
 export function parseDate(
   value: Date | string | number | null | undefined,
 ): Date | null {
-  if (!value) return null;
-  try {
-    const parsed =
-      typeof value === 'string'
-        ? parseISO(value)
-        : value instanceof Date
-          ? value
-          : new Date(value);
-    return Number.isNaN(parsed.getTime()) ? null : parsed;
-  } catch {
-    return null;
-  }
+  const m = getMoment(value);
+  return m ? m.toDate() : null;
 }
 
-/**
- * Adjust date by timezone offset hours (+7 hours for Phnom Penh by default).
- */
 export function getAdjustedDate(
   value: Date | string | number | null | undefined,
-  offsetHours = PHNOM_PENH_TZ_OFFSET_HOURS,
 ): Date | null {
-  const parsed = parseDate(value);
-  if (!parsed) return null;
-  return offsetHours ? addHours(parsed, offsetHours) : parsed;
+  return parseDate(value);
 }
 
-/**
- * Format a date into a formatted string (default pattern: 'dd MMM yyyy').
- * Applies +7 hours Phnom Penh timezone adjustment by default.
- */
 export function formatDate(
   value: Date | string | number | null | undefined,
-  pattern = 'dd MMM yyyy',
+  pattern = 'DD MMM YYYY',
   fallback = 'N/A',
-  offsetHours = PHNOM_PENH_TZ_OFFSET_HOURS,
 ): string {
-  const adjusted = getAdjustedDate(value, offsetHours);
-  if (!adjusted) return fallback;
-  return format(adjusted, pattern);
+  const m = getMoment(value);
+  if (!m) return fallback;
+  return m.format(toMomentPattern(pattern));
 }
 
-/**
- * Format a date & time into a formatted string (default pattern: 'dd MMM yyyy, HH:mm').
- * Applies +7 hours Phnom Penh timezone adjustment by default.
- */
 export function formatDateTime(
   value: Date | string | number | null | undefined,
-  pattern = 'dd MMM yyyy, HH:mm',
+  pattern = 'DD MMM YYYY, HH:mm',
   fallback = 'N/A',
-  offsetHours = PHNOM_PENH_TZ_OFFSET_HOURS,
 ): string {
-  return formatDate(value, pattern, fallback, offsetHours);
+  return formatDate(value, pattern, fallback);
 }
 
-/**
- * Check if a date falls within the current calendar month.
- */
 export function isCurrentMonth(
   value: Date | string | number | null | undefined,
-  offsetHours = PHNOM_PENH_TZ_OFFSET_HOURS,
 ): boolean {
-  const adjusted = getAdjustedDate(value, offsetHours);
-  if (!adjusted) return false;
-
-  const now = getAdjustedDate(new Date(), offsetHours) || new Date();
-
-  return (
-    adjusted.getFullYear() === now.getFullYear() &&
-    adjusted.getMonth() === now.getMonth()
-  );
+  const m = getMoment(value);
+  if (!m) return false;
+  const now = moment().utcOffset(PHNOM_PENH_TZ_OFFSET);
+  return m.isSame(now, 'month') && m.isSame(now, 'year');
 }
 
-/**
- * Get formatted label for the current calendar month (e.g. 'August 2026').
- */
-export function getCurrentMonthLabel(
-  offsetHours = PHNOM_PENH_TZ_OFFSET_HOURS,
-): string {
-  const now = getAdjustedDate(new Date(), offsetHours) || new Date();
-  return format(now, 'MMMM yyyy');
+export function getCurrentMonthLabel(): string {
+  return moment().utcOffset(PHNOM_PENH_TZ_OFFSET).format('MMMM YYYY');
 }
 
-/**
- * Check if a date falls within the previous calendar month.
- */
 export function isLastMonth(
   value: Date | string | number | null | undefined,
-  offsetHours = PHNOM_PENH_TZ_OFFSET_HOURS,
 ): boolean {
-  const adjusted = getAdjustedDate(value, offsetHours);
-  if (!adjusted) return false;
-
-  const now = getAdjustedDate(new Date(), offsetHours) || new Date();
-  const lastMonthDate = subMonths(now, 1);
-
-  return (
-    adjusted.getFullYear() === lastMonthDate.getFullYear() &&
-    adjusted.getMonth() === lastMonthDate.getMonth()
-  );
+  const m = getMoment(value);
+  if (!m) return false;
+  const lastMonth = moment()
+    .utcOffset(PHNOM_PENH_TZ_OFFSET)
+    .subtract(1, 'month');
+  return m.isSame(lastMonth, 'month') && m.isSame(lastMonth, 'year');
 }
 
-/**
- * Get formatted label for the previous calendar month (e.g. 'July 2026').
- */
-export function getLastMonthLabel(
-  offsetHours = PHNOM_PENH_TZ_OFFSET_HOURS,
-): string {
-  const now = getAdjustedDate(new Date(), offsetHours) || new Date();
-  const lastMonthDate = subMonths(now, 1);
-  return format(lastMonthDate, 'MMMM yyyy');
+export function getLastMonthLabel(): string {
+  return moment()
+    .utcOffset(PHNOM_PENH_TZ_OFFSET)
+    .subtract(1, 'month')
+    .format('MMMM YYYY');
 }
-
-
