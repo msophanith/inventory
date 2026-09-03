@@ -76,7 +76,13 @@ export default function ProductMovementHistory({ movements }: Props) {
               <th className='px-4 py-3'>
                 {filter === 'RETURN' ? 'Return Qty' : t('movement.quantity')}
               </th>
-              <th className='px-4 py-3'>{t('products.sellPrice')}</th>
+              <th className='px-4 py-3'>
+                {filter === 'IN' 
+                  ? t('products.buyPrice') 
+                  : filter === 'OUT' 
+                    ? t('products.sellPrice') 
+                    : t('products.price')}
+              </th>
               <th className='px-4 py-3'>Reference / Note</th>
               <th className='px-4 py-3 text-right'>Date</th>
             </tr>

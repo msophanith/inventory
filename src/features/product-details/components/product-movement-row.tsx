@@ -10,7 +10,11 @@ interface Props {
 
 export function ProductMovementRow({ item }: Props) {
   const { t } = useLanguage();
-  const sellPrice = item.unitPrice ?? item.product?.sellPrice ?? 0;
+  const isStockIn = item.type === 'IN';
+  const displayPrice =
+    item.unitPrice ??
+    (isStockIn ? item.product?.buyPrice : item.product?.sellPrice) ??
+    0;
   const isDamaged = Boolean(
     item.isDamaged || item.reference?.toLowerCase() === 'damage',
   );
@@ -50,10 +54,10 @@ export function ProductMovementRow({ item }: Props) {
       </td>
       <td className='px-4 py-3'>
         <p className='font-bold text-slate-800 text-xs sm:text-sm'>
-          {formatCurrencyUsd(sellPrice)}
+          {formatCurrencyUsd(displayPrice)}
         </p>
         <p className='text-[10px] font-medium text-slate-400'>
-          {formatCurrencyKhr(sellPrice)}
+          {formatCurrencyKhr(displayPrice)}
         </p>
       </td>
       <td className='px-4 py-3 text-slate-600 font-medium max-w-xs truncate text-xs'>

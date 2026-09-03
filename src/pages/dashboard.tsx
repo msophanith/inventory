@@ -13,7 +13,11 @@ import { DashboardLowStockFeed } from '../features/dashboard/components/dashboar
 
 const DashboardPage = () => {
   const { productSummary, productSummaryLoading } = useProduct(true);
-  const { summary, data: movements, isLoading: isMovementLoading } = useMovement();
+  const {
+    summary,
+    data: movements,
+    isLoading: isMovementLoading,
+  } = useMovement();
 
   return (
     <PageContainer className='space-y-6 sm:space-y-8 pb-24 lg:pb-6'>
@@ -48,12 +52,18 @@ const DashboardPage = () => {
 
           {/* 4. Top Sellers + Low-Stock Feed (2-col grid) */}
           <div className='grid grid-cols-1 gap-6 lg:grid-cols-2'>
-            <DashboardTopSellers movements={movements} isLoading={isMovementLoading} />
+            <DashboardTopSellers
+              movements={movements}
+              isLoading={isMovementLoading}
+            />
             <DashboardLowStockFeed />
           </div>
 
           {/* 5. Live Activity Feed & Sales vs Margin Performance Chart */}
-          <DashboardRecentActivity movements={movements} isLoading={isMovementLoading} />
+          <DashboardRecentActivity
+            movements={movements}
+            isLoading={isMovementLoading}
+          />
         </>
       )}
     </PageContainer>

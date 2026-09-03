@@ -3,15 +3,12 @@ import { v4 as uuidv4 } from 'uuid';
 import { useNavigate } from 'react-router-dom';
 import { gooeyToast } from 'goey-toast';
 
-import { productService } from '../../../services';
-import { useMovement } from '../../movement/hooks/use-movement';
+import { productService, movementService } from '../../../services';
 import type { ProductFormValues } from '../schema/product.schema';
 
 const useProductAction = () => {
   const queryClient = useQueryClient();
   const navigate = useNavigate();
-
-  const { createMovement } = useMovement();
 
   const { mutate: onCreateProduct, isPending: isCreatingProduct } = useMutation(
     {
@@ -22,7 +19,7 @@ const useProductAction = () => {
         try {
           const initialQty = variables.quantity || 0;
           if (initialQty > 0) {
-            await createMovement({
+            await movementService.addMovement({
               id: uuidv4(),
               productId: product.id,
               type: 'IN',
