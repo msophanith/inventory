@@ -10,6 +10,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { AuthProvider } from "./features/auth/context/auth-context";
 import { CurrencyProvider } from "./features/currency/context/currency-context";
 import { LanguageProvider } from "./i18n/language-context";
+import { DevToolsGuard } from "./components/security/devtools-guard";
 
 const queryClient = new QueryClient();
 
@@ -22,8 +23,10 @@ ReactDOM.createRoot(
         <AuthProvider>
           <CurrencyProvider>
             <LanguageProvider>
-              <GooeyToaster position="top-right" />
-              <RouterProvider router={router} />
+              <DevToolsGuard>
+                <GooeyToaster position="top-right" />
+                <RouterProvider router={router} />
+              </DevToolsGuard>
             </LanguageProvider>
           </CurrencyProvider>
         </AuthProvider>
