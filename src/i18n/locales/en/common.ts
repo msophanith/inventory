@@ -38,4 +38,6 @@ export const commonEn = {
   pressToToggle: 'Press ?',
   expandSidebar: 'Expand Sidebar',
   collapseSidebar: 'Collapse Sidebar',
+  developedBy: 'Developed by',
+  copyright: 'All rights reserved.',
 };

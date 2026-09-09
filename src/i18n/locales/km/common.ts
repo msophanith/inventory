@@ -38,4 +38,6 @@ export const commonKm = {
   pressToToggle: 'ចុច ?',
   expandSidebar: 'ពង្រីករបារចំហៀង',
   collapseSidebar: 'បង្រួមរបារចំហៀង',
+  developedBy: 'បង្កើតឡើងដោយ',
+  copyright: 'រក្សាសិទ្ធិគ្រប់យ៉ាង',
 };

@@ -76,4 +76,5 @@ export const reportsKm = {
   monthly: 'ប្រចាំខែ',
   daily: 'ប្រចាំថ្ងៃ',
   categoryReport: 'ប្រភេទ',
+  todaySales: 'ចំណូលលក់ថ្ងៃនេះ',
 };

@@ -1,12 +1,15 @@
+import { useNavigate } from 'react-router-dom';
 import type { Movement } from '../../../services/movement';
 import { formatDateTime } from '../../../utils/date';
 import MovementTypeBadge from './movement-badge';
 
 interface Props {
   readonly item: Movement;
+  readonly onClick?: () => void;
 }
 
-export function MovementTableRow({ item }: Props) {
+export function MovementTableRow({ item, onClick }: Props) {
+  const navigate = useNavigate();
   const isDamaged = Boolean(
     item.isDamaged || item.reference?.toLowerCase() === 'damage',
   );
@@ -17,17 +20,37 @@ export function MovementTableRow({ item }: Props) {
   const isOut = stock <= 0;
   const isLow = stock > 0 && stock <= minStock;
 
+  const handleClick = () => {
+    if (onClick) {
+      onClick();
+      return;
+    }
+    const targetId = item.productId || item.product?.id;
+    if (targetId) {
+      navigate(`/products/${targetId}`);
+    }
+  };
+
   return (
-    <tr className='hover:bg-slate-50/70 transition-colors'>
+    <tr
+      onClick={handleClick}
+      className='hover:bg-slate-50/80 transition-colors cursor-pointer group'
+      title={
+        item.product?.name
+          ? `View ${item.product.name} details`
+          : 'View product details'
+      }
+    >
       {/* Product & Movement ID */}
       <td className='px-5 py-3.5'>
-        <p className='font-bold text-slate-900'>
+        <p className='font-bold text-slate-900 group-hover:text-indigo-600 transition-colors'>
           {item.product?.name || item.productId}
         </p>
         <p className='text-xs text-slate-400 font-mono'>
           #{item.id.slice(0, 8)}
         </p>
       </td>
+
 
       {/* Movement Type */}
       <td className='px-5 py-3.5'>

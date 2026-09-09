@@ -1,56 +1,58 @@
 import { useMemo } from 'react';
+import { useNavigate } from 'react-router-dom';
 import type { Movement } from '../../../services/movement';
 import { getCurrentMonthLabel, isCurrentMonth } from '../../../utils/date';
 import { MovementTableFilter } from './movement-table-filter';
 import { MovementTablePagination } from './movement-table-pagination';
 import { MovementTableRow } from './movement-table-row';
+import { MovementTableHead } from './movement-table-head';
+import { MovementTableBanner } from './movement-table-banner';
 import { useMovementStore } from '../store/use-movement-store';
 import { useLanguage } from '../../../i18n/language-context';
 
 interface Props {
   readonly movements: Movement[];
   readonly isLoading?: boolean;
+  readonly onRowClick?: (productId: string) => void;
 }
 
 const PAGE_SIZE_OPTIONS = [10, 20, 50];
 
-const MovementTable = ({ movements, isLoading }: Props) => {
+const MovementTable = ({ movements, isLoading, onRowClick }: Props) => {
+  const navigate = useNavigate();
   const { t } = useLanguage();
-  const type = useMovementStore((state) => state.filterType);
-  const setType = useMovementStore((state) => state.setFilterType);
-  
-  const damagedOnly = useMovementStore((state) => state.damagedOnly);
-  const setDamagedOnly = useMovementStore((state) => state.setDamagedOnly);
-  
-  const searchQuery = useMovementStore((state) => state.searchQuery);
-  const setSearchQuery = useMovementStore((state) => state.setSearchQuery);
-  
-  const page = useMovementStore((state) => state.page);
-  const setPage = useMovementStore((state) => state.setPage);
-  
-  const pageSize = useMovementStore((state) => state.pageSize);
-  const setPageSize = useMovementStore((state) => state.setPageSize);
+
+  const {
+    filterType: type,
+    setFilterType: setType,
+    damagedOnly,
+    setDamagedOnly,
+    searchQuery,
+    setSearchQuery,
+    page,
+    setPage,
+    pageSize,
+    setPageSize,
+  } = useMovementStore();
 
   const currentMonthLabel = useMemo(() => getCurrentMonthLabel(), []);
 
   const filteredMovements = useMemo(() => {
+    const q = searchQuery.toLowerCase().trim();
     return movements.filter((item) => {
-      const matchMonth = isCurrentMonth(item.createdAt);
-      const matchType = type === 'ALL' || item.type === type;
-      const isItemDamaged = Boolean(
+      if (!isCurrentMonth(item.createdAt)) return false;
+      if (type !== 'ALL' && item.type !== type) return false;
+      const isDamaged = Boolean(
         item.isDamaged || item.reference?.toLowerCase() === 'damage',
       );
-      const matchDamage = damagedOnly ? isItemDamaged : true;
-
-      const q = searchQuery.toLowerCase().trim();
-      const matchSearch =
-        !q ||
+      if (damagedOnly && !isDamaged) return false;
+      if (!q) return true;
+      return (
         item.product?.name?.toLowerCase().includes(q) ||
         item.reference?.toLowerCase().includes(q) ||
         item.note?.toLowerCase().includes(q) ||
-        item.id.toLowerCase().includes(q);
-
-      return matchMonth && matchType && matchDamage && matchSearch;
+        item.id.toLowerCase().includes(q)
+      );
     });
   }, [movements, type, damagedOnly, searchQuery]);
 
@@ -60,14 +62,20 @@ const MovementTable = ({ movements, isLoading }: Props) => {
     page * pageSize,
   );
 
+  const handleRowClick = (productId: string) => {
+    if (!productId) return;
+    if (onRowClick) {
+      onRowClick(productId);
+    } else {
+      navigate(`/products/${productId}`);
+    }
+  };
+
   const renderTableBody = () => {
     if (isLoading) {
       return (
         <tr>
-          <td
-            colSpan={7}
-            className='p-10 text-center text-slate-400 font-medium'
-          >
+          <td colSpan={7} className='p-10 text-center text-slate-400 font-medium'>
             {t('movement.loadingMovements')}
           </td>
         </tr>
@@ -77,10 +85,7 @@ const MovementTable = ({ movements, isLoading }: Props) => {
     if (paginatedData.length === 0) {
       return (
         <tr>
-          <td
-            colSpan={7}
-            className='p-12 text-center text-slate-500 font-medium'
-          >
+          <td colSpan={7} className='p-12 text-center text-slate-500 font-medium'>
             {t('movement.noMovementsFound', { month: currentMonthLabel })}
           </td>
         </tr>
@@ -88,28 +93,18 @@ const MovementTable = ({ movements, isLoading }: Props) => {
     }
 
     return paginatedData.map((item) => (
-      <MovementTableRow key={item.id} item={item} />
+      <MovementTableRow
+        key={item.id}
+        item={item}
+        onClick={() => handleRowClick(item.productId || item.product?.id || '')}
+      />
     ));
   };
 
   return (
     <div className='space-y-6 rounded-3xl border border-slate-200/80 bg-white p-4 sm:p-6 shadow-xs min-w-0 w-full max-w-full overflow-hidden'>
-      {/* Header */}
-      <div>
-        <div className='flex items-center gap-2.5 flex-wrap'>
-          <h1 className='text-2xl font-bold text-slate-900 tracking-tight'>
-            {t('movement.history')}
-          </h1>
-          <span className='px-2.5 py-0.5 rounded-full text-xs font-semibold bg-emerald-100 text-emerald-800 border border-emerald-200/60'>
-            {t('movement.thisMonth', { month: currentMonthLabel })}
-          </span>
-        </div>
-        <p className='text-sm text-slate-500 mt-1'>
-          {t('movement.historyDesc', { month: currentMonthLabel })}
-        </p>
-      </div>
+      <MovementTableBanner monthLabel={currentMonthLabel} />
 
-      {/* Filter & Search Toolbar */}
       <MovementTableFilter
         selectedType={type}
         onTypeChange={setType}
@@ -119,27 +114,15 @@ const MovementTable = ({ movements, isLoading }: Props) => {
         onSearchChange={setSearchQuery}
       />
 
-      {/* Responsive Table View */}
       <div className='overflow-x-auto rounded-2xl border border-slate-100 min-w-0 w-full'>
         <table className='w-full border-collapse text-left text-sm'>
-          <thead>
-            <tr className='border-b border-slate-200 bg-slate-50/80 text-xs font-bold uppercase tracking-wider text-slate-500'>
-              <th className='px-5 py-3.5'>{t('movement.product')}</th>
-              <th className='px-5 py-3.5'>{t('movement.movementType')}</th>
-              <th className='px-5 py-3.5 text-center'>{t('movement.quantity')}</th>
-              <th className='px-5 py-3.5 text-center'>{t('movement.remainingStock')}</th>
-              <th className='px-5 py-3.5'>{t('movement.condition')}</th>
-              <th className='px-5 py-3.5'>{t('movement.referenceNote')}</th>
-              <th className='px-5 py-3.5 text-right'>{t('movement.dateTime')}</th>
-            </tr>
-          </thead>
+          <MovementTableHead />
           <tbody className='divide-y divide-slate-100'>
             {renderTableBody()}
           </tbody>
         </table>
       </div>
 
-      {/* Pagination Controls */}
       <MovementTablePagination
         page={page}
         totalPages={totalPages}
@@ -154,3 +137,4 @@ const MovementTable = ({ movements, isLoading }: Props) => {
 };
 
 export default MovementTable;
+

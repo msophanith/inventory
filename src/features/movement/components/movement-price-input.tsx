@@ -1,83 +1,84 @@
 import type { UseFormRegister } from 'react-hook-form';
-import { DollarSign, Tag, Wallet } from 'lucide-react';
+import { DollarSign, RotateCcw } from 'lucide-react';
 import { formatCurrencyKhr, formatCurrencyUsd } from '../../../utils/currency';
+import type { MovementType } from '../../../services/movement';
 import type { FormValues } from './movement-form';
 
 interface Props {
   readonly defaultUnitPrice: number;
   readonly unitPrice: number;
   readonly totalValue: number;
+  readonly quantity: number;
+  readonly type: MovementType;
   readonly register: UseFormRegister<FormValues>;
+  readonly onResetPrice?: () => void;
 }
 
 export function MovementPriceInput({
   defaultUnitPrice,
   unitPrice,
   totalValue,
+  quantity,
+  type,
   register,
+  onResetPrice,
 }: Props) {
+  const isCustom = Math.abs((unitPrice || 0) - defaultUnitPrice) > 0.001;
+
+  const label =
+    type === 'IN' ? 'Unit Cost' : type === 'RETURN' ? 'Unit Refund' : 'Unit Price';
+
   return (
-    <div className='space-y-3 sm:space-y-4'>
-      {/* Unit Price Adjustment Field */}
-      <div>
-        <div className='flex items-center justify-between mb-1.5'>
-          <label className='flex items-center gap-1.5 text-xs sm:text-sm font-extrabold text-slate-700 uppercase tracking-wider'>
-            <Tag size={14} className='text-indigo-600' />
-            Unit Price ($ USD)
-          </label>
-          <span className='text-[11px] font-bold text-slate-500 bg-slate-100 px-2 py-0.5 rounded-lg border border-slate-200'>
-            Default: ${defaultUnitPrice.toFixed(2)}
-          </span>
-        </div>
-
-        <div className='relative flex items-center'>
-          <div className='pointer-events-none absolute left-3.5 flex items-center justify-center text-slate-400 font-bold text-sm'>
-            <DollarSign size={16} />
+    <div className='rounded-2xl border border-slate-200 bg-slate-50/70 p-3 sm:p-3.5 shadow-2xs'>
+      <div className='grid grid-cols-1 sm:grid-cols-2 gap-3 items-center'>
+        {/* Left: Unit Price Input */}
+        <div>
+          <div className='flex items-center justify-between mb-1 text-xs'>
+            <span className='font-black uppercase tracking-wider text-slate-700'>
+              {label}
+            </span>
+            {isCustom && onResetPrice && (
+              <button
+                type='button'
+                onClick={onResetPrice}
+                className='flex items-center gap-1 text-[10px] font-bold text-indigo-600 hover:text-indigo-800'
+              >
+                <RotateCcw size={10} /> Reset (${defaultUnitPrice.toFixed(2)})
+              </button>
+            )}
           </div>
-          <input
-            type='number'
-            step='0.01'
-            min='0'
-            {...register('unitPrice', { valueAsNumber: true })}
-            className='w-full rounded-2xl border border-slate-200 bg-white py-3 pl-9 pr-4 text-xs sm:text-sm font-extrabold text-slate-900 shadow-2xs focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 transition-all'
-          />
-        </div>
 
-        {unitPrice > 0 && (
-          <p className='mt-1 text-[11px] font-extrabold text-indigo-600 pl-1'>
-            Khmer Riel Equivalent: <span className='underline font-black'>{formatCurrencyKhr(unitPrice)}</span>
+          <div className='relative flex items-center'>
+            <div className='pointer-events-none absolute left-2.5 text-slate-400 font-bold'>
+              <DollarSign size={15} />
+            </div>
+            <input
+              type='number'
+              step='0.01'
+              min='0'
+              {...register('unitPrice', { valueAsNumber: true })}
+              className='w-full rounded-xl border border-slate-200 bg-white py-2 pl-7 pr-3 text-sm font-extrabold text-slate-900 shadow-2xs focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/20'
+            />
+          </div>
+          <p className='text-[10px] font-medium text-slate-400 mt-1 pl-0.5'>
+            Rate: {formatCurrencyKhr(unitPrice || 0)} / unit
           </p>
-        )}
-      </div>
+        </div>
 
-      {/* Dynamic Total Value Card */}
-      <div className='relative overflow-hidden rounded-2xl bg-gradient-to-br from-slate-900 via-slate-800 to-slate-950 p-4 text-white shadow-xl shadow-slate-900/15 border border-slate-800'>
-        {/* Subtle decorative glow circle */}
-        <div className='pointer-events-none absolute -right-6 -bottom-6 h-24 w-24 rounded-full bg-emerald-500/10 blur-xl' />
-
-        <div className='relative flex items-center justify-between gap-3'>
-          <div className='flex items-center gap-2.5'>
-            <div className='flex h-10 w-10 items-center justify-center rounded-xl bg-white/10 text-emerald-400 border border-white/10 backdrop-blur-md shrink-0 shadow-inner'>
-              <Wallet size={20} />
-            </div>
-            <div>
-              <p className='text-xs font-extrabold text-slate-300 uppercase tracking-wider'>
-                Total Transaction Value
-              </p>
-              <p className='text-[10px] font-medium text-slate-400'>
-                Dual currency calculation
-              </p>
-            </div>
-          </div>
-
-          <div className='text-right'>
-            <span className='text-lg sm:text-xl font-black text-emerald-400 block leading-tight tracking-tight'>
+        {/* Right: Calculated Total with Dual Currency */}
+        <div className='border-t sm:border-t-0 sm:border-l border-slate-200 pt-2 sm:pt-0 sm:pl-3 flex sm:flex-col justify-between items-center sm:items-end'>
+          <div className='text-left sm:text-right'>
+            <span className='text-[11px] font-bold text-slate-500 uppercase tracking-wider block'>
+              Total ({quantity} pcs)
+            </span>
+            <span className='text-lg sm:text-xl font-black text-emerald-600 leading-tight block'>
               {formatCurrencyUsd(totalValue)}
             </span>
-            <span className='inline-block mt-0.5 rounded-md bg-indigo-500/20 px-2 py-0.5 text-[11px] font-black text-indigo-300 border border-indigo-400/30 backdrop-blur-xs'>
-              {formatCurrencyKhr(totalValue)}
-            </span>
           </div>
+
+          <span className='inline-block rounded-lg bg-indigo-50 px-2 py-0.5 text-xs font-black text-indigo-700 border border-indigo-200/70'>
+            {formatCurrencyKhr(totalValue)}
+          </span>
         </div>
       </div>
     </div>

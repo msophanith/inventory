@@ -1,6 +1,7 @@
 import type { ColumnDef } from '@tanstack/react-table';
-import { MoreHorizontal, Package } from 'lucide-react';
+import { Calendar, MoreHorizontal, Package } from 'lucide-react';
 import type { Product } from '../../../services/product';
+import { formatDate } from '../../../utils/date';
 
 export const productColumns: ColumnDef<Product>[] = [
   {
@@ -91,6 +92,19 @@ export const productColumns: ColumnDef<Product>[] = [
               minimumFractionDigits: 2,
             })}
           </p>
+        </div>
+      );
+    },
+  },
+  {
+    accessorKey: 'createdAt',
+    header: 'Created Date',
+    cell: ({ row }) => {
+      const createdAt = row.original.createdAt;
+      return (
+        <div className='flex items-center gap-1.5 text-xs font-semibold text-slate-700 whitespace-nowrap'>
+          <Calendar size={13} className='text-slate-400 shrink-0' />
+          <span>{formatDate(createdAt, 'DD MMM YYYY')}</span>
         </div>
       );
     },

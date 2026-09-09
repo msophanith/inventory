@@ -76,4 +76,5 @@ export const reportsEn = {
   monthly: 'Monthly',
   daily: 'Daily',
   categoryReport: 'Category',
+  todaySales: 'Today Sales',
 };

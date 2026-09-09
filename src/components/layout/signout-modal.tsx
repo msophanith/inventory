@@ -22,7 +22,7 @@ export function SignoutModal({
 
   return (
     <div
-      className='fixed inset-0 z-[100] flex items-end sm:items-center justify-center bg-slate-900/60 p-0 sm:p-4 backdrop-blur-xs animate-in fade-in duration-200'
+      className='fixed inset-0 z-[9999] h-screen h-dvh w-screen min-h-screen flex items-end sm:items-center justify-center bg-slate-950/70 p-0 sm:p-4 backdrop-blur-sm animate-in fade-in duration-200'
       onClick={onClose}
     >
       <div

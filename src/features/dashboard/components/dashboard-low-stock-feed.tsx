@@ -1,94 +1,134 @@
-import { AlertTriangle, PackageSearch, ArrowRight } from 'lucide-react';
+import { useState, useMemo } from 'react';
+import { AlertTriangle, ArrowRight, CheckCircle2 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useProduct } from '../../product/hooks/use-product';
-import type { Product } from '../../../services/product';
 import { useLanguage } from '../../../i18n/language-context';
+import { StockBadge } from './stock-badge';
 
-function StockBadge({ product }: { product: Product }) {
-  const qty = product.quantity ?? 0;
-  const { t } = useLanguage();
-
-  if (qty <= 0) {
-    return (
-      <span className='inline-flex items-center gap-1 rounded-full bg-rose-100 px-2 py-0.5 text-[10px] font-extrabold text-rose-700'>
-        <span className='h-1.5 w-1.5 rounded-full bg-rose-500 animate-pulse inline-block' />
-        {t('products.outOfStock')}
-      </span>
-    );
-  }
-  return (
-    <span className='inline-flex items-center gap-1 rounded-full bg-amber-100 px-2 py-0.5 text-[10px] font-extrabold text-amber-800'>
-      <span className='h-1.5 w-1.5 rounded-full bg-amber-400 inline-block' />
-      {t('products.lowStock')}
-    </span>
-  );
-}
+type FeedFilter = 'ALL' | 'LOW' | 'OUT';
 
 export function DashboardLowStockFeed() {
   const { t } = useLanguage();
   const navigate = useNavigate();
+  const [filter, setFilter] = useState<FeedFilter>('ALL');
   const { useGetOutOfStockProducts, useGetLowStockProducts } = useProduct(true);
-  const { data: outOfStock = [], isLoading: loadOut } = useGetOutOfStockProducts(5);
-  const { data: lowStock = [], isLoading: loadLow } = useGetLowStockProducts(8);
+  const { data: outOfStock = [], isLoading: loadOut } =
+    useGetOutOfStockProducts(15);
+  const { data: lowStock = [], isLoading: loadLow } =
+    useGetLowStockProducts(15);
 
-  const combined: Product[] = [
-    ...outOfStock,
-    ...lowStock.filter((p) => !outOfStock.some((o) => o.id === p.id)),
-  ].slice(0, 8);
+  const displayedProducts = useMemo(() => {
+    if (filter === 'OUT') return outOfStock.slice(0, 10);
+    if (filter === 'LOW') return lowStock.slice(0, 10);
+
+    if (outOfStock.length > 0 && lowStock.length > 0) {
+      const takeOut = outOfStock.slice(0, 5);
+      const takeLow = lowStock
+        .filter((p) => !takeOut.some((o) => o.id === p.id))
+        .slice(0, 5);
+      return [...takeOut, ...takeLow];
+    }
+    return [...outOfStock, ...lowStock].slice(0, 10);
+  }, [filter, outOfStock, lowStock]);
 
   const isLoading = loadOut || loadLow;
 
   return (
-    <div className='rounded-3xl border border-rose-200/60 bg-gradient-to-br from-rose-50/40 to-orange-50/20 p-5 sm:p-6 shadow-sm space-y-4'>
-      <div className='flex items-center justify-between border-b border-rose-100 pb-4'>
-        <div className='flex items-center gap-2.5'>
-          <div className='flex h-9 w-9 items-center justify-center rounded-xl bg-rose-100 text-rose-600'>
-            <AlertTriangle size={18} />
+    <div className='rounded-3xl border border-rose-200/60 bg-linear-to-br from-rose-50/30 via-white to-orange-50/20 p-5 sm:p-6 shadow-xs space-y-4 transition hover:shadow-md'>
+      {/* Header */}
+      <div className='flex flex-wrap items-center justify-between gap-3 border-b border-rose-100 pb-4'>
+        <div className='flex items-center gap-3'>
+          <div className='flex h-10 w-10 items-center justify-center rounded-2xl bg-rose-100 text-rose-600 border border-rose-200'>
+            <AlertTriangle size={20} />
           </div>
           <div>
-            <h2 className='font-extrabold text-slate-900 text-sm'>{t('reports.restockNeeded')}</h2>
-            <p className='text-[11px] text-slate-500'>{t('reports.productsRequiringAttention')}</p>
+            <h2 className='text-sm sm:text-base font-extrabold text-slate-900'>
+              {t('reports.restockNeeded')}
+            </h2>
+            <p className='text-xs text-slate-500 font-medium'>
+              {t('reports.productsRequiringAttention')}
+            </p>
           </div>
         </div>
+
         <button
           type='button'
-          onClick={() => navigate('/movement')}
-          className='flex items-center gap-1 rounded-xl bg-rose-600 px-3 py-1.5 text-xs font-extrabold text-white shadow-sm hover:bg-rose-700 transition active:scale-95 cursor-pointer'
+          onClick={() => navigate('/products')}
+          className='flex items-center gap-1.5 rounded-xl bg-rose-600 px-3 py-1.5 text-xs font-black text-white shadow-xs hover:bg-rose-700 transition active:scale-95 cursor-pointer'
         >
-          <span>{t('reports.restockItems')}</span> <ArrowRight size={13} />
+          <span>{t('reports.restockItems')}</span>
+          <ArrowRight size={13} />
         </button>
       </div>
 
+      {/* Filter Tabs */}
+      <div className='flex items-center gap-1 rounded-xl bg-slate-100/80 p-1 border border-slate-200/60 text-xs'>
+        <button
+          type='button'
+          onClick={() => setFilter('ALL')}
+          className={`flex-1 rounded-lg px-2 py-1 text-center font-extrabold transition-all cursor-pointer ${
+            filter === 'ALL'
+              ? 'bg-white text-slate-900 shadow-2xs'
+              : 'text-slate-500 hover:text-slate-800'
+          }`}
+        >
+          {t('common.all')} ({outOfStock.length + lowStock.length})
+        </button>
+        <button
+          type='button'
+          onClick={() => setFilter('LOW')}
+          className={`flex-1 rounded-lg px-2 py-1 text-center font-extrabold transition-all cursor-pointer ${
+            filter === 'LOW'
+              ? 'bg-white text-amber-800 shadow-2xs'
+              : 'text-slate-500 hover:text-amber-800'
+          }`}
+        >
+          {t('products.lowStock')} ({lowStock.length})
+        </button>
+        <button
+          type='button'
+          onClick={() => setFilter('OUT')}
+          className={`flex-1 rounded-lg px-2 py-1 text-center font-extrabold transition-all cursor-pointer ${
+            filter === 'OUT'
+              ? 'bg-white text-rose-800 shadow-2xs'
+              : 'text-slate-500 hover:text-rose-800'
+          }`}
+        >
+          {t('products.outOfStock')} ({outOfStock.length})
+        </button>
+      </div>
+
+      {/* List */}
       {isLoading ? (
-        <div className='space-y-2'>
+        <div className='space-y-2.5'>
           {new Array(4).fill(0).map((_, i) => (
             <div
               key={i}
-              className='flex items-center justify-between rounded-2xl border border-rose-100/80 bg-white/40 px-3 py-2.5'
-            >
-              <div className='min-w-0 flex-1 space-y-1.5'>
-                <div className='h-3 w-3/4 animate-pulse rounded-full bg-rose-200/60' />
-                <div className='h-2.5 w-1/2 animate-pulse rounded-full bg-rose-100' />
-              </div>
-              <div className='h-5 w-16 animate-pulse rounded-full bg-rose-200/60' />
-            </div>
+              className='h-12 animate-pulse rounded-2xl bg-rose-100/40'
+            />
           ))}
         </div>
-      ) : combined.length === 0 ? (
-        <div className='flex flex-col items-center justify-center py-8 gap-2'>
-          <PackageSearch size={32} className='text-emerald-400' />
-          <p className='text-xs font-bold text-emerald-700'>{t('reports.allProductsWellStocked')}</p>
+      ) : displayedProducts.length === 0 ? (
+        <div className='flex flex-col items-center justify-center py-10 gap-2 text-center'>
+          <CheckCircle2 size={36} className='text-emerald-500' />
+          <p className='text-xs font-bold text-emerald-800'>
+            {t('reports.allProductsWellStocked')}
+          </p>
         </div>
       ) : (
-        <div className='space-y-2'>
-          {combined.map((p) => (
+        <div className='space-y-2.5'>
+          {displayedProducts.map((p) => (
             <div
               key={p.id}
-              className='flex items-center justify-between rounded-2xl border border-rose-100/80 bg-white/70 px-3 py-2.5 hover:bg-white transition'
+              className='flex items-center justify-between rounded-2xl border border-rose-100/70 bg-white/90 px-3.5 py-2.5 shadow-2xs transition hover:border-rose-200 hover:bg-white'
             >
-              <div className='min-w-0 flex-1'>
-                <p className='text-xs font-bold text-slate-900 truncate'>{p.name}</p>
-                <p className='text-[10px] text-slate-400 font-medium'>{p.category}</p>
+              <div className='min-w-0 flex-1 pr-3'>
+                <p className='text-xs font-bold text-slate-900 truncate'>
+                  {p.name}
+                </p>
+                <p className='text-[10px] font-semibold text-slate-400'>
+                  {p.category || 'General'}
+                </p>
               </div>
               <StockBadge product={p} />
             </div>

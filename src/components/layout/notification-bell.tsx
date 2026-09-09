@@ -25,11 +25,11 @@ export function NotificationBell() {
         type='button'
         onClick={() => setIsOpen((prev) => !prev)}
         title='Stock Alert Notifications'
-        className='relative flex h-9 w-9 items-center justify-center rounded-xl bg-slate-100/80 text-slate-600 hover:bg-indigo-50 hover:text-indigo-600 transition cursor-pointer active:scale-95'
+        className='relative flex h-9 w-9 items-center justify-center rounded-xl border border-slate-200/80 bg-slate-50/80 text-slate-600 hover:bg-white hover:text-indigo-600 hover:border-indigo-200 transition-all cursor-pointer active:scale-95 shadow-2xs'
       >
-        <Bell size={18} />
+        <Bell size={17} />
         {totalAlertCount > 0 && (
-          <span className='absolute -top-1 -right-1 flex h-4 min-w-[16px] items-center justify-center rounded-full bg-rose-500 px-1 text-[10px] font-black text-white shadow-xs ring-2 ring-white animate-pulse'>
+          <span className='absolute -top-1 -right-1 flex h-4 min-w-4 items-center justify-center rounded-full bg-rose-500 px-1 text-[10px] font-black text-white shadow-xs ring-2 ring-white animate-pulse'>
             {totalAlertCount > 99 ? '99+' : totalAlertCount}
           </span>
         )}

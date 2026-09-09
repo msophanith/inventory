@@ -61,11 +61,12 @@ export default function ProductTable({
   });
 
   const renderTableContent = () => {
+    const colCount = table.getVisibleLeafColumns().length || 6;
     if (loading) {
       return (
         <tr>
           <td
-            colSpan={5}
+            colSpan={colCount}
             className='p-10 text-center text-slate-400 font-medium'
           >
             {t('products.loadingProducts')}
@@ -78,7 +79,7 @@ export default function ProductTable({
       return (
         <tr>
           <td
-            colSpan={5}
+            colSpan={colCount}
             className='p-12 text-center text-slate-500 font-medium'
           >
             {t('products.noProductsFound')}
@@ -132,7 +133,6 @@ export default function ProductTable({
               )}
             </tr>
           </thead>
-
           <tbody className='divide-y divide-slate-100'>
             {renderTableContent()}
           </tbody>

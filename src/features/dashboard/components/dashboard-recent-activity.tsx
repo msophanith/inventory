@@ -1,124 +1,39 @@
-import {
-  ArrowDownCircle,
-  ArrowRightCircle,
-  ArrowUpCircle,
-  Activity,
-  RotateCcw,
-} from 'lucide-react';
+import { useState, useMemo } from 'react';
+import { Activity, ArrowRight } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useLanguage } from '../../../i18n/language-context';
 import type { Movement } from '../../../services/movement';
-import { formatDateTime } from '../../../utils/date';
-import { formatCurrencyKhr, formatCurrencyUsd } from '../../../utils/currency';
+import { RecentActivityRow } from './recent-activity-row';
 
 interface Props {
   readonly movements?: Movement[];
   readonly isLoading?: boolean;
 }
 
-function getMovementBadge(type: string) {
-  if (type === 'IN') {
-    return {
-      style: 'bg-emerald-100 text-emerald-700',
-      Icon: ArrowDownCircle,
-    };
-  }
-  if (type === 'OUT') {
-    return {
-      style: 'bg-blue-100 text-blue-700',
-      Icon: ArrowUpCircle,
-    };
-  }
-  return {
-    style: 'bg-amber-100 text-amber-800',
-    Icon: RotateCcw,
-  };
-}
+type FilterType = 'ALL' | 'OUT' | 'IN' | 'ADJUSTMENT';
 
 export function DashboardRecentActivity({
   movements = [],
   isLoading = false,
 }: Props) {
   const { t } = useLanguage();
-  const recentMovements = movements.slice(0, 6);
+  const [filter, setFilter] = useState<FilterType>('ALL');
 
-  let content;
-  if (isLoading) {
-    content = (
-      <div className='space-y-3'>
-        {[...Array(4)].map((_, i) => (
-          <div
-            key={i}
-            className='h-12 animate-pulse rounded-2xl bg-slate-100'
-          />
-        ))}
-      </div>
-    );
-  } else if (recentMovements.length === 0) {
-    content = (
-      <p className='p-6 text-center text-xs text-slate-400 font-semibold'>
-        {t('reports.noSalesDataYet')}
-      </p>
-    );
-  } else {
-    content = (
-      <div className='divide-y divide-slate-100'>
-        {recentMovements.map((m) => {
-          const totalPrice =
-            (m.quantity || 0) * (m.unitPrice || m.product?.sellPrice || 0);
-          const { style, Icon } = getMovementBadge(m.type);
-
-          return (
-            <div
-              key={m.id}
-              className='flex items-center justify-between py-3 hover:bg-slate-50/60 px-2 rounded-2xl transition'
-            >
-              <div className='flex items-center gap-3'>
-                <div
-                  className={`flex h-9 w-9 items-center justify-center rounded-xl font-bold ${style}`}
-                >
-                  <Icon size={16} />
-                </div>
-                <div>
-                  <div className='flex items-center gap-2'>
-                    <span className='font-bold text-xs text-slate-900'>
-                      {m.product?.name || t('reports.stockMovement')}
-                    </span>
-                    <span className='text-[10px] font-extrabold px-2 py-0.5 rounded-full bg-slate-100 text-slate-600 uppercase'>
-                      {m.type === 'IN' ? t('movement.in') : m.type === 'OUT' ? t('movement.out') : t('movement.adjustment')} ({m.quantity})
-                    </span>
-                  </div>
-                  <p className='text-[10px] font-mono text-slate-400 mt-0.5'>
-                    {formatDateTime(m.createdAt, 'dd MMM, HH:mm')} •{' '}
-                    {m.reference || t('reports.posTerminal')}
-                  </p>
-                </div>
-              </div>
-
-              <div className='text-right'>
-                <span className='block text-xs font-black text-slate-900'>
-                  {formatCurrencyUsd(totalPrice)}
-                </span>
-                <span className='block text-[10px] font-bold text-indigo-600'>
-                  {formatCurrencyKhr(totalPrice)}
-                </span>
-              </div>
-            </div>
-          );
-        })}
-      </div>
-    );
-  }
+  const filteredMovements = useMemo(() => {
+    if (filter === 'ALL') return movements.slice(0, 7);
+    return movements.filter((m) => m.type === filter).slice(0, 7);
+  }, [movements, filter]);
 
   return (
-    <div className='rounded-3xl border border-slate-200/80 bg-white p-5 sm:p-6 shadow-sm space-y-4'>
-      <div className='flex items-center justify-between border-b border-slate-100 pb-3.5'>
-        <div className='flex items-center gap-2.5'>
-          <div className='flex h-10 w-10 items-center justify-center rounded-2xl bg-indigo-50 text-indigo-600 shadow-2xs'>
+    <div className='rounded-3xl border border-slate-200/80 bg-white p-5 sm:p-6 shadow-xs space-y-4 transition hover:shadow-md'>
+      {/* Header & Filter Row */}
+      <div className='flex flex-wrap items-center justify-between gap-3 border-b border-slate-100 pb-4'>
+        <div className='flex items-center gap-3'>
+          <div className='flex h-10 w-10 items-center justify-center rounded-2xl bg-indigo-50 text-indigo-600 border border-indigo-100 shadow-2xs'>
             <Activity size={20} />
           </div>
           <div>
-            <h3 className='text-base font-extrabold text-slate-900'>
+            <h3 className='text-sm sm:text-base font-extrabold text-slate-900'>
               {t('reports.recentActivity')}
             </h3>
             <p className='text-xs text-slate-500 font-medium'>
@@ -126,16 +41,63 @@ export function DashboardRecentActivity({
             </p>
           </div>
         </div>
-        <Link
-          to='/reports'
-          className='flex items-center gap-1 rounded-xl bg-slate-50 px-3 py-1.5 text-xs font-extrabold text-slate-700 hover:bg-indigo-50 hover:text-indigo-600 transition cursor-pointer'
-        >
-          <span>{t('common.viewDetails')}</span>
-          <ArrowRightCircle size={14} />
-        </Link>
+
+        {/* Filter Pills & View All */}
+        <div className='flex items-center gap-2'>
+          <div className='flex items-center gap-1 rounded-xl bg-slate-100 p-1 border border-slate-200/60'>
+            {(['ALL', 'OUT', 'IN', 'RETURN'] as FilterType[]).map((type) => (
+              <button
+                key={type}
+                type='button'
+                onClick={() => setFilter(type)}
+                className={`rounded-lg px-2.5 py-1 text-xs font-black transition-all cursor-pointer ${
+                  filter === type
+                    ? 'bg-white text-indigo-600 shadow-2xs'
+                    : 'text-slate-500 hover:text-slate-800'
+                }`}
+              >
+                {type === 'ALL'
+                  ? t('common.all')
+                  : type === 'OUT'
+                    ? t('movement.out')
+                    : type === 'IN'
+                      ? t('movement.in')
+                      : t('movement.return')}
+              </button>
+            ))}
+          </div>
+
+          <Link
+            to='/movement'
+            className='flex items-center gap-1 rounded-xl bg-slate-50 px-3 py-1.5 text-xs font-black text-slate-700 hover:bg-indigo-50 hover:text-indigo-600 transition cursor-pointer border border-slate-200/60'
+          >
+            <span>{t('common.viewDetails')}</span>
+            <ArrowRight size={13} />
+          </Link>
+        </div>
       </div>
 
-      {content}
+      {/* Content */}
+      {isLoading ? (
+        <div className='space-y-3'>
+          {[...Array(4)].map((_, i) => (
+            <div
+              key={i}
+              className='h-12 animate-pulse rounded-2xl bg-slate-100'
+            />
+          ))}
+        </div>
+      ) : filteredMovements.length === 0 ? (
+        <p className='py-12 text-center text-xs text-slate-400 font-semibold'>
+          {t('reports.noSalesDataYet')}
+        </p>
+      ) : (
+        <div className='divide-y divide-slate-100'>
+          {filteredMovements.map((m) => (
+            <RecentActivityRow key={m.id} movement={m} />
+          ))}
+        </div>
+      )}
     </div>
   );
 }

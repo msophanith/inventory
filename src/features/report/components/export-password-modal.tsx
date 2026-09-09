@@ -1,11 +1,17 @@
 import { useState } from 'react';
+import { createPortal } from 'react-dom';
 import { Eye, EyeOff, Lock, ShieldCheck, X } from 'lucide-react';
 
 interface Props {
   readonly isOpen: boolean;
   readonly onClose: () => void;
   readonly onExport: (password?: string) => void;
-  readonly exportType: 'EXCEL' | 'MONTH_CSV' | 'TODAY_CSV' | 'PRODUCT_IN_EXCEL' | 'NEW_PRODUCT_EXCEL';
+  readonly exportType:
+    | 'EXCEL'
+    | 'MONTH_CSV'
+    | 'TODAY_CSV'
+    | 'PRODUCT_IN_EXCEL'
+    | 'NEW_PRODUCT_EXCEL';
 }
 
 export function ExportPasswordModal({
@@ -39,9 +45,9 @@ export function ExportPasswordModal({
     onClose();
   };
 
-  return (
-    <div className='fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-xs p-4 animate-in fade-in duration-200'>
-      <div className='relative w-full max-w-md rounded-3xl border border-slate-200 bg-white p-6 shadow-2xl transition-all animate-in zoom-in-95 duration-200'>
+  return createPortal(
+    <div className='fixed inset-0 z-9999 flex h-dvh w-screen min-h-screen items-center justify-center bg-slate-900/60 backdrop-blur-md p-4 animate-in fade-in duration-200'>
+      <div className='relative w-full max-w-md rounded-3xl border border-slate-200 bg-white p-6 shadow-2xl transition-all animate-in zoom-in-95 duration-200 my-auto'>
         {/* Close Button */}
         <button
           type='button'
@@ -102,22 +108,23 @@ export function ExportPasswordModal({
           <button
             type='button'
             onClick={handleExportWithoutPassword}
-            className='w-full sm:w-auto rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-xs font-bold text-slate-700 shadow-xs hover:bg-slate-50 transition cursor-pointer active:scale-95'
+            className='w-full sm:w-auto rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-xs font-bold text-slate-700 shadow-xs hover:bg-slate-50 transition cursor-pointer active:scale-95 whitespace-nowrap text-center'
           >
             Download Without Password
           </button>
           <button
             type='button'
             onClick={handleExportWithPassword}
-            className='w-full sm:w-auto flex items-center justify-center gap-1.5 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 px-5 py-2.5 text-xs font-extrabold text-white shadow-md shadow-emerald-600/20 hover:from-emerald-500 hover:to-teal-500 transition cursor-pointer active:scale-95'
+            className='w-full sm:w-auto sm:min-w-46.25 flex items-center justify-center gap-1.5 rounded-xl bg-linear-to-r from-emerald-600 to-teal-600 px-5 py-2.5 text-xs font-extrabold text-white shadow-md shadow-emerald-600/20 hover:from-emerald-500 hover:to-teal-500 transition cursor-pointer active:scale-95 whitespace-nowrap text-center'
           >
-            <ShieldCheck size={16} />
+            <ShieldCheck size={16} className='shrink-0' />
             <span>
               {password.trim() ? 'Export Protected ZIP' : 'Download File'}
             </span>
           </button>
         </div>
       </div>
-    </div>
+    </div>,
+    document.body,
   );
 }

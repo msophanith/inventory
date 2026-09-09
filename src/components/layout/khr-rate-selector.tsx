@@ -41,11 +41,11 @@ export function KhrRateSelector() {
         type='button'
         onClick={() => setIsOpen((prev) => !prev)}
         title='Adjust KHR Exchange Rate'
-        className='flex items-center gap-1 sm:gap-1.5 rounded-full border border-indigo-200/80 bg-indigo-50/90 px-2 sm:px-3 py-1 sm:py-1.5 text-[11px] sm:text-xs font-black text-indigo-800 hover:bg-indigo-100/90 transition cursor-pointer active:scale-95 shadow-2xs'
+        className='group flex items-center gap-1.5 rounded-full border border-slate-200/80 bg-slate-50/80 hover:bg-white hover:border-indigo-200 px-2.5 sm:px-3 py-1 text-xs font-bold text-slate-700 hover:text-indigo-600 transition-all cursor-pointer active:scale-95 shadow-2xs'
       >
-        <Banknote size={13} className='text-indigo-600 shrink-0' />
-        <span className='whitespace-nowrap'>$1 = ៛{new Intl.NumberFormat('en-US').format(khrRate)}</span>
-        <Edit3 size={10} className='text-indigo-400 ml-0.5 shrink-0 hidden xs:inline-block' />
+        <Banknote size={13} className='text-slate-400 group-hover:text-indigo-600 transition-colors shrink-0' />
+        <span className='whitespace-nowrap font-mono text-[11px] sm:text-xs'>$1 = ៛{new Intl.NumberFormat('en-US').format(khrRate)}</span>
+        <Edit3 size={10} className='text-slate-400 group-hover:text-indigo-500 transition-colors ml-0.5 shrink-0 hidden xs:inline-block' />
       </button>
 
       {isOpen && (

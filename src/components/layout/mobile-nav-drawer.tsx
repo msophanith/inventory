@@ -3,6 +3,7 @@ import { useAuth } from '../../features/auth/use-auth';
 import Logo from './logo';
 import type { MenuItem } from './mobile-nav-items';
 import { MobileNavGrid } from './mobile-nav-grid';
+import { useLanguage } from '../../i18n/language-context';
 
 interface Props {
   readonly isOpen: boolean;
@@ -18,6 +19,7 @@ export function MobileNavDrawer({
   onOpenShortcuts,
 }: Props) {
   const { user, signOut, isAdmin, role } = useAuth();
+  const { t } = useLanguage();
 
   return (
     <>
@@ -114,6 +116,14 @@ export function MobileNavDrawer({
               <LogOut size={13} />
               <span>Sign Out</span>
             </button>
+          </div>
+
+          <div className='pt-1 text-center text-[11px] text-slate-400 font-medium space-y-0.5'>
+            <p>© {new Date().getFullYear()} {t('common.appName')} · {t('common.copyright')}</p>
+            <p className='text-[10px] text-slate-400'>
+              {t('common.developedBy')}{' '}
+              <span className='font-bold text-slate-600'>Sophanith Mey</span>
+            </p>
           </div>
         </div>
       </div>

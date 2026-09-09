@@ -1,5 +1,5 @@
 import { PageMeta } from '../components/seo/page-meta';
-import ProductInfoSkeleton from '../features/product/components/product-skeleton';
+import { DashboardSkeleton } from '../features/dashboard/components/dashboard-skeleton';
 import { useMovement } from '../features/movement/hooks/use-movement';
 import { useProduct } from '../features/product/hooks/use-product';
 import { PageContainer } from '../components/layout/page-container';
@@ -11,7 +11,7 @@ import { DashboardRecentActivity } from '../features/dashboard/components/dashbo
 import { DashboardTopSellers } from '../features/dashboard/components/dashboard-top-sellers';
 import { DashboardLowStockFeed } from '../features/dashboard/components/dashboard-low-stock-feed';
 
-const DashboardPage = () => {
+export function DashboardPage() {
   const { productSummary, productSummaryLoading } = useProduct(true);
   const {
     summary,
@@ -20,16 +20,17 @@ const DashboardPage = () => {
   } = useMovement();
 
   return (
-    <PageContainer className='space-y-6 sm:space-y-8 pb-24 lg:pb-6'>
+    <PageContainer className='space-y-6 sm:space-y-8 pb-24 lg:pb-8'>
       <PageMeta
         title='Dashboard'
         description='Overview of inventory KPIs, sales analytics, top sellers, and stock alerts.'
       />
+
       {/* 1. Header Banner with Greeting & Quick Launchers */}
       <DashboardHeader />
 
-      {productSummaryLoading ? (
-        <ProductInfoSkeleton />
+      {productSummaryLoading || isMovementLoading ? (
+        <DashboardSkeleton />
       ) : (
         <>
           {/* 2. Executive KPI Cards with Dual Currency */}
@@ -41,7 +42,7 @@ const DashboardPage = () => {
             todaySale={summary}
           />
 
-          {/* 3. Stock Distribution + Revenue Trend Line Chart (2-col grid) */}
+          {/* 3. Stock Distribution + Revenue Trend Line Chart */}
           <DashboardAnalyticsCharts
             totalItems={productSummary?.totalItems || 0}
             lowStock={productSummary?.lowStockItems || 0}
@@ -49,8 +50,12 @@ const DashboardPage = () => {
             movements={movements}
             isLoading={isMovementLoading}
           />
-
-          {/* 4. Top Sellers + Low-Stock Feed (2-col grid) */}
+          {/* 4. Live Activity Feed with Filter Pills */}
+          <DashboardRecentActivity
+            movements={movements}
+            isLoading={isMovementLoading}
+          />
+          {/* 5. Top Sellers + Restock Feed (2-col grid) */}
           <div className='grid grid-cols-1 gap-6 lg:grid-cols-2'>
             <DashboardTopSellers
               movements={movements}
@@ -58,16 +63,10 @@ const DashboardPage = () => {
             />
             <DashboardLowStockFeed />
           </div>
-
-          {/* 5. Live Activity Feed & Sales vs Margin Performance Chart */}
-          <DashboardRecentActivity
-            movements={movements}
-            isLoading={isMovementLoading}
-          />
         </>
       )}
     </PageContainer>
   );
-};
+}
 
-export { DashboardPage };
+export default DashboardPage;
