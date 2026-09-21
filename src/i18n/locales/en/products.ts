@@ -24,6 +24,7 @@ export const productsEn = {
   deleteProduct: 'Delete Product',
   thisActionCannotBeUndone: 'This action cannot be undone.',
   areYouSureYouWantToDelete: 'Are you sure you want to delete',
+  typeToConfirm: 'Please type the product name to confirm:',
   thisWillRemove: 'This will remove all associated data including stock history and transactions.',
   shelf: 'Shelf',
   unit: 'Unit',

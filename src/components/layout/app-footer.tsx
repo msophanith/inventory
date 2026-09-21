@@ -28,7 +28,7 @@ export function AppFooter() {
           </span>
           <span className='text-slate-300'>·</span>
           <span className='font-mono text-[11px] text-slate-400 bg-slate-100 px-1.5 py-0.5 rounded'>
-            v1.0.2
+            v1.0.3
           </span>
         </div>
       </div>
