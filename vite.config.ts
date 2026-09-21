@@ -49,6 +49,9 @@ export default defineConfig({
       },
     }),
   ],
+  optimizeDeps: {
+    exclude: ['@preflower/barcode-detector-polyfill']
+  },
   server: {
     port: 3001,
   },
