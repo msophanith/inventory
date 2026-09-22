@@ -3,6 +3,7 @@ import { useQueryClient } from '@tanstack/react-query';
 import { useDevToolsDetector } from './use-devtools-detector';
 import { DevToolsBlockedView } from './devtools-blocked-view';
 import { setNetworkBlocked } from './network-guard';
+import { isMobileOrTablet } from './device-check';
 
 interface Props {
   readonly children: ReactNode;
@@ -13,7 +14,7 @@ export function DevToolsGuard({ children }: Props) {
   const queryClient = useQueryClient();
 
   useEffect(() => {
-    if (isOpen) {
+    if (isOpen && !isMobileOrTablet()) {
       setNetworkBlocked(true);
       queryClient.cancelQueries();
     } else {
@@ -21,7 +22,7 @@ export function DevToolsGuard({ children }: Props) {
     }
   }, [isOpen, queryClient]);
 
-  if (isOpen) {
+  if (isOpen && !isMobileOrTablet()) {
     return (
       <DevToolsBlockedView
         onBypass={() => {

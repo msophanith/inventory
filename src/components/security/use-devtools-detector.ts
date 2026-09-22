@@ -1,11 +1,13 @@
 import { useEffect, useState } from 'react';
 import { setNetworkBlocked } from './network-guard';
+import { isMobileOrTablet } from './device-check';
 
 const WIDTH_THRESHOLD = 160;
 const HEIGHT_THRESHOLD = 220;
 
 export const isDevBypassed = (): boolean => {
   if (typeof window === 'undefined') return false;
+  if (isMobileOrTablet()) return true;
   return (
     !import.meta.env.PROD && localStorage.getItem('allow_dev_mode') === 'true'
   );
@@ -13,7 +15,7 @@ export const isDevBypassed = (): boolean => {
 
 export const checkDevToolsInitial = (): boolean => {
   if (typeof window === 'undefined') return false;
-  if (isDevBypassed()) return false;
+  if (isMobileOrTablet() || isDevBypassed()) return false;
   const widthDiff = window.outerWidth - window.innerWidth > WIDTH_THRESHOLD;
   const heightDiff = window.outerHeight - window.innerHeight > HEIGHT_THRESHOLD;
   return widthDiff || heightDiff;

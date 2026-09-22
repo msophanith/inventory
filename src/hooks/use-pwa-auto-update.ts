@@ -36,7 +36,10 @@ export function usePwaAutoUpdate() {
       const intervalId = setInterval(checkForUpdate, 30 * 60 * 1000);
 
       return () => {
-        document.removeEventListener('visibilitychange', handleVisibilityChange);
+        document.removeEventListener(
+          'visibilitychange',
+          handleVisibilityChange,
+        );
         window.removeEventListener('focus', checkForUpdate);
         clearInterval(intervalId);
       };
@@ -58,7 +61,10 @@ export function usePwaAutoUpdate() {
     };
 
     if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.addEventListener('controllerchange', handleControllerChange);
+      navigator.serviceWorker.addEventListener(
+        'controllerchange',
+        handleControllerChange,
+      );
     }
 
     if (needRefresh) {
@@ -67,7 +73,10 @@ export function usePwaAutoUpdate() {
 
     return () => {
       if ('serviceWorker' in navigator) {
-        navigator.serviceWorker.removeEventListener('controllerchange', handleControllerChange);
+        navigator.serviceWorker.removeEventListener(
+          'controllerchange',
+          handleControllerChange,
+        );
       }
     };
   }, [needRefresh, updateServiceWorker]);
