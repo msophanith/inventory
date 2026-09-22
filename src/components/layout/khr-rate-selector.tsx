@@ -44,8 +44,10 @@ export function KhrRateSelector() {
         className='group flex items-center gap-1.5 rounded-full border border-slate-200/80 bg-slate-50/80 hover:bg-white hover:border-indigo-200 px-2.5 sm:px-3 py-1 text-xs font-bold text-slate-700 hover:text-indigo-600 transition-all cursor-pointer active:scale-95 shadow-2xs'
       >
         <Banknote size={13} className='text-slate-400 group-hover:text-indigo-600 transition-colors shrink-0' />
-        <span className='whitespace-nowrap font-mono text-[11px] sm:text-xs'>$1 = ៛{new Intl.NumberFormat('en-US').format(khrRate)}</span>
-        <Edit3 size={10} className='text-slate-400 group-hover:text-indigo-500 transition-colors ml-0.5 shrink-0 hidden xs:inline-block' />
+        <span className='whitespace-nowrap font-mono text-[11px] sm:text-xs'>
+          <span className='hidden sm:inline'>$1 = </span>៛{new Intl.NumberFormat('en-US').format(khrRate)}
+        </span>
+        <Edit3 size={10} className='text-slate-400 group-hover:text-indigo-500 transition-colors ml-0.5 shrink-0 hidden sm:inline-block' />
       </button>
 
       {isOpen && (
