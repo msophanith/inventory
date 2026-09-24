@@ -18,7 +18,7 @@ export function LoginFooter() {
         <Heart size={12} className='text-rose-500 fill-rose-500 inline-block' />
         <span className='text-slate-300'>·</span>
         <span className='font-mono text-[10px] text-slate-400 bg-slate-100 px-1.5 py-0.5 rounded border border-slate-200/60'>
-          v1.0.2
+          v1.0.3
         </span>
       </p>
     </div>

@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useLanguage } from '../../../i18n/language-context';
-import { Tag, X, Sparkles } from 'lucide-react';
+import { Tag, X, BoxIcon } from 'lucide-react';
 import { formatCurrencyKhr, formatCurrencyUsd } from '../../../utils/currency';
 
 interface Props {
@@ -66,7 +66,7 @@ export function PosDiscountModal({
         {/* Promo Codes */}
         <div className='pt-2'>
           <div className='flex items-center gap-1.5 text-xs font-bold text-slate-400 uppercase tracking-wider mb-2'>
-            <Sparkles size={14} className='text-amber-500' />
+            <BoxIcon size={14} className='text-amber-500' />
             <span>{t('pos.featuredPromos')}</span>
           </div>
           <div className='grid grid-cols-3 gap-2'>

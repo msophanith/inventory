@@ -1,5 +1,5 @@
 import { useNavigate } from 'react-router-dom';
-import { Camera, Calendar, Plus, ShoppingCart, Sparkles } from 'lucide-react';
+import { Camera, Calendar, Plus, ShoppingCart, HandGrab } from 'lucide-react';
 import { useAuth } from '../../auth/use-auth';
 import { formatDate } from '../../../utils/date';
 import { useLanguage } from '../../../i18n/language-context';
@@ -20,7 +20,7 @@ export function DashboardHeader() {
   const todayDateStr = formatDate(new Date(), 'EEEE, dd MMM yyyy');
 
   return (
-    <div className='relative overflow-hidden rounded-3xl border border-indigo-500/20 bg-gradient-to-r from-slate-900 via-indigo-950 to-slate-900 p-5 sm:p-6 text-white shadow-xl'>
+    <div className='relative overflow-hidden rounded-3xl border border-indigo-500/20 bg-linear-to-r from-slate-900 via-indigo-950 to-slate-900 p-5 sm:p-6 text-white shadow-xl'>
       {/* Decorative ambient background glows */}
       <div className='pointer-events-none absolute -right-16 -top-16 h-56 w-56 rounded-full bg-indigo-500/10 blur-3xl' />
       <div className='pointer-events-none absolute -left-16 -bottom-16 h-48 w-48 rounded-full bg-emerald-500/10 blur-3xl' />
@@ -29,7 +29,7 @@ export function DashboardHeader() {
         {/* Title & User Greeting */}
         <div className='flex items-center gap-4'>
           <div className='flex h-13 w-13 shrink-0 items-center justify-center rounded-2xl border border-indigo-400/30 bg-indigo-500/20 text-indigo-300 shadow-inner backdrop-blur-md'>
-            <Sparkles size={24} className='animate-pulse' />
+            <HandGrab size={24} className='animate-pulse' />
           </div>
 
           <div>

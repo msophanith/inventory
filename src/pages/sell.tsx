@@ -1,7 +1,10 @@
 import { useMemo, useState } from 'react';
 import { PageMeta } from '../components/seo/page-meta';
 import { useProduct } from '../features/product/hooks/use-product';
-import { usePosStore, usePosCartTotals } from '../features/sell/store/use-pos-store';
+import {
+  usePosStore,
+  usePosCartTotals,
+} from '../features/sell/store/use-pos-store';
 import { useCheckout } from '../features/sell/hooks/use-checkout';
 import { useMovement } from '../features/movement/hooks/use-movement';
 import { useHardwareScanner } from '../features/sell/hooks/use-hardware-scanner';
@@ -16,9 +19,8 @@ import { PosHeaderBanner } from '../features/sell/components/pos-header-banner';
 import { PosModals } from '../features/sell/components/pos-modals';
 import { PageContainer } from '../components/layout/page-container';
 import { useSellPageState } from './hooks/use-sell-page-state';
-import type { PaymentMethod } from '../features/sell/types/sell.types';
 
-const SellPage = () => {
+export function SellPage() {
   const [search, setSearch] = useState('');
   const [category, setCategory] = useState('ALL');
 
@@ -29,17 +31,24 @@ const SellPage = () => {
     limit: 100,
   });
   const products = useMemo(() => response?.data || [], [response?.data]);
-
   const { data: movements = [] } = useMovement();
-  
+
   const cart = usePosStore();
-  const { subtotal, tax, totalAmount: finalTotal, itemCount } = usePosCartTotals();
+  const {
+    subtotal,
+    tax,
+    totalAmount: finalTotal,
+    itemCount,
+  } = usePosCartTotals();
   const checkout = useCheckout();
 
-  const {
-    handleStockExceeded,
-    handleBarcodeScanned,
-  } = useSellPageState(products);
+  const { handleStockExceeded, handleBarcodeScanned, createPaymentHandler } =
+    useSellPageState(products);
+  const handleConfirmPayment = createPaymentHandler(checkout, {
+    subtotal,
+    tax,
+    finalTotal,
+  });
 
   useHardwareScanner({
     enabled:
@@ -51,38 +60,18 @@ const SellPage = () => {
     onScan: handleBarcodeScanned,
   });
 
-  const handleConfirmPayment = async (params: {
-    paymentMethod: PaymentMethod;
-    amountPaid: number;
-    customerNote?: string;
-  }) => {
-    await checkout.processCheckout({
-      items: cart.items,
-      subtotal: subtotal,
-      tax: tax,
-      discount: cart.discount.amount,
-      total: finalTotal,
-      amountPaid: params.amountPaid,
-      paymentMethod: params.paymentMethod,
-      customerNote: params.customerNote,
-    });
-    cart.clearCart();
-    cart.setIsMobileCartOpen(false);
-  };
-
   return (
-    <PageContainer className='space-y-5 pb-24 lg:pb-0'>
+    <PageContainer className='space-y-3.5 sm:space-y-4 pb-28 lg:pb-6'>
       <PageMeta
         title='POS — Sell'
         description='Point-of-sale terminal: add items to cart, apply discounts, and process payments.'
       />
 
       <PosHeaderBanner
-        onOpenScanModal={() => cart.setIsCameraScanOpen(true)}
         onOpenReceiptHistory={() => cart.setIsOrderHistoryOpen(true)}
       />
 
-      <div className='flex flex-col gap-6 lg:flex-row relative'>
+      <div className='flex flex-col gap-4 lg:flex-row relative'>
         <PosProductGrid
           products={products}
           cartItems={cart.items}
@@ -111,9 +100,7 @@ const SellPage = () => {
           onUpdatePrice={cart.updateUnitPrice}
           onUpdateUnit={cart.updateUnit}
           onRemoveItem={cart.removeItem}
-          onClearCart={() => {
-            cart.clearCart();
-          }}
+          onClearCart={cart.clearCart}
           onCheckout={() => checkout.setIsCheckoutOpen(true)}
           onStockExceeded={handleStockExceeded}
         />
@@ -123,7 +110,6 @@ const SellPage = () => {
         itemCount={itemCount}
         totalAmount={finalTotal}
         onOpenCartDrawer={() => cart.setIsMobileCartOpen(true)}
-        onOpenScanModal={() => cart.setIsCameraScanOpen(true)}
       />
 
       <PosDiscountModal
@@ -158,15 +144,13 @@ const SellPage = () => {
         onUpdatePrice={cart.updateUnitPrice}
         onUpdateUnit={cart.updateUnit}
         onRemoveItem={cart.removeItem}
-        onClearCart={() => {
-          cart.clearCart();
-        }}
+        onClearCart={cart.clearCart}
         onCheckout={() => checkout.setIsCheckoutOpen(true)}
         onStockExceeded={handleStockExceeded}
         onOpenReceipt={(receipt) => checkout.setReceiptData(receipt)}
       />
     </PageContainer>
   );
-};
+}
 
-export { SellPage };
+export default SellPage;

@@ -1,76 +1,56 @@
-import { Camera, ChevronRight, ShoppingCart } from 'lucide-react';
+import { ChevronRight, ShoppingCart } from 'lucide-react';
 import { useLanguage } from '../../../i18n/language-context';
-import { formatCurrencyUsd } from '../../../utils/currency';
+import { formatCurrencyKhr, formatCurrencyUsd } from '../../../utils/currency';
 
 interface Props {
   readonly itemCount: number;
   readonly totalAmount: number;
   readonly onOpenCartDrawer: () => void;
-  readonly onOpenScanModal: () => void;
+  readonly onOpenScanModal?: () => void;
 }
 
 export function PosMobileCartBar({
   itemCount,
   totalAmount,
   onOpenCartDrawer,
-  onOpenScanModal,
 }: Props) {
   const { t } = useLanguage();
+
+  if (itemCount === 0) return null;
+
   return (
-    <div className='lg:hidden fixed bottom-16 sm:bottom-6 left-3 right-3 z-40 flex items-center gap-2 max-w-lg mx-auto'>
-      {/* Quick Camera Barcode Scanner FAB */}
+    <div className='lg:hidden fixed bottom-20 left-3 right-3 z-40 max-w-lg mx-auto animate-in slide-in-from-bottom-3 duration-200'>
       <button
         type='button'
-        onClick={onOpenScanModal}
-        title='Scan Barcode with Camera'
-        className='flex h-14 w-14 items-center justify-center rounded-2xl bg-slate-900 text-white shadow-xl shadow-slate-900/20 active:scale-95 transition cursor-pointer shrink-0 border border-slate-700/50'
+        onClick={onOpenCartDrawer}
+        className='w-full flex items-center justify-between gap-3 rounded-2xl bg-linear-to-r from-slate-900 via-indigo-950 to-slate-900 px-4 py-3 text-white shadow-2xl shadow-slate-900/30 active:scale-98 transition cursor-pointer border border-indigo-500/30'
       >
-        <Camera size={22} />
-      </button>
+        <div className='flex items-center gap-3 min-w-0'>
+          <div className='relative flex h-10 w-10 items-center justify-center rounded-xl bg-indigo-500/20 text-indigo-400 shrink-0 border border-indigo-500/30'>
+            <ShoppingCart size={20} />
+            <span className='absolute -top-1.5 -right-1.5 flex h-5 w-5 items-center justify-center rounded-full bg-emerald-500 text-[10px] font-black text-white shadow-xs'>
+              {itemCount}
+            </span>
+          </div>
 
-      {/* Floating Sticky Cart Bar */}
-      {itemCount > 0 ? (
-        <button
-          type='button'
-          onClick={onOpenCartDrawer}
-          className='flex-1 flex items-center justify-between gap-3 rounded-2xl bg-gradient-to-r from-emerald-600 to-teal-600 px-4 py-3.5 text-white shadow-xl shadow-emerald-600/30 active:scale-98 transition cursor-pointer border border-emerald-400/30'
-        >
-          <div className='flex items-center gap-3 min-w-0'>
-            <div className='relative flex h-9 w-9 items-center justify-center rounded-xl bg-white/20 shrink-0'>
-              <ShoppingCart size={20} />
-              <span className='absolute -top-1.5 -right-1.5 flex h-5 w-5 items-center justify-center rounded-full bg-amber-400 text-[11px] font-extrabold text-slate-950 shadow-xs'>
-                {itemCount}
+          <div className='text-left min-w-0'>
+            <p className='text-[10px] uppercase font-bold text-slate-300 tracking-wider'>
+              {t('pos.cart')} ({itemCount})
+            </p>
+            <p className='text-sm font-black truncate text-white'>
+              {formatCurrencyUsd(totalAmount)}{' '}
+              <span className='text-xs font-bold text-indigo-300'>
+                ({formatCurrencyKhr(totalAmount)})
               </span>
-            </div>
+            </p>
+          </div>
+        </div>
 
-            <div className='text-left min-w-0'>
-              <p className='text-[11px] uppercase tracking-wider text-emerald-100 font-bold'>
-                {t('pos.cart')}
-              </p>
-              <p className='text-base font-black truncate'>
-                {formatCurrencyUsd(totalAmount)}
-              </p>
-            </div>
-          </div>
-
-          <div className='flex items-center gap-1 text-xs font-black uppercase tracking-wider bg-white/20 px-3 py-1.5 rounded-xl shrink-0'>
-            <span>{t('pos.checkout')}</span>
-            <ChevronRight size={16} />
-          </div>
-        </button>
-      ) : (
-        <button
-          type='button'
-          onClick={onOpenCartDrawer}
-          className='flex-1 flex items-center justify-between gap-2 rounded-2xl bg-white/90 backdrop-blur-md px-4 py-3.5 text-slate-700 shadow-lg border border-slate-200 cursor-pointer'
-        >
-          <div className='flex items-center gap-2.5 text-xs font-bold text-slate-500'>
-            <ShoppingCart size={18} className='text-slate-400' />
-            <span>{t('pos.cartEmpty')}</span>
-          </div>
-          <span className='text-xs font-extrabold text-indigo-600'>{t('pos.openCart')}</span>
-        </button>
-      )}
+        <div className='flex items-center gap-1 text-xs font-black bg-emerald-600 hover:bg-emerald-500 px-3.5 py-2 rounded-xl shrink-0 shadow-md transition'>
+          <span>{t('pos.checkout')}</span>
+          <ChevronRight size={16} />
+        </div>
+      </button>
     </div>
   );
 }

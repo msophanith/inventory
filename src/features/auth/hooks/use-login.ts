@@ -5,6 +5,8 @@ import { useNavigate } from 'react-router-dom';
 import { useState } from 'react';
 import { useAuth } from '../use-auth';
 
+import { isMobileDevice } from '../../../utils/device';
+
 const loginSchema = yup.object({
   email: yup
     .string()
@@ -35,7 +37,8 @@ const useLogin = () => {
     if (error) {
       setServerError(error);
     } else {
-      navigate('/', { replace: true });
+      const destination = isMobileDevice() ? '/scan' : '/';
+      navigate(destination, { replace: true });
     }
   });
 

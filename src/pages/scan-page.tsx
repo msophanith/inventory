@@ -1,83 +1,36 @@
-import { useCallback, useState } from 'react';
+import { useState } from 'react';
+import { BarcodeScannerProvider } from 'react-barcode-scanner';
 import { PageMeta } from '../components/seo/page-meta';
-import { useNavigate } from 'react-router-dom';
-import { gooeyToast } from 'goey-toast';
-import { useLanguage } from '../i18n/language-context';
-import { productService } from '../services';
-import { useHardwareScanner } from '../features/sell/hooks/use-hardware-scanner';
-import { playScanSound } from '../features/sell/utils/scan-sound';
-import { PosCameraScannerModal } from '../features/sell/components/pos-camera-scanner-modal';
 import { PageContainer } from '../components/layout/page-container';
+import { useHardwareScanner } from '../features/sell/hooks/use-hardware-scanner';
+import { useScanTerminal } from '../features/scan/hooks/use-scan-terminal';
+import {
+  ScanCameraViewfinder,
+  ScanHeader,
+  ScanHistoryList,
+  ScanManualBar,
+  ScanNotFoundResult,
+  ScanProductResult,
+  ScanSettingsModal,
+} from '../features/scan/components';
 
-import { ScanStatusHeader } from '../features/scan/components/scan-status-header';
-import { ScanViewfinder } from '../features/scan/components/scan-viewfinder';
-import { ScanHistoryFeed, type ScanHistoryItem } from '../features/scan/components/scan-history-feed';
+export function ScanPage() {
+  const [isCameraActive, setIsCameraActive] = useState(true);
+  const [isSettingsOpen, setIsSettingsOpen] = useState(false);
 
-const ScanPage = () => {
-  const { t } = useLanguage();
-  const navigate = useNavigate();
-  const [manualCode, setManualCode] = useState('');
-  const [isCameraOpen, setIsCameraOpen] = useState(false);
-  const [isSearching, setIsSearching] = useState(false);
-  const [history, setHistory] = useState<ScanHistoryItem[]>([]);
+  const {
+    settings,
+    updateSettings,
+    history,
+    clearHistory,
+    result,
+    resetResult,
+    handleScanCode,
+    handleAddToCart,
+    isSearching,
+  } = useScanTerminal();
 
-  const handleScanCode = useCallback(
-    async (rawCode: string) => {
-      const clean = rawCode.trim();
-      if (!clean || isSearching) return;
-
-      setIsSearching(true);
-      gooeyToast.info(t('scan.searchingBarcode', { barcode: clean }));
-
-      try {
-        const product = await productService.getByBarcodeOrSearch(clean);
-        if (product) {
-          playScanSound();
-          gooeyToast.success(t('scan.foundProduct', { name: product.name }));
-
-          setHistory((prev) => [
-            {
-              id: `${Date.now()}`,
-              barcode: clean,
-              productName: product.name,
-              productId: product.id,
-              found: true,
-              timestamp: new Date(),
-            },
-            ...prev.slice(0, 19),
-          ]);
-
-          setTimeout(() => {
-            navigate(`/products/${product.id}`);
-          }, 800);
-        } else {
-          gooeyToast.error(t('scan.barcodeNotFound', { barcode: clean }));
-
-          setHistory((prev) => [
-            {
-              id: `${Date.now()}`,
-              barcode: clean,
-              found: false,
-              timestamp: new Date(),
-            },
-            ...prev.slice(0, 19),
-          ]);
-
-          setTimeout(() => {
-            navigate(`/products/create?barcode=${encodeURIComponent(clean)}`);
-          }, 1500);
-        }
-      } catch (err) {
-        console.error('Scan error:', err);
-        gooeyToast.error(t('scan.errorQuerying'));
-      } finally {
-        setIsSearching(false);
-      }
-    },
-    [navigate, isSearching, t],
-  );
-
-  const isHardwareListening = !isCameraOpen && !isSearching;
+  const isHardwareListening = !isSettingsOpen && !isSearching;
 
   useHardwareScanner({
     enabled: isHardwareListening,
@@ -85,38 +38,68 @@ const ScanPage = () => {
   });
 
   return (
-    <PageContainer className='space-y-5 max-w-3xl mx-auto py-4 pb-24 lg:pb-6'>
-      <PageMeta
-        title='Barcode Scan'
-        description='Scan barcodes via hardware scanner or camera to quickly look up products.'
-      />
+    <BarcodeScannerProvider>
+      <PageContainer className='space-y-4 max-w-xl mx-auto py-3 px-3 sm:px-4 pb-28 lg:pb-8'>
+        <PageMeta
+          title='Barcode Scanner & Lookup'
+          description='Fast mobile barcode scanner and hardware gun lookup terminal.'
+        />
 
-      {/* Header Banner & Live Hardware Scanner Status Badge */}
-      <ScanStatusHeader isListening={isHardwareListening} />
+        {/* Top Header & Live Status */}
+        <ScanHeader
+          isListening={isHardwareListening}
+          onOpenSettings={() => setIsSettingsOpen(true)}
+          autoRedirect={settings.autoRedirect}
+        />
 
-      {/* Embedded Viewfinder & Manual Barcode Input Card */}
-      <ScanViewfinder
-        manualCode={manualCode}
-        onManualCodeChange={setManualCode}
-        onSubmitLookup={handleScanCode}
-        onOpenCamModal={() => setIsCameraOpen(true)}
-        isSearching={isSearching}
-      />
+        {/* Embedded Live Camera Scanner */}
+        <ScanCameraViewfinder
+          onDetected={handleScanCode}
+          isSearching={isSearching}
+          isActive={isCameraActive}
+          onToggleActive={() => setIsCameraActive((prev) => !prev)}
+        />
 
-      {/* Recent Scanned Barcode Audit Feed */}
-      <ScanHistoryFeed
-        history={history}
-        onClearHistory={() => setHistory([])}
-      />
+        {/* Manual Barcode Input Bar */}
+        <ScanManualBar
+          onSearch={handleScanCode}
+          isSearching={isSearching}
+        />
 
-      {/* Phone Camera Scanner Modal */}
-      <PosCameraScannerModal
-        open={isCameraOpen}
-        onClose={() => setIsCameraOpen(false)}
-        onDetectedBarcode={handleScanCode}
-      />
-    </PageContainer>
+        {/* Scanned Product Result Card */}
+        {result.status === 'found' && result.product && (
+          <ScanProductResult
+            product={result.product}
+            onAddToCart={handleAddToCart}
+            onDismiss={resetResult}
+          />
+        )}
+
+        {/* Scanned Barcode Not Found Card */}
+        {result.status === 'not_found' && (
+          <ScanNotFoundResult
+            barcode={result.searchedBarcode}
+            onDismiss={resetResult}
+          />
+        )}
+
+        {/* Audit Session History Feed */}
+        <ScanHistoryList
+          history={history}
+          onClearHistory={clearHistory}
+          onSelectBarcode={handleScanCode}
+        />
+
+        {/* Preferences & Settings Modal */}
+        <ScanSettingsModal
+          open={isSettingsOpen}
+          onClose={() => setIsSettingsOpen(false)}
+          settings={settings}
+          onUpdateSettings={updateSettings}
+        />
+      </PageContainer>
+    </BarcodeScannerProvider>
   );
-};
+}
 
-export { ScanPage };
+export default ScanPage;

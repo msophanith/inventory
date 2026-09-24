@@ -5,12 +5,12 @@ import { playScanSound } from '../../features/sell/utils/scan-sound';
 import type { Product } from '../../services/product';
 import { usePosStore } from '../../features/sell/store/use-pos-store';
 import { useLanguage } from '../../i18n/language-context';
+import type { PaymentMethod } from '../../features/sell/types/sell.types';
 
 export function useSellPageState(products: Product[]) {
   const addItem = usePosStore((state) => state.addItem);
   const { t } = useLanguage();
 
-  // O(1) indexed lookup map for fast barcode/ID scanning
   const productMap = useMemo(() => {
     const map = new Map<string, Product>();
     for (const p of products) {
@@ -34,7 +34,6 @@ export function useSellPageState(products: Product[]) {
       if (!clean) return;
 
       let target = productMap.get(clean);
-
       if (!target) {
         target =
           (await productService.getByBarcodeOrSearch(clean)) ?? undefined;
@@ -55,8 +54,36 @@ export function useSellPageState(products: Product[]) {
     [productMap, addItem, t],
   );
 
+  const createPaymentHandler = useCallback(
+    (
+      checkout: { processCheckout: (args: any) => Promise<unknown> },
+      totals: { subtotal: number; tax: number; finalTotal: number },
+    ) =>
+      async (params: {
+        paymentMethod: PaymentMethod;
+        amountPaid: number;
+        customerNote?: string;
+      }) => {
+        const cart = usePosStore.getState();
+        await checkout.processCheckout({
+          items: cart.items,
+          subtotal: totals.subtotal,
+          tax: totals.tax,
+          discount: cart.discount.amount,
+          total: totals.finalTotal,
+          amountPaid: params.amountPaid,
+          paymentMethod: params.paymentMethod,
+          customerNote: params.customerNote,
+        });
+        cart.clearCart();
+        cart.setIsMobileCartOpen(false);
+      },
+    [],
+  );
+
   return {
     handleStockExceeded,
     handleBarcodeScanned,
+    createPaymentHandler,
   };
 }

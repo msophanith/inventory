@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { Sparkles } from 'lucide-react';
+import { MagnetIcon } from 'lucide-react';
 import { type Product } from '../../../../services/product';
 import { productService } from '../../../../services';
 
@@ -92,7 +92,7 @@ export function ProductNameInput({
           }`}
         />
         {isOpen && (
-          <Sparkles
+          <MagnetIcon
             size={14}
             className='absolute right-3.5 top-1/2 -translate-y-1/2 text-indigo-500 animate-pulse pointer-events-none'
           />

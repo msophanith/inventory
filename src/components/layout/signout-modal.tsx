@@ -22,7 +22,7 @@ export function SignoutModal({
 
   return (
     <div
-      className='fixed inset-0 z-[9999] h-screen h-dvh w-screen min-h-screen flex items-end sm:items-center justify-center bg-slate-950/70 p-0 sm:p-4 backdrop-blur-sm animate-in fade-in duration-200'
+      className='fixed inset-0 z-9999 h-screen w-screen min-h-screen flex items-end sm:items-center justify-center bg-slate-950/70 p-0 sm:p-4 backdrop-blur-sm animate-in fade-in duration-200'
       onClick={onClose}
     >
       <div
@@ -35,12 +35,20 @@ export function SignoutModal({
               <LogOut size={22} />
             </div>
             <div>
-              <h3 className='text-lg font-bold text-slate-900'>{t('common.signOut')}</h3>
-              <p className='text-xs text-slate-500 font-medium'>{t('auth.signingOut')}</p>
+              <h3 className='text-lg font-bold text-slate-900'>
+                {t('common.signOut')}
+              </h3>
+              <p className='text-xs text-slate-500 font-medium'>
+                {t('auth.signingOut')}
+              </p>
             </div>
           </div>
 
-          <button type='button' onClick={onClose} className='rounded-xl p-1.5 text-slate-400 hover:bg-slate-100 transition'>
+          <button
+            type='button'
+            onClick={onClose}
+            className='rounded-xl p-1.5 text-slate-400 hover:bg-slate-100 transition'
+          >
             <X size={18} />
           </button>
         </div>
@@ -62,7 +70,7 @@ export function SignoutModal({
             type='button'
             disabled={isLoggingOut}
             onClick={onConfirm}
-            className='flex-1 rounded-xl bg-gradient-to-r from-rose-600 to-red-600 py-2.5 text-xs font-bold text-white shadow-md shadow-rose-500/20 hover:from-rose-700 hover:to-red-700 transition transform active:scale-95 cursor-pointer flex items-center justify-center gap-1.5 disabled:opacity-60'
+            className='flex-1 rounded-xl bg-linear-to-r from-rose-600 to-red-600 py-2.5 text-xs font-bold text-white shadow-md shadow-rose-500/20 hover:from-rose-700 hover:to-red-700 transition transform active:scale-95 cursor-pointer flex items-center justify-center gap-1.5 disabled:opacity-60'
           >
             {isLoggingOut ? (
               <>

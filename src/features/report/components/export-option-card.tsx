@@ -1,5 +1,5 @@
 import type { ReactNode } from 'react';
-import { ArrowRight, Download, Sparkles } from 'lucide-react';
+import { ArrowRight, Download, DownloadCloud } from 'lucide-react';
 import type { ExportType } from './report-export-modals';
 
 export interface ExportOptionItem {
@@ -51,7 +51,7 @@ export function ExportOptionCard({ option, onSelect }: Props) {
             <div className='space-y-1.5'>
               <div className='flex flex-wrap items-center gap-2'>
                 <span className='inline-flex items-center gap-1 rounded-full bg-emerald-600 px-2.5 py-0.5 text-[10px] font-black uppercase tracking-wider text-white shadow-2xs'>
-                  <Sparkles size={11} /> Master Report
+                  <DownloadCloud size={11} /> Master Report
                 </span>
                 <span
                   className={`rounded-lg px-2 py-0.5 font-mono text-[11px] font-extrabold shadow-2xs ${theme.badgeBg} ${theme.badgeText}`}

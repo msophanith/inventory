@@ -3,6 +3,7 @@ import { PageMeta } from '../components/seo/page-meta';
 
 import { useAuth } from '../features/auth/use-auth';
 import { useLogin } from '../features/auth/hooks/use-login';
+import { isMobileDevice } from '../utils/device';
 import { LoginBrand } from '../components/auth/login/login-brand';
 import { LoginAlerts } from '../components/auth/login/login-alerts';
 import { LoginForm } from '../components/auth/login/login-form';
@@ -20,7 +21,10 @@ const LoginPage = () => {
     handleSubmit,
   } = useLogin();
 
-  if (user) return <Navigate to='/' replace />;
+  if (user) {
+    const destination = isMobileDevice() ? '/scan' : '/';
+    return <Navigate to={destination} replace />;
+  }
 
   return (
     <div className='relative flex min-h-screen items-center justify-center overflow-hidden bg-slate-50 px-4 py-12 selection:bg-indigo-600 selection:text-white'>

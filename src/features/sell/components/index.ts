@@ -1,5 +1,7 @@
 export { PosProductCard } from './pos-product-card';
 export { PosProductGrid } from './pos-product-grid';
+export { PosProductBadge } from './pos-product-badge';
+export { PosFilterBar } from './pos-filter-bar';
 export { PosCartItem } from './pos-cart-item';
 export { PosCartPanel } from './pos-cart-panel';
 export { PosCheckoutModal } from './pos-checkout-modal';
@@ -10,4 +12,3 @@ export { PosMobileCartDrawer } from './pos-mobile-cart-drawer';
 export { PosCashPresets } from './pos-cash-presets';
 export { PosOrderHistoryModal } from './pos-order-history-modal';
 export { PosDiscountModal } from './pos-discount-modal';
-
