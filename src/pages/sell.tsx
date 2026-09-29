@@ -1,23 +1,23 @@
 import { useMemo, useState } from 'react';
-import { PageMeta } from '../components/seo/page-meta';
-import { useProduct } from '../features/product/hooks/use-product';
+import { PageMeta } from '@/components/seo/page-meta';
+import { useProduct } from '@/features/product/hooks/use-product';
 import {
   usePosStore,
   usePosCartTotals,
-} from '../features/sell/store/use-pos-store';
-import { useCheckout } from '../features/sell/hooks/use-checkout';
-import { useMovement } from '../features/movement/hooks/use-movement';
-import { useHardwareScanner } from '../features/sell/hooks/use-hardware-scanner';
-import { playScanSound } from '../features/sell/utils/scan-sound';
+} from '@/features/sell/store/use-pos-store';
+import { useCheckout } from '@/features/sell/hooks/use-checkout';
+import { useMovement } from '@/features/movement/hooks/use-movement';
+import { useHardwareScanner } from '@/features/sell/hooks/use-hardware-scanner';
+import { playScanSound } from '@/features/sell/utils/scan-sound';
 import {
   PosCartPanel,
   PosDiscountModal,
   PosMobileCartBar,
   PosProductGrid,
-} from '../features/sell/components';
-import { PosHeaderBanner } from '../features/sell/components/pos-header-banner';
-import { PosModals } from '../features/sell/components/pos-modals';
-import { PageContainer } from '../components/layout/page-container';
+} from '@/features/sell/components';
+import { PosHeaderBanner } from '@/features/sell/components/pos-header-banner';
+import { PosModals } from '@/features/sell/components/pos-modals';
+import { PageContainer } from '@/components/layout/page-container';
 import { useSellPageState } from './hooks/use-sell-page-state';
 
 export function SellPage() {

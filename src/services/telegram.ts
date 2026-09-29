@@ -1,5 +1,5 @@
-import type { ReceiptData } from '../features/sell/types/sell.types';
-import { generatePdfInvoiceBlob } from '../features/sell/utils/pdf-generator';
+import type { ReceiptData } from '@/features/sell/types/sell.types';
+import { generatePdfInvoiceBlob } from '@/features/sell/utils/pdf-generator';
 import type { Movement } from './movement';
 import type { Product } from './product';
 import { fetchTodaySaleSummary } from './movement-queries';

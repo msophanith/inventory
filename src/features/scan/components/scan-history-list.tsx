@@ -1,9 +1,9 @@
 import { ArrowRight, CheckCircle2, Copy, History, PlusCircle, Trash2 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { gooeyToast } from 'goey-toast';
-import { useLanguage } from '../../../i18n/language-context';
-import type { ScanHistoryItem } from '../types';
-import { formatCurrencyKhr, formatCurrencyUsd } from '../../../utils/currency';
+import { useLanguage } from '@/i18n/language-context';
+import type { ScanHistoryItem } from '@/features/scan/types';
+import { formatCurrencyKhr, formatCurrencyUsd } from '@/utils/currency';
 
 interface Props {
   readonly history: ScanHistoryItem[];

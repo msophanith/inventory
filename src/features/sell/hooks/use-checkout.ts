@@ -1,9 +1,9 @@
 import { useState } from 'react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { movementService, telegramService } from '../../../services';
-import type { CartItem, PaymentMethod, ReceiptData } from '../types/sell.types';
-import { useAuth } from '../../auth/use-auth';
-import { usePosStore } from '../store/use-pos-store';
+import { movementService, telegramService } from '@/services';
+import type { CartItem, PaymentMethod, ReceiptData } from '@/features/sell/types/sell.types';
+import { useAuth } from '@/features/auth/use-auth';
+import { usePosStore } from '@/features/sell/store/use-pos-store';
 
 const STORAGE_KEY = 'pos_order_counter';
 

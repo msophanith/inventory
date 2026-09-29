@@ -1,12 +1,12 @@
 import { useState } from 'react';
 import { Grid } from 'lucide-react';
 import { NavLink, useLocation } from 'react-router-dom';
-import { useAuth } from '../../features/auth/use-auth';
+import { useAuth } from '@/features/auth/use-auth';
 import { ShortcutsModal } from './shortcuts-modal';
 import { MobileNavDrawer } from './mobile-nav-drawer';
 import { getBottomBarMenus, getDrawerMenus } from './mobile-nav-items';
 import { useMobileNavScroll } from './use-mobile-nav-scroll';
-import { useLanguage } from '../../i18n/language-context';
+import { useLanguage } from '@/i18n/language-context';
 
 export default function MobileBottomNav() {
   const { isAdmin } = useAuth();

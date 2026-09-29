@@ -5,8 +5,8 @@ import {
   ShoppingBag,
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import type { TodaySaleSummary } from '../../../services/movement';
-import { useLanguage } from '../../../i18n/language-context';
+import type { TodaySaleSummary } from '@/services/movement';
+import { useLanguage } from '@/i18n/language-context';
 import { DashboardKpiCardItem } from './dashboard-kpi-card-item';
 
 interface Props {

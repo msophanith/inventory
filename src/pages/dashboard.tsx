@@ -1,15 +1,15 @@
-import { PageMeta } from '../components/seo/page-meta';
-import { DashboardSkeleton } from '../features/dashboard/components/dashboard-skeleton';
-import { useMovement } from '../features/movement/hooks/use-movement';
-import { useProduct } from '../features/product/hooks/use-product';
-import { PageContainer } from '../components/layout/page-container';
+import { PageMeta } from '@/components/seo/page-meta';
+import { DashboardSkeleton } from '@/features/dashboard/components/dashboard-skeleton';
+import { useMovement } from '@/features/movement/hooks/use-movement';
+import { useProduct } from '@/features/product/hooks/use-product';
+import { PageContainer } from '@/components/layout/page-container';
 
-import { DashboardHeader } from '../features/dashboard/components/dashboard-header';
-import { DashboardKpiCards } from '../features/dashboard/components/dashboard-kpi-cards';
-import { DashboardAnalyticsCharts } from '../features/dashboard/components/dashboard-analytics-charts';
-import { DashboardRecentActivity } from '../features/dashboard/components/dashboard-recent-activity';
-import { DashboardTopSellers } from '../features/dashboard/components/dashboard-top-sellers';
-import { DashboardLowStockFeed } from '../features/dashboard/components/dashboard-low-stock-feed';
+import { DashboardHeader } from '@/features/dashboard/components/dashboard-header';
+import { DashboardKpiCards } from '@/features/dashboard/components/dashboard-kpi-cards';
+import { DashboardAnalyticsCharts } from '@/features/dashboard/components/dashboard-analytics-charts';
+import { DashboardRecentActivity } from '@/features/dashboard/components/dashboard-recent-activity';
+import { DashboardTopSellers } from '@/features/dashboard/components/dashboard-top-sellers';
+import { DashboardLowStockFeed } from '@/features/dashboard/components/dashboard-low-stock-feed';
 
 export function DashboardPage() {
   const { productSummary, productSummaryLoading } = useProduct(true);

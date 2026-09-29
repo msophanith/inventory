@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Minus, Plus, Trash2 } from 'lucide-react';
-import type { CartItem } from '../types/sell.types';
-import { formatCurrencyUsd } from '../../../utils/currency';
+import type { CartItem } from '@/features/sell/types/sell.types';
+import { formatCurrencyUsd } from '@/utils/currency';
 
 interface Props {
   readonly item: CartItem;

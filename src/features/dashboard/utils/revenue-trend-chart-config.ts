@@ -10,7 +10,7 @@ import {
   Filler,
   type ChartOptions,
 } from 'chart.js';
-import { formatCurrencyKhr, formatCurrencyUsd } from '../../../utils/currency';
+import { formatCurrencyKhr, formatCurrencyUsd } from '@/utils/currency';
 
 ChartJS.register(
   CategoryScale,

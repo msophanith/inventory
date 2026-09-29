@@ -1,6 +1,6 @@
 import { Bell, Navigation, Smartphone, Volume2, X } from 'lucide-react';
-import { useLanguage } from '../../../i18n/language-context';
-import type { ScanSettings } from '../types';
+import { useLanguage } from '@/i18n/language-context';
+import type { ScanSettings } from '@/features/scan/types';
 
 interface Props {
   readonly open: boolean;

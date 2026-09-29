@@ -6,8 +6,8 @@ import {
   RotateCcw,
   X,
 } from 'lucide-react';
-import type { MovementType } from '../../../services/movement';
-import type { Product } from '../../../services/product';
+import type { MovementType } from '@/services/movement';
+import type { Product } from '@/services/product';
 
 interface Props {
   readonly type: MovementType;

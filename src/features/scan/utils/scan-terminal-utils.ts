@@ -1,6 +1,6 @@
-import { playScanSound } from '../../sell/utils/scan-sound';
-import type { Product } from '../../../services/product.types';
-import type { ScanHistoryItem, ScanSettings } from '../types';
+import { playScanSound } from '@/features/sell/utils/scan-sound';
+import type { Product } from '@/services/product.types';
+import type { ScanHistoryItem, ScanSettings } from '@/features/scan/types';
 
 export const SETTINGS_KEY = 'pos_scan_settings';
 export const HISTORY_KEY = 'pos_scan_history';

@@ -1,5 +1,5 @@
 import { Loader2, LogOut, X } from 'lucide-react';
-import { useLanguage } from '../../i18n/language-context';
+import { useLanguage } from '@/i18n/language-context';
 
 interface Props {
   readonly show: boolean;

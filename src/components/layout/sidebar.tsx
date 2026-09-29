@@ -5,8 +5,8 @@ import Logo from './logo';
 import { ShortcutsModal } from './shortcuts-modal';
 import { SidebarFooter } from './sidebar-footer';
 import { getSidebarMenus } from './sidebar-menu-items';
-import { useAuth } from '../../features/auth/use-auth';
-import { useLanguage } from '../../i18n/language-context';
+import { useAuth } from '@/features/auth/use-auth';
+import { useLanguage } from '@/i18n/language-context';
 
 export default function Sidebar() {
   const { isAdmin, role } = useAuth();

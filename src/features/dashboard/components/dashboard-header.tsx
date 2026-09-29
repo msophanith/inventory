@@ -1,8 +1,8 @@
 import { useNavigate } from 'react-router-dom';
 import { Camera, Calendar, Plus, ShoppingCart, HandGrab } from 'lucide-react';
-import { useAuth } from '../../auth/use-auth';
-import { formatDate } from '../../../utils/date';
-import { useLanguage } from '../../../i18n/language-context';
+import { useAuth } from '@/features/auth/use-auth';
+import { formatDate } from '@/utils/date';
+import { useLanguage } from '@/i18n/language-context';
 
 export function DashboardHeader() {
   const navigate = useNavigate();

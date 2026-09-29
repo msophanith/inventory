@@ -1,8 +1,8 @@
-import type { ReceiptData } from '../features/sell/types/sell.types';
+import type { ReceiptData } from '@/features/sell/types/sell.types';
 import type { Movement } from './movement';
 import type { Product } from './product';
-import { formatDateTime } from '../utils/date';
-import { formatCurrencyKhr, formatCurrencyUsd } from '../utils/currency';
+import { formatDateTime } from '@/utils/date';
+import { formatCurrencyKhr, formatCurrencyUsd } from '@/utils/currency';
 
 export function escapeHtml(str: string): string {
   return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');

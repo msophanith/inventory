@@ -1,9 +1,9 @@
 import { useMemo } from 'react';
 import { X, Download, ShieldCheck } from 'lucide-react';
-import { useLanguage } from '../../../i18n/language-context';
+import { useLanguage } from '@/i18n/language-context';
 import type { ExportType } from './report-export-modals';
 import { ExportOptionCard } from './export-option-card';
-import { getExportOptions } from '../utils/export-options-config';
+import { getExportOptions } from '@/features/report/utils/export-options-config';
 
 interface Props {
   readonly isOpen: boolean;

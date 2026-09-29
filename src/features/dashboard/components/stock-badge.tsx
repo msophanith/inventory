@@ -1,5 +1,5 @@
-import type { Product } from '../../../services/product';
-import { useLanguage } from '../../../i18n/language-context';
+import type { Product } from '@/services/product';
+import { useLanguage } from '@/i18n/language-context';
 
 interface Props {
   readonly product: Product;

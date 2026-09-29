@@ -1,6 +1,6 @@
 import { Loader2 } from 'lucide-react';
-import type { MovementType } from '../../../services/movement';
-import { formatCurrencyUsd } from '../../../utils/currency';
+import type { MovementType } from '@/services/movement';
+import { formatCurrencyUsd } from '@/utils/currency';
 
 interface Props {
   readonly type: MovementType;

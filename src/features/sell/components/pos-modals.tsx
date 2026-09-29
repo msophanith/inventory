@@ -1,5 +1,5 @@
-import type { Movement } from '../../../services/movement';
-import type { CartItem, PaymentMethod, ReceiptData } from '../types/sell.types';
+import type { Movement } from '@/services/movement';
+import type { CartItem, PaymentMethod, ReceiptData } from '@/features/sell/types/sell.types';
 import {
   PosCameraScannerModal,
   PosCheckoutModal,

@@ -1,7 +1,7 @@
 import { useNavigate } from 'react-router-dom';
 import { ArrowRight, ExternalLink, RotateCcw, ShoppingCart } from 'lucide-react';
-import { useLanguage } from '../../../i18n/language-context';
-import type { Product } from '../../../services/product.types';
+import { useLanguage } from '@/i18n/language-context';
+import type { Product } from '@/services/product.types';
 
 interface Props {
   readonly product: Product;

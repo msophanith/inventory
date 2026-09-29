@@ -1,5 +1,5 @@
 import { createContext, useContext, useState, type ReactNode } from 'react';
-import { DEFAULT_KHR_RATE } from '../../../utils/currency';
+import { DEFAULT_KHR_RATE } from '@/utils/currency';
 
 interface CurrencyContextValue {
   khrRate: number;

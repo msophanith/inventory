@@ -1,8 +1,8 @@
 import { useState, useMemo } from 'react';
 import { AlertTriangle, ArrowRight, CheckCircle2 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import { useProduct } from '../../product/hooks/use-product';
-import { useLanguage } from '../../../i18n/language-context';
+import { useProduct } from '@/features/product/hooks/use-product';
+import { useLanguage } from '@/i18n/language-context';
 import { StockBadge } from './stock-badge';
 
 type FeedFilter = 'ALL' | 'LOW' | 'OUT';

@@ -1,6 +1,6 @@
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import type { Table } from '@tanstack/react-table';
-import type { Product } from '../../../services/product';
+import type { Product } from '@/services/product';
 
 interface Props {
   readonly table: Table<Product>;

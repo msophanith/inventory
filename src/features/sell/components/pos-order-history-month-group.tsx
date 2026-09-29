@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { ChevronDown, ChevronRight } from 'lucide-react';
-import type { Movement } from '../../../services/movement';
+import type { Movement } from '@/services/movement';
 import { PosOrderHistoryItem } from './pos-order-history-item';
 
 interface Props {

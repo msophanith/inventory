@@ -1,7 +1,7 @@
 import { useMemo, useState } from 'react';
 import { ListFilter, Package, Search, X } from 'lucide-react';
-import type { Movement } from '../../../services/movement';
-import type { ProductReportItem } from '../types/report.types';
+import type { Movement } from '@/services/movement';
+import type { ProductReportItem } from '@/features/report/types/report.types';
 import { ReportProductRows } from './report-product-rows';
 import { ReportTransactionRows } from './report-transaction-rows';
 import { ReportTablePagination } from './report-table-pagination';

@@ -1,7 +1,7 @@
 import { Calendar, CalendarRange, Download, FileSpreadsheet, RefreshCw } from 'lucide-react';
-import type { MonthOption } from '../types/report.types';
-import type { DateMode } from '../hooks/use-report';
-import { useLanguage } from '../../../i18n/language-context';
+import type { MonthOption } from '@/features/report/types/report.types';
+import type { DateMode } from '@/features/report/hooks/use-report';
+import { useLanguage } from '@/i18n/language-context';
 
 interface Props {
   readonly selectedMonth: string;

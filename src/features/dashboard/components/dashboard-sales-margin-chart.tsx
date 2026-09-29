@@ -1,14 +1,14 @@
 import { useMemo, useState } from 'react';
 import { TrendingUp, DollarSign, PieChart, Layers, AlertTriangle } from 'lucide-react';
-import type { Movement } from '../../../services/movement';
-import { formatCurrencyKhr, formatCurrencyUsd } from '../../../utils/currency';
+import type { Movement } from '@/services/movement';
+import { formatCurrencyKhr, formatCurrencyUsd } from '@/utils/currency';
 import {
   aggregateSalesAndMargin,
   calculateTotals,
   type GroupByPeriod,
-} from '../utils/sales-margin-calculator';
+} from '@/features/dashboard/utils/sales-margin-calculator';
 import { SalesMarginBarChart } from './sales-margin-bar-chart';
-import { useLanguage } from '../../../i18n/language-context';
+import { useLanguage } from '@/i18n/language-context';
 
 interface Props {
   readonly movements?: Movement[];

@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
 import { ChevronDown, Command, LogOut, ShieldCheck, User } from 'lucide-react';
-import { useLanguage } from '../../i18n/language-context';
+import { useLanguage } from '@/i18n/language-context';
 
 interface Props {
   readonly userEmail?: string;

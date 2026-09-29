@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import { telegramService } from '../services';
+import { telegramService } from '@/services';
 
 const SENT_KEY = 'daily_report_sent_date';
 const REPORT_HOUR = 20; // 20:00 local time

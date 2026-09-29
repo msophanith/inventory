@@ -1,10 +1,10 @@
 import { useState } from 'react';
 import { ShoppingCart, Trash2 } from 'lucide-react';
-import type { CartItem, ReceiptData } from '../types/sell.types';
+import type { CartItem, ReceiptData } from '@/features/sell/types/sell.types';
 import { PosCartItem } from './pos-cart-item';
-import { generatePdfInvoiceBlob } from '../utils/pdf-generator';
+import { generatePdfInvoiceBlob } from '@/features/sell/utils/pdf-generator';
 import { PosCartFooter } from './pos-cart-footer';
-import { useLanguage } from '../../../i18n/language-context';
+import { useLanguage } from '@/i18n/language-context';
 
 interface Props {
   readonly items: CartItem[];

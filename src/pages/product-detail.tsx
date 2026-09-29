@@ -1,26 +1,26 @@
 import { useState } from 'react';
-import { PageMeta } from '../components/seo/page-meta';
+import { PageMeta } from '@/components/seo/page-meta';
 import { ArrowLeft } from 'lucide-react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { gooeyToast } from 'goey-toast';
 
-import ProductHero from '../features/product-details/components/product-hero';
-import ProductStats from '../features/product-details/components/product-stat';
-import ProductInfoCard from '../features/product-details/components/product-info-card';
-import StockProgress from '../features/product-details/components/stock-progress';
-import QuickActions from '../features/product-details/components/quick-action';
-import ProductDetailsSkeleton from '../features/product-details/components/skeleton';
-import ProductMovementHistory from '../features/product-details/components/product-movement';
-import ConfirmDeleteModal from '../features/product-details/components/confirm-delete-modal';
+import ProductHero from '@/features/product-details/components/product-hero';
+import ProductStats from '@/features/product-details/components/product-stat';
+import ProductInfoCard from '@/features/product-details/components/product-info-card';
+import StockProgress from '@/features/product-details/components/stock-progress';
+import QuickActions from '@/features/product-details/components/quick-action';
+import ProductDetailsSkeleton from '@/features/product-details/components/skeleton';
+import ProductMovementHistory from '@/features/product-details/components/product-movement';
+import ConfirmDeleteModal from '@/features/product-details/components/confirm-delete-modal';
 
-import { useProduct } from '../features/product/hooks/use-product';
-import { useMovement } from '../features/movement/hooks/use-movement';
+import { useProduct } from '@/features/product/hooks/use-product';
+import { useMovement } from '@/features/movement/hooks/use-movement';
 import {
   StockMovementModal,
   type FormValues,
-} from '../features/movement/components';
-import { PageContainer } from '../components/layout/page-container';
-import { useLanguage } from '../i18n/language-context';
+} from '@/features/movement/components';
+import { PageContainer } from '@/components/layout/page-container';
+import { useLanguage } from '@/i18n/language-context';
 
 const ProductDetailsPage = () => {
   const { t } = useLanguage();

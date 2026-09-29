@@ -10,7 +10,7 @@ import ProductInventory from './product-inventory';
 import {
   productSchema,
   type ProductFormValues,
-} from '../../schema/product.schema';
+} from '@/features/product/schema/product.schema';
 
 interface Props {
   readonly defaultValues?: ProductFormValues;

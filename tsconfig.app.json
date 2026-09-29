@@ -21,12 +21,13 @@
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "erasableSyntaxOnly": true,
-    "noFallthroughCasesInSwitch": true
+    "noFallthroughCasesInSwitch": true,
+
+    /* Path aliases */
+    "paths": {
+      "@/*": ["./src/*"]
+    }
   },
   "include": ["src"],
-  "exclude": ["node_modules"],
-  "baseUrl": "src",
-  "paths": {
-    "@/*": ["/src"]
-  },
+  "exclude": ["node_modules"]
 }

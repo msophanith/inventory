@@ -1,7 +1,7 @@
 import { jsPDF } from 'jspdf';
 import QRCode from 'qrcode';
 
-import type { ReceiptData } from '../types/sell.types';
+import type { ReceiptData } from '@/features/sell/types/sell.types';
 import {
   KHMER_FONT_REGULAR_BASE64,
   KHMER_FONT_BOLD_BASE64,

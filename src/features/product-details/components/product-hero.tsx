@@ -1,8 +1,8 @@
 import { useState } from 'react';
 import { Barcode, Box, Check, Layers, MapPin, Pencil, Trash2 } from 'lucide-react';
-import type { Product } from '../../../services/product';
+import type { Product } from '@/services/product';
 import { useNavigate } from 'react-router-dom';
-import { useLanguage } from '../../../i18n/language-context';
+import { useLanguage } from '@/i18n/language-context';
 
 interface Props {
   readonly product: Product;

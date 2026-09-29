@@ -1,7 +1,7 @@
 import { Eye, EyeOff, Loader2, LogIn, Mail, Lock } from 'lucide-react';
 import type { FormState, UseFormRegister } from 'react-hook-form';
-import type { LoginFormValues } from '../../../features/auth/hooks/use-login';
-import { useLanguage } from '../../../i18n/language-context';
+import type { LoginFormValues } from '@/features/auth/hooks/use-login';
+import { useLanguage } from '@/i18n/language-context';
 
 interface LoginFormProps {
   readonly register: UseFormRegister<LoginFormValues>;

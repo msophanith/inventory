@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import type { PaginationState, SortingState } from '@tanstack/react-table';
-import type { StockFilterType } from '../components/product-table-header';
+import type { StockFilterType } from '@/features/product/components/product-table-header';
 export type AlertState = {
   type: 'success' | 'error';
   message: string;

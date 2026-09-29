@@ -1,6 +1,6 @@
 import { Trash2, X, ReceiptText, CreditCard } from 'lucide-react';
-import { useLanguage } from '../../../i18n/language-context';
-import type { CartItem } from '../types/sell.types';
+import { useLanguage } from '@/i18n/language-context';
+import type { CartItem } from '@/features/sell/types/sell.types';
 import { PosCartItem } from './pos-cart-item';
 
 interface Props {

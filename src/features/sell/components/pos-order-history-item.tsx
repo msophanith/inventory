@@ -1,7 +1,7 @@
 import { Printer } from 'lucide-react';
-import type { Movement } from '../../../services/movement';
-import { formatDateTime } from '../../../utils/date';
-import { formatCurrencyKhr, formatCurrencyUsd } from '../../../utils/currency';
+import type { Movement } from '@/services/movement';
+import { formatDateTime } from '@/utils/date';
+import { formatCurrencyKhr, formatCurrencyUsd } from '@/utils/currency';
 
 interface Props {
   readonly item: Movement;

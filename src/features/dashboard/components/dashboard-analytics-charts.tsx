@@ -1,4 +1,4 @@
-import type { Movement } from '../../../services/movement';
+import type { Movement } from '@/services/movement';
 import { DashboardStockDistribution } from './dashboard-stock-distribution';
 import { DashboardRevenueTrendChart } from './dashboard-revenue-trend-chart';
 

@@ -1,5 +1,5 @@
 import { DollarSign, Receipt, ShoppingCart, TrendingUp } from 'lucide-react';
-import type { TodaySaleSummary } from '../../../services/movement';
+import type { TodaySaleSummary } from '@/services/movement';
 
 interface TodaySaleCardProps {
   data?: TodaySaleSummary;

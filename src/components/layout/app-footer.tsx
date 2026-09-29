@@ -1,5 +1,5 @@
 import { Heart } from 'lucide-react';
-import { useLanguage } from '../../i18n/language-context';
+import { useLanguage } from '@/i18n/language-context';
 
 export function AppFooter() {
   const { t } = useLanguage();

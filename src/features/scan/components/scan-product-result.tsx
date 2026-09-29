@@ -1,9 +1,9 @@
 import { Check, Copy, Layers, MapPin, Package, X } from 'lucide-react';
 import { useState } from 'react';
 import { gooeyToast } from 'goey-toast';
-import { useLanguage } from '../../../i18n/language-context';
-import type { Product } from '../../../services/product.types';
-import { formatCurrencyKhr, formatCurrencyUsd } from '../../../utils/currency';
+import { useLanguage } from '@/i18n/language-context';
+import type { Product } from '@/services/product.types';
+import { formatCurrencyKhr, formatCurrencyUsd } from '@/utils/currency';
 import { ScanProductActions } from './scan-product-actions';
 
 interface Props {

@@ -1,7 +1,7 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import type { Product } from '../../../services/product';
-import type { CartItem } from '../types/sell.types';
+import type { Product } from '@/services/product';
+import type { CartItem } from '@/features/sell/types/sell.types';
 
 export type DiscountState = {
   type: 'PERCENT' | 'FIXED';

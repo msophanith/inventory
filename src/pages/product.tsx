@@ -1,15 +1,15 @@
 import { useMemo, useState } from 'react';
-import { PageMeta } from '../components/seo/page-meta';
+import { PageMeta } from '@/components/seo/page-meta';
 import { gooeyToast } from 'goey-toast';
-import { useLanguage } from '../i18n/language-context';
-import ProductTable from '../features/product/components/product-table';
-import type { StockFilterType } from '../features/product/components/product-table-header';
-import { useProduct } from '../features/product/hooks/use-product';
-import { exportAllProductsToCsv } from '../features/product/utils/product-csv-export';
-import { useDebounce } from '../hooks/use-debounce';
+import { useLanguage } from '@/i18n/language-context';
+import ProductTable from '@/features/product/components/product-table';
+import type { StockFilterType } from '@/features/product/components/product-table-header';
+import { useProduct } from '@/features/product/hooks/use-product';
+import { exportAllProductsToCsv } from '@/features/product/utils/product-csv-export';
+import { useDebounce } from '@/hooks/use-debounce';
 import { useNavigate } from 'react-router-dom';
-import { PageContainer } from '../components/layout/page-container';
-import { useProductStore } from '../features/product/store/use-product-store';
+import { PageContainer } from '@/components/layout/page-container';
+import { useProductStore } from '@/features/product/store/use-product-store';
 
 const ProductPage = () => {
   const { useGetProducts, handleSearchChange, search } = useProduct(false);

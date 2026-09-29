@@ -1,4 +1,4 @@
-import { useLanguage } from '../../../i18n/language-context';
+import { useLanguage } from '@/i18n/language-context';
 
 export function MovementTableHead() {
   const { t } = useLanguage();

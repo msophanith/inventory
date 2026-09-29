@@ -1,6 +1,6 @@
-import { productService } from '../../../services';
-import { type Product } from '../../../services/product';
-import { formatDate } from '../../../utils/date';
+import { productService } from '@/services';
+import { type Product } from '@/services/product';
+import { formatDate } from '@/utils/date';
 
 export async function exportAllProductsToCsv(): Promise<void> {
   const response = await productService.getAll({ limit: 10000 });

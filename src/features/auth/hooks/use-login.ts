@@ -3,9 +3,9 @@ import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { useNavigate } from 'react-router-dom';
 import { useState } from 'react';
-import { useAuth } from '../use-auth';
+import { useAuth } from '@/features/auth/use-auth';
 
-import { isMobileDevice } from '../../../utils/device';
+import { isMobileDevice } from '@/utils/device';
 
 const loginSchema = yup.object({
   email: yup

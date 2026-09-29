@@ -5,9 +5,9 @@ import {
   Percent,
   TrendingUp,
 } from 'lucide-react';
-import type { Product } from '../../../services/product';
-import { calculateMargin } from '../../../utils/helper';
-import { useLanguage } from '../../../i18n/language-context';
+import type { Product } from '@/services/product';
+import { calculateMargin } from '@/utils/helper';
+import { useLanguage } from '@/i18n/language-context';
 
 export default function ProductStats({
   product,

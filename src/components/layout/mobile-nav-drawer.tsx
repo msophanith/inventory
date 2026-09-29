@@ -1,9 +1,9 @@
 import { Keyboard, LogOut, X } from 'lucide-react';
-import { useAuth } from '../../features/auth/use-auth';
+import { useAuth } from '@/features/auth/use-auth';
 import Logo from './logo';
 import type { MenuItem } from './mobile-nav-items';
 import { MobileNavGrid } from './mobile-nav-grid';
-import { useLanguage } from '../../i18n/language-context';
+import { useLanguage } from '@/i18n/language-context';
 
 interface Props {
   readonly isOpen: boolean;

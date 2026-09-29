@@ -1,9 +1,9 @@
 import { useState } from 'react';
 import { BarcodeScannerProvider } from 'react-barcode-scanner';
-import { PageMeta } from '../components/seo/page-meta';
-import { PageContainer } from '../components/layout/page-container';
-import { useHardwareScanner } from '../features/sell/hooks/use-hardware-scanner';
-import { useScanTerminal } from '../features/scan/hooks/use-scan-terminal';
+import { PageMeta } from '@/components/seo/page-meta';
+import { PageContainer } from '@/components/layout/page-container';
+import { useHardwareScanner } from '@/features/sell/hooks/use-hardware-scanner';
+import { useScanTerminal } from '@/features/scan/hooks/use-scan-terminal';
 import {
   ScanCameraViewfinder,
   ScanHeader,
@@ -12,7 +12,7 @@ import {
   ScanNotFoundResult,
   ScanProductResult,
   ScanSettingsModal,
-} from '../features/scan/components';
+} from '@/features/scan/components';
 
 export function ScanPage() {
   const [isCameraActive, setIsCameraActive] = useState(true);

@@ -1,9 +1,9 @@
 import { useState, useMemo } from 'react';
 import { History, Search, X } from 'lucide-react';
-import type { Movement } from '../../../services/movement';
-import type { ReceiptData } from '../types/sell.types';
-import { formatDate } from '../../../utils/date';
-import { generatePdfInvoiceBlob } from '../utils/pdf-generator';
+import type { Movement } from '@/services/movement';
+import type { ReceiptData } from '@/features/sell/types/sell.types';
+import { formatDate } from '@/utils/date';
+import { generatePdfInvoiceBlob } from '@/features/sell/utils/pdf-generator';
 import { PosOrderHistoryMonthGroup } from './pos-order-history-month-group';
 
 interface Props {

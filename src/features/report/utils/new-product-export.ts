@@ -1,6 +1,6 @@
 import * as XLSX from 'xlsx';
-import { formatDateTime } from '../../../utils/date';
-import type { Product } from '../../../services/product';
+import { formatDateTime } from '@/utils/date';
+import type { Product } from '@/services/product';
 import { downloadFileWithOptionalPassword } from './export-helper';
 
 /**

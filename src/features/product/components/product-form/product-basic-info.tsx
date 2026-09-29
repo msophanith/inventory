@@ -2,12 +2,12 @@ import { useCallback } from 'react';
 import { Camera, FileText } from 'lucide-react';
 import FormInput from './form-input';
 import { ProductNameInput } from './product-name-input';
-import { useHardwareScanner } from '../../../sell/hooks/use-hardware-scanner';
-import { PosCameraScannerModal } from '../../../sell/components/pos-camera-scanner-modal';
-import { playScanSound } from '../../../sell/utils/scan-sound';
+import { useHardwareScanner } from '@/features/sell/hooks/use-hardware-scanner';
+import { PosCameraScannerModal } from '@/features/sell/components/pos-camera-scanner-modal';
+import { playScanSound } from '@/features/sell/utils/scan-sound';
 import type { UseFormSetValue } from 'react-hook-form';
-import type { ProductFormValues } from '../../schema/product.schema';
-import { useProductStore } from '../../store/use-product-store';
+import type { ProductFormValues } from '@/features/product/schema/product.schema';
+import { useProductStore } from '@/features/product/store/use-product-store';
 
 interface Props {
   readonly register: any;

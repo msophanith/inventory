@@ -1,4 +1,4 @@
-import { supabase } from '../utils/supabase';
+import { supabase } from '@/utils/supabase';
 import type { PaginatedResponse, Product, ProductQueryParams } from './product.types';
 import { fetchProductSummary } from './product-summary-queries';
 

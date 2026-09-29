@@ -1,11 +1,11 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { gooeyToast } from 'goey-toast';
-import { useLanguage } from '../../../i18n/language-context';
-import { productService } from '../../../services';
-import type { Product } from '../../../services/product.types';
-import { usePosStore } from '../../sell/store/use-pos-store';
-import type { ScanLookupResult, ScanSettings } from '../types';
+import { useLanguage } from '@/i18n/language-context';
+import { productService } from '@/services';
+import type { Product } from '@/services/product.types';
+import { usePosStore } from '@/features/sell/store/use-pos-store';
+import type { ScanLookupResult, ScanSettings } from '@/features/scan/types';
 import {
   createFoundHistoryItem,
   createNotFoundHistoryItem,
@@ -14,7 +14,7 @@ import {
   loadScanSettings,
   SETTINGS_KEY,
   triggerScanFeedback,
-} from '../utils/scan-terminal-utils';
+} from '@/features/scan/utils/scan-terminal-utils';
 
 export function useScanTerminal() {
   const { t } = useLanguage();

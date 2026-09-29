@@ -8,8 +8,8 @@ import {
   Legend,
   type ChartOptions,
 } from 'chart.js';
-import { formatCurrencyKhr, formatCurrencyUsd } from '../../../utils/currency';
-import type { SalesMarginGroup } from '../../dashboard/utils/sales-margin-calculator';
+import { formatCurrencyKhr, formatCurrencyUsd } from '@/utils/currency';
+import type { SalesMarginGroup } from '@/features/dashboard/utils/sales-margin-calculator';
 
 ChartJS.register(
   CategoryScale,

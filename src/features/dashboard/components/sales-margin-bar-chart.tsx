@@ -9,9 +9,9 @@ import {
   type ChartOptions,
 } from 'chart.js';
 import { Bar } from 'react-chartjs-2';
-import { formatCurrencyKhr, formatCurrencyUsd } from '../../../utils/currency';
-import type { SalesMarginGroup } from '../utils/sales-margin-calculator';
-import { useLanguage } from '../../../i18n/language-context';
+import { formatCurrencyKhr, formatCurrencyUsd } from '@/utils/currency';
+import type { SalesMarginGroup } from '@/features/dashboard/utils/sales-margin-calculator';
+import { useLanguage } from '@/i18n/language-context';
 
 ChartJS.register(
   CategoryScale,

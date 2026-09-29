@@ -1,6 +1,6 @@
-import { formatCurrencyKhr, formatCurrencyUsd } from '../../../utils/currency';
-import type { SalesMarginGroup } from '../utils/sales-margin-calculator';
-import { useLanguage } from '../../../i18n/language-context';
+import { formatCurrencyKhr, formatCurrencyUsd } from '@/utils/currency';
+import type { SalesMarginGroup } from '@/features/dashboard/utils/sales-margin-calculator';
+import { useLanguage } from '@/i18n/language-context';
 
 interface Props {
   readonly group: SalesMarginGroup;

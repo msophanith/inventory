@@ -1,5 +1,5 @@
 import { ArrowDownCircle, ArrowUpCircle, RotateCcw } from 'lucide-react';
-import type { MovementType } from '../../../services/movement';
+import type { MovementType } from '@/services/movement';
 
 interface Props {
   type: MovementType;

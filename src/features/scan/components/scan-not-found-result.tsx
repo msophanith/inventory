@@ -2,7 +2,7 @@ import { useNavigate } from 'react-router-dom';
 import { AlertCircle, Check, Copy, Plus, RotateCcw, X } from 'lucide-react';
 import { useState } from 'react';
 import { gooeyToast } from 'goey-toast';
-import { useLanguage } from '../../../i18n/language-context';
+import { useLanguage } from '@/i18n/language-context';
 
 interface Props {
   readonly barcode: string;

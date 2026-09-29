@@ -1,18 +1,18 @@
 import { useState } from 'react';
-import { PageMeta } from '../components/seo/page-meta';
-import { useLanguage } from '../i18n/language-context';
-import { useReport } from '../features/report/hooks/use-report';
+import { PageMeta } from '@/components/seo/page-meta';
+import { useLanguage } from '@/i18n/language-context';
+import { useReport } from '@/features/report/hooks/use-report';
 import {
   ReportHeader,
   ReportSummary,
   ReportTable,
-} from '../features/report/components';
-import { ReportExportModals } from '../features/report/components/report-export-modals';
-import { ReportSkeleton } from '../features/report/components/report-skeleton';
-import { ReportRevenueCOGSChart } from '../features/report/components/report-revenue-cogs-chart';
-import { PageContainer } from '../components/layout/page-container';
-import { DashboardSalesMarginChart } from '../features/dashboard/components/dashboard-sales-margin-chart';
-import { useMovement } from '../features/movement/hooks/use-movement';
+} from '@/features/report/components';
+import { ReportExportModals } from '@/features/report/components/report-export-modals';
+import { ReportSkeleton } from '@/features/report/components/report-skeleton';
+import { ReportRevenueCOGSChart } from '@/features/report/components/report-revenue-cogs-chart';
+import { PageContainer } from '@/components/layout/page-container';
+import { DashboardSalesMarginChart } from '@/features/dashboard/components/dashboard-sales-margin-chart';
+import { useMovement } from '@/features/movement/hooks/use-movement';
 
 export function ReportPage() {
   const {

@@ -1,11 +1,11 @@
 import { useCallback, useMemo } from 'react';
 import { gooeyToast } from 'goey-toast';
-import { productService } from '../../services';
-import { playScanSound } from '../../features/sell/utils/scan-sound';
-import type { Product } from '../../services/product';
-import { usePosStore } from '../../features/sell/store/use-pos-store';
-import { useLanguage } from '../../i18n/language-context';
-import type { PaymentMethod } from '../../features/sell/types/sell.types';
+import { productService } from '@/services';
+import { playScanSound } from '@/features/sell/utils/scan-sound';
+import type { Product } from '@/services/product';
+import { usePosStore } from '@/features/sell/store/use-pos-store';
+import { useLanguage } from '@/i18n/language-context';
+import type { PaymentMethod } from '@/features/sell/types/sell.types';
 
 export function useSellPageState(products: Product[]) {
   const addItem = usePosStore((state) => state.addItem);

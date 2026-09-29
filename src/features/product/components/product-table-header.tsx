@@ -1,5 +1,5 @@
 import { Download, Loader2, Plus, Search, X } from 'lucide-react';
-import { useLanguage } from '../../../i18n/language-context';
+import { useLanguage } from '@/i18n/language-context';
 
 export type StockFilterType = 'ALL' | 'IN_STOCK' | 'LOW_STOCK' | 'OUT_OF_STOCK';
 

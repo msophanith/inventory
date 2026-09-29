@@ -1,7 +1,7 @@
 import { AlertTriangle, ArrowUpRight, ChevronRight, Package } from 'lucide-react';
 import { Link } from 'react-router-dom';
-import type { Product } from '../../../services/product';
-import { formatCurrencyKhr, formatCurrencyUsd } from '../../../utils/currency';
+import type { Product } from '@/services/product';
+import { formatCurrencyKhr, formatCurrencyUsd } from '@/utils/currency';
 
 interface Props {
   readonly products: Product[];

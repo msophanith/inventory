@@ -1,7 +1,7 @@
 import { memo } from 'react';
 import { Package, Plus } from 'lucide-react';
-import type { Product } from '../../../services/product';
-import { formatCurrencyKhr, formatCurrencyUsd } from '../../../utils/currency';
+import type { Product } from '@/services/product';
+import { formatCurrencyKhr, formatCurrencyUsd } from '@/utils/currency';
 import { PosProductBadge } from './pos-product-badge';
 
 interface Props {

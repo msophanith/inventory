@@ -1,7 +1,7 @@
 import type { UseFormRegister } from 'react-hook-form';
 import { DollarSign, RotateCcw } from 'lucide-react';
-import { formatCurrencyKhr, formatCurrencyUsd } from '../../../utils/currency';
-import type { MovementType } from '../../../services/movement';
+import { formatCurrencyKhr, formatCurrencyUsd } from '@/utils/currency';
+import type { MovementType } from '@/services/movement';
 import type { FormValues } from './movement-form';
 
 interface Props {

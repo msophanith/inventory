@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { MagnetIcon } from 'lucide-react';
-import { type Product } from '../../../../services/product';
-import { productService } from '../../../../services';
+import { type Product } from '@/services/product';
+import { productService } from '@/services';
 
 interface Props {
   readonly register: any;

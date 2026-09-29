@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useAuth } from '../features/auth/use-auth';
+import { useAuth } from '@/features/auth/use-auth';
 
 export interface ShortcutItem {
   readonly key: string;

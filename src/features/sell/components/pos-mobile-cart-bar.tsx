@@ -1,6 +1,6 @@
 import { ChevronRight, ShoppingCart } from 'lucide-react';
-import { useLanguage } from '../../../i18n/language-context';
-import { formatCurrencyKhr, formatCurrencyUsd } from '../../../utils/currency';
+import { useLanguage } from '@/i18n/language-context';
+import { formatCurrencyKhr, formatCurrencyUsd } from '@/utils/currency';
 
 interface Props {
   readonly itemCount: number;

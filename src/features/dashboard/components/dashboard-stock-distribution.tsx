@@ -1,6 +1,6 @@
 import { BarChart3, CheckCircle2, ShieldAlert } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import { useLanguage } from '../../../i18n/language-context';
+import { useLanguage } from '@/i18n/language-context';
 
 interface Props {
   readonly totalItems: number;

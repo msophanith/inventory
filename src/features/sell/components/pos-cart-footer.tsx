@@ -1,6 +1,6 @@
 import { CreditCard, FileText, Tag } from 'lucide-react';
-import { formatCurrencyKhr, formatCurrencyUsd } from '../../../utils/currency';
-import { useLanguage } from '../../../i18n/language-context';
+import { formatCurrencyKhr, formatCurrencyUsd } from '@/utils/currency';
+import { useLanguage } from '@/i18n/language-context';
 
 interface Props {
   readonly subtotal: number;

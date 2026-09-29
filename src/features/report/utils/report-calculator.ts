@@ -1,6 +1,6 @@
-import type { Movement } from '../../../services/movement';
-import type { CalculatedMovementItem, MonthOption } from '../types/report.types';
-import { formatDate } from '../../../utils/date';
+import type { Movement } from '@/services/movement';
+import type { CalculatedMovementItem, MonthOption } from '@/features/report/types/report.types';
+import { formatDate } from '@/utils/date';
 import {
   calculateProductReport,
   calculateReportSummary,

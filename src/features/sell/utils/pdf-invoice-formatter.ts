@@ -1,7 +1,7 @@
 import type { jsPDF } from 'jspdf';
-import type { ReceiptData } from '../types/sell.types';
-import { formatDate } from '../../../utils/date';
-import { formatCurrencyKhr, formatCurrencyUsd } from '../../../utils/currency';
+import type { ReceiptData } from '@/features/sell/types/sell.types';
+import { formatDate } from '@/utils/date';
+import { formatCurrencyKhr, formatCurrencyUsd } from '@/utils/currency';
 import { drawText } from './pdf-canvas-utils';
 
 export function renderInvoiceHeader(doc: jsPDF, receipt: ReceiptData, fontName: string): number {

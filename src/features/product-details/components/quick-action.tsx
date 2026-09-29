@@ -1,5 +1,5 @@
 import { ArrowDownToLine, ArrowUpFromLine, RotateCcw } from 'lucide-react';
-import { useLanguage } from '../../../i18n/language-context';
+import { useLanguage } from '@/i18n/language-context';
 
 interface QuickActionProps {
   readonly onStockIn: () => void;

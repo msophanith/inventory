@@ -1,5 +1,5 @@
 import { AlertTriangle, Search } from 'lucide-react';
-import type { MovementType } from '../../../services/movement';
+import type { MovementType } from '@/services/movement';
 
 interface Props {
   readonly selectedType: MovementType | 'ALL';

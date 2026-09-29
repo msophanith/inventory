@@ -4,7 +4,7 @@ import QuantityStepper from './quantity-stepper';
 import { MovementPriceInput } from './movement-price-input';
 import MovementReasonSelector from './movement-reason-selector';
 import MovementFormFooter from './movement-form-footer';
-import type { MovementType } from '../../../services/movement';
+import type { MovementType } from '@/services/movement';
 
 type Product = {
   quantity: number;

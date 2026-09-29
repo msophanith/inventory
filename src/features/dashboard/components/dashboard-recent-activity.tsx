@@ -1,8 +1,8 @@
 import { useState, useMemo } from 'react';
 import { Activity, ArrowRight } from 'lucide-react';
 import { Link } from 'react-router-dom';
-import { useLanguage } from '../../../i18n/language-context';
-import type { Movement } from '../../../services/movement';
+import { useLanguage } from '@/i18n/language-context';
+import type { Movement } from '@/services/movement';
 import { RecentActivityRow } from './recent-activity-row';
 
 interface Props {

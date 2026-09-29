@@ -1,6 +1,6 @@
-import type { Movement } from '../../../services/movement';
-import { calculateMovementItem } from '../../report/utils/report-calculator';
-import { formatDate } from '../../../utils/date';
+import type { Movement } from '@/services/movement';
+import { calculateMovementItem } from '@/features/report/utils/report-calculator';
+import { formatDate } from '@/utils/date';
 
 export type GroupByPeriod = 'monthly' | 'daily' | 'category';
 

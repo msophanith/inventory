@@ -1,5 +1,5 @@
-import type { ProductFormValues } from '../features/product/schema/product.schema';
-import { supabase } from '../utils/supabase';
+import type { ProductFormValues } from '@/features/product/schema/product.schema';
+import { supabase } from '@/utils/supabase';
 import type {
   PaginatedResponse,
   Product,

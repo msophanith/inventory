@@ -1,8 +1,8 @@
-import type { Movement } from '../../../services/movement';
-import { formatDateTime } from '../../../utils/date';
-import { formatCurrencyKhr, formatCurrencyUsd } from '../../../utils/currency';
-import MovementBadge from '../../movement/components/movement-badge';
-import { useLanguage } from '../../../i18n/language-context';
+import type { Movement } from '@/services/movement';
+import { formatDateTime } from '@/utils/date';
+import { formatCurrencyKhr, formatCurrencyUsd } from '@/utils/currency';
+import MovementBadge from '@/features/movement/components/movement-badge';
+import { useLanguage } from '@/i18n/language-context';
 
 interface Props {
   readonly item: Movement;

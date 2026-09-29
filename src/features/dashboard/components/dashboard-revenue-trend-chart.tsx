@@ -1,17 +1,17 @@
 import { useMemo, useState } from 'react';
 import { TrendingUp } from 'lucide-react';
 import { Line } from 'react-chartjs-2';
-import { formatCurrencyKhr, formatCurrencyUsd } from '../../../utils/currency';
-import type { Movement } from '../../../services/movement';
-import { useLanguage } from '../../../i18n/language-context';
+import { formatCurrencyKhr, formatCurrencyUsd } from '@/utils/currency';
+import type { Movement } from '@/services/movement';
+import { useLanguage } from '@/i18n/language-context';
 import {
   buildDailyRevenue,
   type RevenueRange,
-} from '../utils/revenue-trend-calculator';
+} from '@/features/dashboard/utils/revenue-trend-calculator';
 import {
   getRevenueChartData,
   getRevenueChartOptions,
-} from '../utils/revenue-trend-chart-config';
+} from '@/features/dashboard/utils/revenue-trend-chart-config';
 
 interface Props {
   readonly movements?: Movement[];

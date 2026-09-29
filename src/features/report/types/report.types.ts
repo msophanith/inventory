@@ -1,5 +1,5 @@
-import type { Movement } from '../../../services/movement';
-import type { Product } from '../../../services/product';
+import type { Movement } from '@/services/movement';
+import type { Product } from '@/services/product';
 
 export interface MonthlyReportSummary {
   totalSales: number;

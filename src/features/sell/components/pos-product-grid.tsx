@@ -1,12 +1,12 @@
 import { useMemo, useRef, useState, useLayoutEffect } from 'react';
 import { BoxIcon } from 'lucide-react';
 import { useWindowVirtualizer } from '@tanstack/react-virtual';
-import { useLanguage } from '../../../i18n/language-context';
-import type { Product } from '../../../services/product';
-import type { CartItem } from '../types/sell.types';
+import { useLanguage } from '@/i18n/language-context';
+import type { Product } from '@/services/product';
+import type { CartItem } from '@/features/sell/types/sell.types';
 import { PosProductCard } from './pos-product-card';
 import { PosFilterBar } from './pos-filter-bar';
-import { useProduct } from '../../product/hooks/use-product';
+import { useProduct } from '@/features/product/hooks/use-product';
 
 interface Props {
   readonly products: Product[];

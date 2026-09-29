@@ -1,5 +1,5 @@
 import { PackageCheck, ShieldCheck } from 'lucide-react';
-import { useLanguage } from '../../../i18n/language-context';
+import { useLanguage } from '@/i18n/language-context';
 
 export function LoginBrand() {
   const { t } = useLanguage();

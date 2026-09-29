@@ -1,21 +1,21 @@
 import { useMemo, useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { movementService, productService } from '../../../services';
-import { formatDate } from '../../../utils/date';
+import { movementService, productService } from '@/services';
+import { formatDate } from '@/utils/date';
 import {
   calculateProductReport,
   calculateReportSummary,
   filterMovementsByMonth,
   getAvailableMonths,
-} from '../utils/report-calculator';
+} from '@/features/report/utils/report-calculator';
 import {
   exportReportToCsv,
   exportReportToExcel,
   exportProductInToExcel,
   exportNewProductToExcel,
-} from '../utils/excel-export';
-import { exportTodaySalesToCsv } from '../utils/today-sales-export';
-import type { Movement } from '../../../services/movement';
+} from '@/features/report/utils/excel-export';
+import { exportTodaySalesToCsv } from '@/features/report/utils/today-sales-export';
+import type { Movement } from '@/services/movement';
 
 export type DateMode = 'MONTH' | 'RANGE';
 

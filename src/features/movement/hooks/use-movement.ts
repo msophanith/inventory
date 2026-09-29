@@ -1,12 +1,12 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { gooeyToast } from 'goey-toast';
 
-import { movementService } from '../../../services';
+import { movementService } from '@/services';
 import type {
   Movement,
   MovementFilter,
-} from '../../../services/movement';
-import { useMovementStore } from '../store/use-movement-store';
+} from '@/services/movement';
+import { useMovementStore } from '@/features/movement/store/use-movement-store';
 
 const useMovement = (filters?: MovementFilter) => {
   const queryClient = useQueryClient();

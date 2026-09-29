@@ -1,6 +1,6 @@
 import { AlertTriangle, ArrowDownLeft, ArrowUpRight } from 'lucide-react';
-import type { ProductReportItem } from '../types/report.types';
-import { formatCurrencyKhr, formatCurrencyUsd } from '../../../utils/currency';
+import type { ProductReportItem } from '@/features/report/types/report.types';
+import { formatCurrencyKhr, formatCurrencyUsd } from '@/utils/currency';
 
 interface Props {
   readonly data: ProductReportItem[];

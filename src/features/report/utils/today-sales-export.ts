@@ -1,6 +1,6 @@
 import { format } from 'date-fns';
-import type { Movement } from '../../../services/movement';
-import { parseDate } from '../../../utils/date';
+import type { Movement } from '@/services/movement';
+import { parseDate } from '@/utils/date';
 import { calculateMovementItem } from './report-calculator';
 import { downloadFileWithOptionalPassword } from './export-helper';
 

@@ -1,8 +1,8 @@
 import { createContext, useEffect, useState, type ReactNode } from 'react';
 import type { Session, User } from '@supabase/supabase-js';
-import { supabase } from '../../../utils/supabase';
-import type { AuthUser, UserRole } from '../../../types/auth';
-import { telegramService } from '../../../services/telegram';
+import { supabase } from '@/utils/supabase';
+import type { AuthUser, UserRole } from '@/types/auth';
+import { telegramService } from '@/services/telegram';
 
 interface AuthContextValue {
   user: AuthUser | null;

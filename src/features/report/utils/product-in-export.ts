@@ -1,6 +1,6 @@
 import * as XLSX from 'xlsx';
-import { formatDateTime } from '../../../utils/date';
-import type { Movement } from '../../../services/movement';
+import { formatDateTime } from '@/utils/date';
+import type { Movement } from '@/services/movement';
 import { downloadFileWithOptionalPassword } from './export-helper';
 
 /**

@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react';
 import type { LucideIcon } from 'lucide-react';
-import { formatCurrencyKhr, formatCurrencyUsd } from '../../../utils/currency';
+import { formatCurrencyKhr, formatCurrencyUsd } from '@/utils/currency';
 
 export type ReportCardTheme = 'emerald' | 'indigo' | 'rose';
 

@@ -1,8 +1,8 @@
 import { useState } from 'react';
-import { useLanguage } from '../../../i18n/language-context';
+import { useLanguage } from '@/i18n/language-context';
 import { Banknote, QrCode, User, X } from 'lucide-react';
-import type { PaymentMethod } from '../types/sell.types';
-import { formatCurrencyKhr, formatCurrencyUsd } from '../../../utils/currency';
+import type { PaymentMethod } from '@/features/sell/types/sell.types';
+import { formatCurrencyKhr, formatCurrencyUsd } from '@/utils/currency';
 import { PosCashPresets } from './pos-cash-presets';
 
 interface Props {

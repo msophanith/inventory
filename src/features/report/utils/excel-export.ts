@@ -1,7 +1,7 @@
 import * as XLSX from 'xlsx';
-import { formatDateTime } from '../../../utils/date';
-import type { Movement } from '../../../services/movement';
-import type { MonthlyReportSummary, ProductReportItem } from '../types/report.types';
+import { formatDateTime } from '@/utils/date';
+import type { Movement } from '@/services/movement';
+import type { MonthlyReportSummary, ProductReportItem } from '@/features/report/types/report.types';
 import { calculateMovementItem } from './report-calculator';
 import { downloadFileWithOptionalPassword } from './export-helper';
 import { exportReportToCsv } from './csv-export';

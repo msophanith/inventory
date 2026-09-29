@@ -1,7 +1,7 @@
 import type { ColumnDef } from '@tanstack/react-table';
 import { Calendar, MoreHorizontal, Package } from 'lucide-react';
-import type { Product } from '../../../services/product';
-import { formatDate } from '../../../utils/date';
+import type { Product } from '@/services/product';
+import { formatDate } from '@/utils/date';
 
 export const productColumns: ColumnDef<Product>[] = [
   {

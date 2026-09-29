@@ -1,12 +1,12 @@
 import { AlertTriangle, ArrowLeft, Home, RefreshCw } from 'lucide-react';
-import { PageMeta } from '../components/seo/page-meta';
+import { PageMeta } from '@/components/seo/page-meta';
 import {
   Link,
   isRouteErrorResponse,
   useNavigate,
   useRouteError,
 } from 'react-router-dom';
-import { useLanguage } from '../i18n/language-context';
+import { useLanguage } from '@/i18n/language-context';
 
 function ErrorPage() {
   const error = useRouteError();

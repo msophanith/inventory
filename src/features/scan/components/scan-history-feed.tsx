@@ -1,6 +1,6 @@
 import { ArrowRight, CheckCircle2, History, PlusCircle } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import { useLanguage } from '../../../i18n/language-context';
+import { useLanguage } from '@/i18n/language-context';
 
 export interface ScanHistoryItem {
   id: string;

@@ -1,5 +1,5 @@
 import { FileSpreadsheet, Download, Zap, PackagePlus, Box } from 'lucide-react';
-import type { ExportOptionItem } from '../components/export-option-card';
+import type { ExportOptionItem } from '@/features/report/components/export-option-card';
 
 type TranslateFn = (key: string) => string;
 

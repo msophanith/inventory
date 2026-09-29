@@ -1,12 +1,12 @@
 import { Outlet } from 'react-router-dom';
-import MobileBottomNav from '../components/layout/mobile-bottom-nav';
-import Navbar from '../components/layout/navbar';
-import Sidebar from '../components/layout/sidebar';
-// import { AppFooter } from '../components/layout/app-footer';
-import { ShortcutsModal } from '../components/layout/shortcuts-modal';
-import { PwaInstallBanner } from '../components/layout/pwa-install-banner';
-import { useKeyboardShortcuts } from '../hooks/use-keyboard-shortcuts';
-import { usePwaAutoUpdate } from '../hooks/use-pwa-auto-update';
+import MobileBottomNav from '@/components/layout/mobile-bottom-nav';
+import Navbar from '@/components/layout/navbar';
+import Sidebar from '@/components/layout/sidebar';
+// import { AppFooter } from '@/components/layout/app-footer';
+import { ShortcutsModal } from '@/components/layout/shortcuts-modal';
+import { PwaInstallBanner } from '@/components/layout/pwa-install-banner';
+import { useKeyboardShortcuts } from '@/hooks/use-keyboard-shortcuts';
+import { usePwaAutoUpdate } from '@/hooks/use-pwa-auto-update';
 
 export default function AppLayout() {
   usePwaAutoUpdate();

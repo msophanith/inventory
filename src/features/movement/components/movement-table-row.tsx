@@ -1,6 +1,6 @@
 import { useNavigate } from 'react-router-dom';
-import type { Movement } from '../../../services/movement';
-import { formatDateTime } from '../../../utils/date';
+import type { Movement } from '@/services/movement';
+import { formatDateTime } from '@/utils/date';
 import MovementTypeBadge from './movement-badge';
 
 interface Props {

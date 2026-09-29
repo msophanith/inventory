@@ -3,10 +3,10 @@ import {
   ArrowUpCircle,
   RotateCcw,
 } from 'lucide-react';
-import { formatCurrencyKhr, formatCurrencyUsd } from '../../../utils/currency';
-import { formatDateTime } from '../../../utils/date';
-import { useLanguage } from '../../../i18n/language-context';
-import type { Movement } from '../../../services/movement';
+import { formatCurrencyKhr, formatCurrencyUsd } from '@/utils/currency';
+import { formatDateTime } from '@/utils/date';
+import { useLanguage } from '@/i18n/language-context';
+import type { Movement } from '@/services/movement';
 
 interface Props {
   readonly movement: Movement;

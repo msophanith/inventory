@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
-import { productService } from '../../../services';
+import { productService } from '@/services';
 
 export function useLowStockNotifications() {
   const { data: lowStockProducts = [], isLoading: isLoadingLow } = useQuery({

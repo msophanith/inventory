@@ -4,11 +4,11 @@ import {
   type PaginationState,
   useReactTable,
 } from '@tanstack/react-table';
-import type { Product } from '../../../services/product';
+import type { Product } from '@/services/product';
 import { productColumns } from './product-table-columns';
 import { ProductTableHeader, type StockFilterType } from './product-table-header';
 import { ProductTablePagination } from './product-table-pagination';
-import { useLanguage } from '../../../i18n/language-context';
+import { useLanguage } from '@/i18n/language-context';
 
 interface Props {
   readonly products: Product[];

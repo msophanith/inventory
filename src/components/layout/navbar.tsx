@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { LogOut } from 'lucide-react';
-import { useAuth } from '../../features/auth/use-auth';
+import { useAuth } from '@/features/auth/use-auth';
 import Logo from './logo';
 import { NotificationBell } from './notification-bell';
 import { KhrRateSelector } from './khr-rate-selector';
@@ -8,7 +8,7 @@ import { LanguageSelector } from './language-selector';
 import { SignoutModal } from './signout-modal';
 import { NavbarUserMenu } from './navbar-user-menu';
 import { ShortcutsModal } from './shortcuts-modal';
-import { useLanguage } from '../../i18n/language-context';
+import { useLanguage } from '@/i18n/language-context';
 
 export default function Navbar() {
   const { user, signOut, isAdmin, role } = useAuth();

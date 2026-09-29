@@ -1,7 +1,7 @@
 import { Calendar, Folder, Hash, Info, Layers, Package } from 'lucide-react';
-import type { Product } from '../../../services/product';
-import { useLanguage } from '../../../i18n/language-context';
-import { formatDate } from '../../../utils/date';
+import type { Product } from '@/services/product';
+import { useLanguage } from '@/i18n/language-context';
+import { formatDate } from '@/utils/date';
 
 interface Props {
   readonly product: Product;

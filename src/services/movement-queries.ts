@@ -1,4 +1,4 @@
-import { supabase } from '../utils/supabase';
+import { supabase } from '@/utils/supabase';
 import type { Movement, MovementFilter, TodaySaleSummary } from './movement.types';
 
 const TABLE_NAME = 'StockMovement';

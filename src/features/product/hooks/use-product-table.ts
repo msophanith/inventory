@@ -6,8 +6,8 @@ import {
   useReactTable,
 } from "@tanstack/react-table";
 import { useMemo } from "react";
-import type { Product } from '../../../services/product';
-import { useProductStore } from '../store/use-product-store';
+import type { Product } from '@/services/product';
+import { useProductStore } from '@/features/product/store/use-product-store';
 
 export function useProductTable(products: Product[]) {
   const sorting = useProductStore((state) => state.sorting);

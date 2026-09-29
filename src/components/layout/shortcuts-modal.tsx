@@ -1,6 +1,6 @@
 import { Keyboard, X } from 'lucide-react';
-import { SHORTCUT_LIST } from '../../hooks/use-keyboard-shortcuts';
-import { useLanguage } from '../../i18n/language-context';
+import { SHORTCUT_LIST } from '@/hooks/use-keyboard-shortcuts';
+import { useLanguage } from '@/i18n/language-context';
 
 interface Props {
   readonly open: boolean;

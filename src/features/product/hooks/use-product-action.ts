@@ -3,8 +3,8 @@ import { v4 as uuidv4 } from 'uuid';
 import { useNavigate } from 'react-router-dom';
 import { gooeyToast } from 'goey-toast';
 
-import { productService, movementService } from '../../../services';
-import type { ProductFormValues } from '../schema/product.schema';
+import { productService, movementService } from '@/services';
+import type { ProductFormValues } from '@/features/product/schema/product.schema';
 
 const useProductAction = () => {
   const queryClient = useQueryClient();

@@ -1,8 +1,8 @@
 import { useQuery } from '@tanstack/react-query';
 import { DollarSign, History, ShoppingBag, ShoppingBasket } from 'lucide-react';
-import { movementService } from '../../../services';
-import { formatCurrencyKhr, formatCurrencyUsd } from '../../../utils/currency';
-import { useLanguage } from '../../../i18n/language-context';
+import { movementService } from '@/services';
+import { formatCurrencyKhr, formatCurrencyUsd } from '@/utils/currency';
+import { useLanguage } from '@/i18n/language-context';
 
 interface PosHeaderBannerProps {
   readonly onOpenReceiptHistory?: () => void;

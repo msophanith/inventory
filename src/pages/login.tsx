@@ -1,13 +1,13 @@
 import { Navigate } from 'react-router-dom';
-import { PageMeta } from '../components/seo/page-meta';
+import { PageMeta } from '@/components/seo/page-meta';
 
-import { useAuth } from '../features/auth/use-auth';
-import { useLogin } from '../features/auth/hooks/use-login';
-import { isMobileDevice } from '../utils/device';
-import { LoginBrand } from '../components/auth/login/login-brand';
-import { LoginAlerts } from '../components/auth/login/login-alerts';
-import { LoginForm } from '../components/auth/login/login-form';
-import { LoginFooter } from '../components/auth/login/login-footer';
+import { useAuth } from '@/features/auth/use-auth';
+import { useLogin } from '@/features/auth/hooks/use-login';
+import { isMobileDevice } from '@/utils/device';
+import { LoginBrand } from '@/components/auth/login/login-brand';
+import { LoginAlerts } from '@/components/auth/login/login-alerts';
+import { LoginForm } from '@/components/auth/login/login-form';
+import { LoginFooter } from '@/components/auth/login/login-footer';
 
 const LoginPage = () => {
   const { user } = useAuth();

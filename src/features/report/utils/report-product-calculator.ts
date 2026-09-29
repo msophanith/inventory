@@ -1,5 +1,5 @@
-import type { Movement } from '../../../services/movement';
-import type { MonthlyReportSummary, ProductReportItem } from '../types/report.types';
+import type { Movement } from '@/services/movement';
+import type { MonthlyReportSummary, ProductReportItem } from '@/features/report/types/report.types';
 import { calculateMovementItem } from './report-calculator';
 
 export function calculateReportSummary(

@@ -1,14 +1,14 @@
 import 'react-barcode-scanner/polyfill';
 import { useCallback, useMemo, useRef, useState } from 'react';
-import { useLanguage } from '../../../i18n/language-context';
+import { useLanguage } from '@/i18n/language-context';
 import { Camera, Search, X, Zap, ZapOff } from 'lucide-react';
 import {
   BarcodeScannerProvider,
   useTorch,
   type DetectedBarcode,
 } from 'react-barcode-scanner';
-import { playScanSound } from '../utils/scan-sound';
-import { BARCODE_FORMATS } from '../constants/barcode-formats';
+import { playScanSound } from '@/features/sell/utils/scan-sound';
+import { BARCODE_FORMATS } from '@/features/sell/constants/barcode-formats';
 import { PosScannerViewfinder } from './pos-scanner-viewfinder';
 
 interface Props {

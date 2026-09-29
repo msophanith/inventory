@@ -1,11 +1,11 @@
 import { useState } from 'react';
 import { CheckCircle2, FileText, PackageCheck, Printer } from 'lucide-react';
-import { useLanguage } from '../../../i18n/language-context';
-import type { ReceiptData } from '../types/sell.types';
-import { formatDateTime } from '../../../utils/date';
-import { generatePdfInvoiceBlob } from '../utils/pdf-generator';
-import { formatCurrencyUsd } from '../../../utils/currency';
-import { printThermalReceipt, printThermalReceiptWebUSB } from '../utils/thermal-printer';
+import { useLanguage } from '@/i18n/language-context';
+import type { ReceiptData } from '@/features/sell/types/sell.types';
+import { formatDateTime } from '@/utils/date';
+import { generatePdfInvoiceBlob } from '@/features/sell/utils/pdf-generator';
+import { formatCurrencyUsd } from '@/utils/currency';
+import { printThermalReceipt, printThermalReceiptWebUSB } from '@/features/sell/utils/thermal-printer';
 
 interface Props {
   readonly receipt: ReceiptData | null;

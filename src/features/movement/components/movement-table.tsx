@@ -1,14 +1,14 @@
 import { useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
-import type { Movement } from '../../../services/movement';
-import { getCurrentMonthLabel, isCurrentMonth } from '../../../utils/date';
+import type { Movement } from '@/services/movement';
+import { getCurrentMonthLabel, isCurrentMonth } from '@/utils/date';
 import { MovementTableFilter } from './movement-table-filter';
 import { MovementTablePagination } from './movement-table-pagination';
 import { MovementTableRow } from './movement-table-row';
 import { MovementTableHead } from './movement-table-head';
 import { MovementTableBanner } from './movement-table-banner';
-import { useMovementStore } from '../store/use-movement-store';
-import { useLanguage } from '../../../i18n/language-context';
+import { useMovementStore } from '@/features/movement/store/use-movement-store';
+import { useLanguage } from '@/i18n/language-context';
 
 interface Props {
   readonly movements: Movement[];

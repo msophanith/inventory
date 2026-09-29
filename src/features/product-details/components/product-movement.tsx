@@ -1,7 +1,7 @@
 import { useMemo, useState } from 'react';
 import { ChevronLeft, ChevronRight, History, Search } from 'lucide-react';
-import type { Movement, MovementType } from '../../../services/movement';
-import { useLanguage } from '../../../i18n/language-context';
+import type { Movement, MovementType } from '@/services/movement';
+import { useLanguage } from '@/i18n/language-context';
 import { ProductMovementRow } from './product-movement-row';
 
 interface Props {

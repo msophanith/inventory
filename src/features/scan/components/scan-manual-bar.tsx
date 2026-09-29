@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Clipboard, Loader2, Search, X } from 'lucide-react';
-import { useLanguage } from '../../../i18n/language-context';
+import { useLanguage } from '@/i18n/language-context';
 
 interface Props {
   readonly onSearch: (code: string) => void;

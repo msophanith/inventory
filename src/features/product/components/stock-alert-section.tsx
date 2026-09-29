@@ -1,4 +1,4 @@
-import type { Product } from '../../../services/product';
+import type { Product } from '@/services/product';
 import { LowStockCard } from './low-stock-card';
 import { OutOfStockCard } from './out-of-stock-card';
 

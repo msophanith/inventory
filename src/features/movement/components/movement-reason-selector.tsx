@@ -8,7 +8,7 @@ import {
   SlidersHorizontal,
   Truck,
 } from 'lucide-react';
-import type { MovementType } from '../../../services/movement';
+import type { MovementType } from '@/services/movement';
 
 interface Props {
   readonly type: MovementType;

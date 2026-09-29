@@ -1,7 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { productService } from '../../../services';
-import type { ProductQueryParams } from '../../../services/product';
-import { useProductStore } from '../store/use-product-store';
+import { productService } from '@/services';
+import type { ProductQueryParams } from '@/services/product';
+import { useProductStore } from '@/features/product/store/use-product-store';
 
 const useProduct = (enableSummary?: boolean) => {
   const queryClient = useQueryClient();

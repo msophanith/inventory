@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
 import { Banknote, Check, Edit3, X } from 'lucide-react';
-import { useCurrency } from '../../features/currency/context/currency-context';
+import { useCurrency } from '@/features/currency/context/currency-context';
 
 export function KhrRateSelector() {
   const { khrRate, setKhrRate } = useCurrency();

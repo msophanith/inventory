@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect } from 'react';
 import { Bell, AlertTriangle, PackageX, ChevronRight, CheckCircle2 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import { useLowStockNotifications } from '../../features/product/hooks/use-low-stock-notifications';
+import { useLowStockNotifications } from '@/features/product/hooks/use-low-stock-notifications';
 
 export function NotificationBell() {
   const [isOpen, setIsOpen] = useState(false);

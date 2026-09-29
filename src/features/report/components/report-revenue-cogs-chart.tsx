@@ -1,13 +1,13 @@
 import { useMemo } from 'react';
 import { Bar } from 'react-chartjs-2';
 import { BarChart3 } from 'lucide-react';
-import { aggregateSalesAndMargin } from '../../dashboard/utils/sales-margin-calculator';
-import type { Movement } from '../../../services/movement';
-import { useLanguage } from '../../../i18n/language-context';
+import { aggregateSalesAndMargin } from '@/features/dashboard/utils/sales-margin-calculator';
+import type { Movement } from '@/services/movement';
+import { useLanguage } from '@/i18n/language-context';
 import {
   getRevenueCogsChartData,
   getRevenueCogsChartOptions,
-} from '../utils/revenue-cogs-chart-config';
+} from '@/features/report/utils/revenue-cogs-chart-config';
 
 interface Props {
   readonly rawMovements: Movement[];

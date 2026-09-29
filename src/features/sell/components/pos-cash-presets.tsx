@@ -1,7 +1,7 @@
 import { useState } from 'react';
-import { useLanguage } from '../../../i18n/language-context';
+import { useLanguage } from '@/i18n/language-context';
 import { Banknote, Calculator, PenLine } from 'lucide-react';
-import { formatCurrencyKhr, formatCurrencyUsd } from '../../../utils/currency';
+import { formatCurrencyKhr, formatCurrencyUsd } from '@/utils/currency';
 
 interface Props {
   readonly total: number;

@@ -3,8 +3,8 @@ import { createPortal } from 'react-dom';
 
 import StockMovementHeader from './stock-movement-header';
 import MovementForm, { type FormValues } from './movement-form';
-import type { MovementType } from '../../../services/movement';
-import type { Product } from '../../../services/product';
+import type { MovementType } from '@/services/movement';
+import type { Product } from '@/services/product';
 
 interface Props {
   readonly open: boolean;

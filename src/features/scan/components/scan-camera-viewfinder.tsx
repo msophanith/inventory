@@ -5,8 +5,8 @@ import {
   type DetectedBarcode,
 } from 'react-barcode-scanner';
 import { Camera, CameraOff, RefreshCw, Zap, ZapOff } from 'lucide-react';
-import { useLanguage } from '../../../i18n/language-context';
-import { BARCODE_FORMATS } from '../../sell/constants/barcode-formats';
+import { useLanguage } from '@/i18n/language-context';
+import { BARCODE_FORMATS } from '@/features/sell/constants/barcode-formats';
 import { ScanCameraReticle } from './scan-camera-reticle';
 
 interface Props {

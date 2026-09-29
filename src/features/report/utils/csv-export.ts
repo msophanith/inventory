@@ -1,4 +1,4 @@
-import type { ProductReportItem } from '../types/report.types';
+import type { ProductReportItem } from '@/features/report/types/report.types';
 import { downloadFileWithOptionalPassword } from './export-helper';
 
 /**

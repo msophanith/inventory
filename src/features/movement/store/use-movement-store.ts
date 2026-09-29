@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import type { MovementType } from '../../../services/movement';
+import type { MovementType } from '@/services/movement';
 
 export type AlertState = {
   type: 'success' | 'error';

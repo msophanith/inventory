@@ -1,8 +1,8 @@
 import { useMemo } from 'react';
 import { Trophy } from 'lucide-react';
-import type { Movement } from '../../../services/movement';
-import { formatCurrencyKhr, formatCurrencyUsd } from '../../../utils/currency';
-import { useLanguage } from '../../../i18n/language-context';
+import type { Movement } from '@/services/movement';
+import { formatCurrencyKhr, formatCurrencyUsd } from '@/utils/currency';
+import { useLanguage } from '@/i18n/language-context';
 
 interface Props {
   readonly movements?: Movement[];

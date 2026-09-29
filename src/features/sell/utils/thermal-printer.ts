@@ -1,8 +1,8 @@
 import QRCode from 'qrcode';
 
-import type { ReceiptData } from '../types/sell.types';
-import { formatDateTime } from '../../../utils/date';
-import { formatCurrencyKhr, formatCurrencyUsd } from '../../../utils/currency';
+import type { ReceiptData } from '@/features/sell/types/sell.types';
+import { formatDateTime } from '@/utils/date';
+import { formatCurrencyKhr, formatCurrencyUsd } from '@/utils/currency';
 import { PAYMENT_QR_CODE_VALUE } from './pdf-generator';
 
 import { EscPosEncoder } from './esc-pos-encoder';

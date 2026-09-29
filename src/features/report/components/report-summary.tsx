@@ -6,8 +6,8 @@ import {
   ShoppingBag,
   TrendingUp,
 } from 'lucide-react';
-import type { MonthlyReportSummary } from '../types/report.types';
-import { useLanguage } from '../../../i18n/language-context';
+import type { MonthlyReportSummary } from '@/features/report/types/report.types';
+import { useLanguage } from '@/i18n/language-context';
 import { ReportSummaryCardItem } from './report-summary-card-item';
 
 interface Props {

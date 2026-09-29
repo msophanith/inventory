@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom';
-import { PageMeta } from '../components/seo/page-meta';
-import { useLanguage } from '../i18n/language-context';
+import { PageMeta } from '@/components/seo/page-meta';
+import { useLanguage } from '@/i18n/language-context';
 
 export default function NotFoundPage() {
   const { t } = useLanguage();

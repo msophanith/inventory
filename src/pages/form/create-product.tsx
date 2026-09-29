@@ -1,13 +1,13 @@
 import { ArrowLeft } from 'lucide-react';
-import { PageMeta } from '../../components/seo/page-meta';
+import { PageMeta } from '@/components/seo/page-meta';
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { v4 as uuidv4 } from 'uuid';
 
-import ProductForm from '../../features/product/components/product-form';
-import { useProductAction } from '../../features/product/hooks/use-product-action';
-import { useProduct } from '../../features/product/hooks/use-product';
-import type { ProductFormValues } from '../../features/product/schema/product.schema';
-import { PageContainer } from '../../components/layout/page-container';
+import ProductForm from '@/features/product/components/product-form';
+import { useProductAction } from '@/features/product/hooks/use-product-action';
+import { useProduct } from '@/features/product/hooks/use-product';
+import type { ProductFormValues } from '@/features/product/schema/product.schema';
+import { PageContainer } from '@/components/layout/page-container';
 
 const CreateProductPage = () => {
   const navigate = useNavigate();

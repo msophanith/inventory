@@ -1,5 +1,5 @@
-import type { Movement } from '../../../services/movement';
-import { formatDate } from '../../../utils/date';
+import type { Movement } from '@/services/movement';
+import { formatDate } from '@/utils/date';
 
 export type RevenueRange = 7 | 14 | 30;
 

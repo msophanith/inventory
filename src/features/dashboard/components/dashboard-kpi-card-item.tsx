@@ -1,5 +1,5 @@
 import type { LucideIcon } from 'lucide-react';
-import { formatCurrencyKhr, formatCurrencyUsd } from '../../../utils/currency';
+import { formatCurrencyKhr, formatCurrencyUsd } from '@/utils/currency';
 
 export type KpiTheme = 'emerald' | 'blue' | 'indigo' | 'rose';
 

@@ -1,7 +1,7 @@
 import { createBrowserRouter, Navigate } from 'react-router-dom';
-import AppLayout from '../layout/app-layout';
-import ProtectedRoute from '../components/protected-route';
-import AdminRoute from '../components/admin-route';
+import AppLayout from '@/layout/app-layout';
+import ProtectedRoute from '@/components/protected-route';
+import AdminRoute from '@/components/admin-route';
 
 import {
   CreateProductPage,
@@ -14,7 +14,7 @@ import {
   ReportPage,
   ScanPage,
   SellPage,
-} from '../pages';
+} from '@/pages';
 
 export const router = createBrowserRouter([
   // ── Public routes ─────────────────────────────────────────────────────────
