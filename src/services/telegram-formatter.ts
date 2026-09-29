@@ -26,13 +26,16 @@ export function formatMovementNotificationMessage(
   const unitPrice = movement.unitPrice ?? product?.sellPrice ?? 0;
   const totalPrice = qty * unitPrice;
 
+  const barcode = product?.barcode || movement.product?.barcode;
+
   return [
     `${typeEmoji} <b>Stock Movement (${escapeHtml(movement.type)})</b>`,
     `<b>Product:</b> ${escapeHtml(name)}`,
+    barcode ? `<b>Barcode:</b> <code>${escapeHtml(barcode)}</code>` : null,
     `<b>Qty:</b> ${qty} ${escapeHtml(product?.unit || 'units')}`,
     `<b>Total Value:</b> ${formatCurrencyUsd(totalPrice)} / ${formatCurrencyKhr(totalPrice)}${isDamaged ? ' (🚨 Damaged)' : ''}`,
     `<b>Date:</b> ${formatDateTime(movement.createdAt)}`,
-  ].join('\n');
+  ].filter(Boolean).join('\n');
 }
 
 export function formatSaleNotificationCaption(receipt: ReceiptData): string {
@@ -71,3 +74,67 @@ export function formatLowStockAlertMessage(product: Product): string {
     '<i>Please restock this product as soon as possible.</i>',
   ].join('\n');
 }
+
+export interface DailySalesSummary {
+  totalSales: number;
+  totalOrders: number;
+  totalItemsSold: number;
+  date: string;
+}
+
+export function formatDailySalesSummaryMessage(summary: DailySalesSummary): string {
+  const hasNoSales = summary.totalOrders === 0;
+  return [
+    `📊 <b>Daily Sales Report — ${escapeHtml(summary.date)}</b>`,
+    '━━━━━━━━━━━━━━━━━━━━━━━━',
+    hasNoSales
+      ? '😶 No sales recorded today.'
+      : [
+          `💰 <b>Total Revenue:</b> ${formatCurrencyUsd(summary.totalSales)} / ${formatCurrencyKhr(summary.totalSales)}`,
+          `🛒 <b>Total Orders:</b> ${summary.totalOrders}`,
+          `📦 <b>Items Sold:</b> ${summary.totalItemsSold}`,
+        ].join('\n'),
+    '━━━━━━━━━━━━━━━━━━━━━━━━',
+    '<i>Auto-generated end-of-day report 🤖</i>',
+  ].join('\n');
+}
+
+export function formatProductDeletedMessage(product: Product): string {
+  return [
+    `🗑️ <b>Product Deleted</b>`,
+    `<b>Name:</b> ${escapeHtml(product.name)}`,
+    product.barcode ? `<b>Barcode:</b> <code>${escapeHtml(product.barcode)}</code>` : null,
+    `<b>Category:</b> ${escapeHtml(product.category)}`,
+    `<b>Last Stock:</b> <code>${product.quantity} ${escapeHtml(product.unit)}</code>`,
+    `<b>Sell Price:</b> ${formatCurrencyUsd(product.sellPrice)} / ${formatCurrencyKhr(product.sellPrice)}`,
+    `<b>Deleted At:</b> ${formatDateTime(new Date().toISOString())}`,
+  ].filter(Boolean).join('\n');
+}
+
+export interface AuthEventInfo {
+  email: string;
+  role?: string;
+  fullName?: string | null;
+}
+
+export function formatUserLoginMessage(info: AuthEventInfo): string {
+  return [
+    `🔓 <b>User Logged In</b>`,
+    `<b>Email:</b> ${escapeHtml(info.email)}`,
+    info.fullName ? `<b>Name:</b> ${escapeHtml(info.fullName)}` : null,
+    info.role ? `<b>Role:</b> ${escapeHtml(info.role)}` : null,
+    `<b>Time:</b> ${formatDateTime(new Date().toISOString())}`,
+  ].filter(Boolean).join('\n');
+}
+
+export function formatUserLogoutMessage(info: AuthEventInfo): string {
+  return [
+    `🔒 <b>User Logged Out</b>`,
+    `<b>Email:</b> ${escapeHtml(info.email)}`,
+    info.fullName ? `<b>Name:</b> ${escapeHtml(info.fullName)}` : null,
+    info.role ? `<b>Role:</b> ${escapeHtml(info.role)}` : null,
+    `<b>Time:</b> ${formatDateTime(new Date().toISOString())}`,
+  ].filter(Boolean).join('\n');
+}
+
+

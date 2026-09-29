@@ -1,40 +1,47 @@
 /**
  * Device detection utility for DevTools Guard.
- * Identifies mobile phones, iPads, and tablets so security restrictions
- * and false-positive viewport metrics can be safely bypassed.
+ *
+ * IMPORTANT: This must NOT rely on navigator.userAgent, navigator.maxTouchPoints,
+ * or matchMedia alone — all of these are spoofed by Chrome/Firefox DevTools
+ * device emulation mode. We use a combination of hardware signals that cannot
+ * be faked by the browser's emulation layer.
  */
 
+/**
+ * Returns true ONLY for genuine physical mobile/tablet hardware.
+ * DevTools "Inspect as mobile" emulation will NOT trigger this.
+ */
 export const isMobileOrTablet = (): boolean => {
   if (typeof window === 'undefined' || typeof navigator === 'undefined') {
     return false;
   }
 
-  const ua = navigator.userAgent || navigator.vendor || '';
+  // DevTools emulation spoofs: userAgent, maxTouchPoints, matchMedia pointer/hover.
+  // It does NOT spoof: window.ontouchstart existence on real hardware,
+  // DeviceOrientationEvent, or the actual hardware concurrency.
 
-  // 1. Check common mobile and tablet user-agents
-  const mobileRegex =
-    /android|webos|iphone|ipad|ipod|blackberry|iemobile|opera mini|silk|kindle|tablet|mobile/i;
-  if (mobileRegex.test(ua)) {
-    return true;
-  }
+  // Signal 1: Real touch hardware exposes ontouchstart on window.
+  // Desktop browsers emulating mobile do NOT have this natively.
+  const hasTouchStart = 'ontouchstart' in window;
 
-  // 2. iPadOS detection: iPadOS 13+ identifies as Macintosh in userAgent
-  // but has multi-touch support (> 1 touch points). Real Macs have 0 touch points.
-  const isIPadOS =
-    (/macintosh/i.test(ua) || navigator.platform === 'MacIntel') &&
-    typeof navigator.maxTouchPoints === 'number' &&
-    navigator.maxTouchPoints > 1;
+  // Signal 2: Real mobile/tablet hardware typically reports orientation via the
+  // DeviceOrientationEvent API being a constructible class (not just "defined").
+  // Desktop machines never fire orientation events naturally.
+  const hasOrientationAPI =
+    typeof window.DeviceOrientationEvent !== 'undefined' &&
+    // On real iOS/Android, the class is defined. On desktop emulation it may
+    // be undefined even if UA is spoofed.
+    typeof window.screen.orientation !== 'undefined';
 
-  if (isIPadOS) {
-    return true;
-  }
+  // Signal 3: Physical screen width on a real device vs a resized desktop window.
+  // window.screen.width reflects the actual hardware screen — it does NOT
+  // change when DevTools resizes the viewport. A genuine phone has screen.width <= 430.
+  // A desktop with emulation resizes window.innerWidth but NOT window.screen.width.
+  const isRealSmallScreen = window.screen.width <= 1024 && window.screen.height <= 1366;
 
-  // 3. Touch devices with coarse pointer (phones/tablets without hover)
-  const isCoarseTouch =
-    typeof window.matchMedia === 'function' &&
-    window.matchMedia('(pointer: coarse) and (hover: none)').matches;
-
-  if (isCoarseTouch) {
+  // Require BOTH a touch signal AND a real small screen to confirm genuine hardware.
+  // DevTools emulation: spoofs innerWidth but screen.width stays at 1920/2560/etc.
+  if (hasTouchStart && hasOrientationAPI && isRealSmallScreen) {
     return true;
   }
 

@@ -1,22 +1,6 @@
-import { useState } from 'react';
 import { Loader2, Lock, ShieldAlert } from 'lucide-react';
 
-interface Props {
-  readonly onBypass?: () => void;
-}
-
-export function DevToolsBlockedView({ onBypass }: Props) {
-  const [clickCount, setClickCount] = useState(0);
-
-  const handleSecretClick = () => {
-    const next = clickCount + 1;
-    setClickCount(next);
-    if (next >= 5) {
-      localStorage.setItem('allow_dev_mode', 'true');
-      onBypass?.();
-    }
-  };
-
+export function DevToolsBlockedView() {
   return (
     <div className='fixed inset-0 z-99999 h-dvh w-screen min-h-screen bg-slate-950 flex flex-col items-center justify-center p-6 text-center select-none overflow-hidden'>
       {/* Ambient security lighting */}
@@ -28,9 +12,8 @@ export function DevToolsBlockedView({ onBypass }: Props) {
         <div className='relative mx-auto flex h-20 w-20 items-center justify-center'>
           <div className='absolute inset-0 rounded-3xl bg-rose-500/20 blur-xl animate-pulse' />
           <div
-            onClick={handleSecretClick}
             title='Security Shield'
-            className='relative flex h-20 w-20 items-center justify-center rounded-3xl bg-linear-to-br from-rose-900/80 to-slate-900 border border-rose-500/40 text-rose-400 shadow-2xl cursor-pointer active:scale-95'
+            className='relative flex h-20 w-20 items-center justify-center rounded-3xl bg-linear-to-br from-rose-900/80 to-slate-900 border border-rose-500/40 text-rose-400 shadow-2xl'
           >
             <ShieldAlert size={36} className='text-rose-400' />
           </div>

@@ -16,7 +16,7 @@ export default function AppLayout() {
     <div className='flex min-h-screen bg-slate-100'>
       <Sidebar />
 
-      <div className='flex flex-1 flex-col min-w-0 overflow-x-hidden'>
+      <div className='flex flex-1 flex-col min-w-0 overflow-x-clip'>
         <Navbar />
 
         <main className='flex-1 flex flex-col min-w-0 pb-20 lg:pb-0'>

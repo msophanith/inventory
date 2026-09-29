@@ -16,7 +16,7 @@ export function DashboardHeader() {
     return t('reports.goodEvening');
   };
 
-  const username = user?.email ? user.email.split('@')[0] : 'Manager';
+  const username = user?.fullName || 'Unknown';
   const todayDateStr = formatDate(new Date(), 'EEEE, dd MMM yyyy');
 
   return (
@@ -59,7 +59,7 @@ export function DashboardHeader() {
           <button
             type='button'
             onClick={() => navigate('/sell')}
-            className='flex items-center gap-2 rounded-2xl bg-gradient-to-r from-emerald-500 to-teal-600 px-4 py-2.5 text-xs font-black text-white shadow-lg shadow-emerald-900/30 transition-all hover:from-emerald-600 hover:to-teal-700 active:scale-95 cursor-pointer'
+            className='flex items-center gap-2 rounded-2xl bg-linear-to-r from-emerald-500 to-teal-600 px-4 py-2.5 text-xs font-black text-white shadow-lg shadow-emerald-900/30 transition-all hover:from-emerald-600 hover:to-teal-700 active:scale-95 cursor-pointer'
           >
             <ShoppingCart size={16} />
             <span>{t('reports.posTerminal')}</span>

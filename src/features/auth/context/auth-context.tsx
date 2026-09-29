@@ -2,6 +2,7 @@ import { createContext, useEffect, useState, type ReactNode } from 'react';
 import type { Session, User } from '@supabase/supabase-js';
 import { supabase } from '../../../utils/supabase';
 import type { AuthUser, UserRole } from '../../../types/auth';
+import { telegramService } from '../../../services/telegram';
 
 interface AuthContextValue {
   user: AuthUser | null;
@@ -108,7 +109,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
 
     if (data.user) {
-      await loadUserWithRole(data.user);
+      const authUser = await loadUserWithRole(data.user);
+      if (authUser) {
+        void telegramService.sendLoginNotification({
+          email: authUser.email ?? '',
+          role: authUser.role,
+          fullName: authUser.fullName,
+        });
+      }
     }
 
     return { error: null };
@@ -122,6 +130,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const signOut = async () => {
     setLoading(true);
     try {
+      if (user) {
+        void telegramService.sendLogoutNotification({
+          email: user.email ?? '',
+          role: user.role,
+          fullName: user.fullName,
+        });
+      }
       await supabase.auth.signOut();
       setUser(null);
       setSession(null);

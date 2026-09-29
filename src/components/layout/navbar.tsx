@@ -37,7 +37,7 @@ export default function Navbar() {
 
   return (
     <>
-      <header className='relative sticky top-0 z-40 flex h-16 items-center justify-between border-b border-slate-200/70 bg-white/80 px-3 sm:px-6 lg:px-8 backdrop-blur-2xl transition-all shadow-xs before:absolute before:inset-x-0 before:top-0 before:h-[1px] before:bg-linear-to-r before:from-transparent before:via-indigo-500/20 before:to-transparent'>
+      <header className='sticky top-0 z-40 flex h-16 items-center justify-between border-b border-slate-200/70 bg-white/80 px-3 sm:px-6 lg:px-8 backdrop-blur-2xl transition-all shadow-xs before:absolute before:inset-x-0 before:top-0 before:h-px before:bg-linear-to-r before:from-transparent before:via-indigo-500/20 before:to-transparent'>
         {/* Mobile Logo */}
         <div className='lg:hidden shrink-0'>
           <Logo />

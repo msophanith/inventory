@@ -10,7 +10,7 @@ interface Props {
 }
 
 export function DevToolsGuard({ children }: Props) {
-  const { isOpen, setIsOpen } = useDevToolsDetector();
+  const { isOpen } = useDevToolsDetector();
   const queryClient = useQueryClient();
 
   useEffect(() => {
@@ -23,14 +23,7 @@ export function DevToolsGuard({ children }: Props) {
   }, [isOpen, queryClient]);
 
   if (isOpen && !isMobileOrTablet()) {
-    return (
-      <DevToolsBlockedView
-        onBypass={() => {
-          setNetworkBlocked(false);
-          setIsOpen(false);
-        }}
-      />
-    );
+    return <DevToolsBlockedView />;
   }
 
   return <>{children}</>;

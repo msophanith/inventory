@@ -2,10 +2,16 @@ import type { ReceiptData } from '../features/sell/types/sell.types';
 import { generatePdfInvoiceBlob } from '../features/sell/utils/pdf-generator';
 import type { Movement } from './movement';
 import type { Product } from './product';
+import { fetchTodaySaleSummary } from './movement-queries';
 import {
+  formatDailySalesSummaryMessage,
   formatLowStockAlertMessage,
   formatMovementNotificationMessage,
+  formatProductDeletedMessage,
   formatSaleNotificationCaption,
+  formatUserLoginMessage,
+  formatUserLogoutMessage,
+  type AuthEventInfo,
 } from './telegram-formatter';
 
 export class TelegramService {
@@ -102,6 +108,35 @@ export class TelegramService {
   async sendLowStockAlert(product: Product): Promise<boolean> {
     const message = formatLowStockAlertMessage(product);
     return this.sendMessage(message);
+  }
+
+  async sendProductDeletedNotification(product: Product): Promise<boolean> {
+    const message = formatProductDeletedMessage(product);
+    return this.sendMessage(message);
+  }
+
+  async sendLoginNotification(info: AuthEventInfo): Promise<boolean> {
+    const message = formatUserLoginMessage(info);
+    return this.sendMessage(message);
+  }
+
+  async sendLogoutNotification(info: AuthEventInfo): Promise<boolean> {
+    const message = formatUserLogoutMessage(info);
+    return this.sendMessage(message);
+  }
+
+  async sendDailySalesSummary(): Promise<boolean> {
+    try {
+      const summary = await fetchTodaySaleSummary();
+      const date = new Date().toLocaleDateString('en-GB', {
+        weekday: 'long', day: '2-digit', month: 'long', year: 'numeric',
+      });
+      const message = formatDailySalesSummaryMessage({ ...summary, date });
+      return this.sendMessage(message);
+    } catch (err) {
+      console.error('[TelegramService] sendDailySalesSummary error:', err);
+      return false;
+    }
   }
 }
 

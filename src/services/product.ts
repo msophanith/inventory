@@ -13,6 +13,7 @@ import {
   fetchProductCategories,
   fetchProductSummary,
 } from './product-queries';
+import { telegramService } from './telegram';
 
 export type {
   StockMovement,
@@ -123,6 +124,8 @@ export class ProductService {
   }
 
   async delete(id: string): Promise<boolean> {
+    const product = await fetchProductById(id);
+
     await supabase.from('StockMovement').delete().eq('productId', id);
 
     const { data, error } = await supabase
@@ -139,6 +142,10 @@ export class ProductService {
       throw new Error(
         'Product not found or delete permission denied by RLS policy.',
       );
+    }
+
+    if (product) {
+      void telegramService.sendProductDeletedNotification(product);
     }
 
     return true;
