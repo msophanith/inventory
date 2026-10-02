@@ -37,7 +37,7 @@ export default function Navbar() {
 
   return (
     <>
-      <header className='sticky top-0 z-40 flex h-16 items-center justify-between border-b border-slate-200/70 bg-white/80 px-3 sm:px-6 lg:px-8 backdrop-blur-2xl transition-all shadow-xs before:absolute before:inset-x-0 before:top-0 before:h-px before:bg-linear-to-r before:from-transparent before:via-indigo-500/20 before:to-transparent'>
+      <header className='sticky top-0 z-40 flex h-16 items-center justify-between border-b border-slate-200/80 bg-white/95 px-3 sm:px-6 lg:px-8 backdrop-blur-md shadow-xs'>
         {/* Mobile Logo */}
         <div className='lg:hidden shrink-0'>
           <Logo />
@@ -86,7 +86,7 @@ export default function Navbar() {
             type='button'
             onClick={() => setShowConfirmModal(true)}
             title={t('common.signOut')}
-            className='group hidden sm:flex items-center justify-center gap-1.5 h-9 rounded-2xl border border-slate-200/80 bg-white px-3 text-xs font-extrabold text-slate-700 shadow-2xs hover:border-rose-200 hover:bg-rose-50 hover:text-rose-600 transition-all cursor-pointer active:scale-95 shrink-0'
+            className='group hidden sm:flex items-center justify-center gap-1.5 h-9 rounded-2xl border border-slate-200/80 bg-white px-3 text-xs font-extrabold text-slate-700 shadow-2xs hover:border-rose-200 hover:bg-rose-50 hover:text-rose-600 transition-colors cursor-pointer active:scale-95 shrink-0'
           >
             <LogOut
               size={15}

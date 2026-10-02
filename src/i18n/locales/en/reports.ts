@@ -77,4 +77,11 @@ export const reportsEn = {
   daily: 'Daily',
   categoryReport: 'Category',
   todaySales: 'Today Sales',
+  allMonths: 'All Months',
+  today: 'Today',
+  yesterday: 'Yesterday',
+  last7Days: 'Last 7 Days',
+  last15Days: 'Last 15 Days',
+  thisMonth: 'This Month',
+  allTime: 'All Time',
 };

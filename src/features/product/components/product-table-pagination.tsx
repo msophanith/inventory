@@ -21,12 +21,12 @@ export function ProductTablePagination({
   const endRow = Math.min((pageIndex + 1) * pageSize, totalRows);
 
   return (
-    <div className='flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between pt-3 border-t border-slate-100 text-sm text-slate-500 font-medium'>
-      <p>
+    <div className='flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between pt-3 border-t border-slate-100 text-xs sm:text-sm text-slate-500 font-medium'>
+      <p className='text-center sm:text-left'>
         Showing <span className='font-bold text-slate-900'>{startRow}-{endRow}</span> of <span className='font-bold text-slate-900'>{totalRows}</span> products
       </p>
 
-      <div className='flex items-center gap-3 self-end sm:self-auto'>
+      <div className='flex items-center justify-between sm:justify-end gap-3 w-full sm:w-auto'>
         <button
           type='button'
           onClick={() => table.previousPage()}

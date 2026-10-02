@@ -1,11 +1,11 @@
 import {
+  AlertOctagon,
   AlertTriangle,
+  Boxes,
   DollarSign,
   Package,
-  ShoppingBag,
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import type { TodaySaleSummary } from '@/services/movement';
 import { useLanguage } from '@/i18n/language-context';
 import { DashboardKpiCardItem } from './dashboard-kpi-card-item';
 
@@ -14,7 +14,6 @@ interface Props {
   readonly lowStock: number;
   readonly outOfStock: number;
   readonly totalValue: number;
-  readonly todaySale?: TodaySaleSummary;
 }
 
 export function DashboardKpiCards({
@@ -22,12 +21,9 @@ export function DashboardKpiCards({
   lowStock,
   outOfStock,
   totalValue,
-  todaySale,
 }: Props) {
   const navigate = useNavigate();
   const { t } = useLanguage();
-  const totalSales = todaySale?.totalSales ?? 0;
-  const totalOrders = todaySale?.totalOrders ?? 0;
 
   const totalAlerts = lowStock + outOfStock;
   const healthyCount = Math.max(0, totalItems - totalAlerts);
@@ -35,55 +31,78 @@ export function DashboardKpiCards({
     totalItems > 0 ? Math.round((healthyCount / totalItems) * 100) : 100;
 
   return (
-    <div className='grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4'>
-      {/* 1. Today's Revenue */}
-      <DashboardKpiCardItem
-        title={t('reports.todaySales')}
-        usdAmount={totalSales}
-        khrAmount={totalSales}
-        subText={`${totalOrders} ${t('reports.totalOrders')}`}
-        statusBadge={t('reports.period')}
-        icon={ShoppingBag}
-        theme='blue'
-      />
+    <div className='space-y-4'>
+      {/* Section Header */}
+      <div className='flex items-center justify-between px-1'>
+        <div className='flex items-center gap-2.5'>
+          <div className='flex h-8 w-8 items-center justify-center rounded-xl bg-indigo-50 text-indigo-600 border border-indigo-100'>
+            <Boxes size={18} />
+          </div>
+          <div>
+            <h3 className='text-sm sm:text-base font-extrabold text-slate-900'>
+              Inventory Health & Valuation
+            </h3>
+            <p className='text-[11px] text-slate-500 font-medium'>
+              Live catalog valuation, SKU ratios, and restock alerts
+            </p>
+          </div>
+        </div>
+      </div>
 
-      {/* 2. Total Inventory Valuation */}
-      <DashboardKpiCardItem
-        title={t('reports.totalValue')}
-        usdAmount={totalValue}
-        khrAmount={totalValue}
-        subText={`${healthRate}% ${t('reports.healthy')}`}
-        icon={DollarSign}
-        theme='emerald'
-      />
+      <div className='grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4'>
+        {/* 1. Total Inventory Valuation */}
+        <DashboardKpiCardItem
+          title={t('reports.totalValue')}
+          usdAmount={totalValue}
+          khrAmount={totalValue}
+          subText={`${healthRate}% ${t('reports.healthy')}`}
+          icon={DollarSign}
+          theme='emerald'
+        />
 
-      {/* 3. Product Catalog Overview */}
-      <DashboardKpiCardItem
-        title={t('products.products')}
-        count={totalItems}
-        countSuffix='SKUs'
-        subText={`${healthyCount} ${t('products.inStock')}`}
-        icon={Package}
-        theme='indigo'
-        action={{
-          label: `${t('common.all')} →`,
-          onClick: () => navigate('/products'),
-        }}
-      />
+        {/* 2. Product Catalog Overview */}
+        <DashboardKpiCardItem
+          title={t('products.products')}
+          count={totalItems}
+          countSuffix='SKUs'
+          subText={`${healthyCount} ${t('products.inStock')}`}
+          icon={Package}
+          theme='indigo'
+          action={{
+            label: `${t('common.all')} →`,
+            onClick: () => navigate('/products'),
+          }}
+        />
 
-      {/* 4. Restock Priority Alerts */}
-      <DashboardKpiCardItem
-        title={t('reports.lowStockCount')}
-        count={totalAlerts}
-        countSuffix={t('reports.items')}
-        subText={`${outOfStock} ${t('products.outOfStock')} · ${lowStock} ${t('products.lowStock')}`}
-        icon={AlertTriangle}
-        theme='rose'
-        action={{
-          label: t('movement.recordMovement'),
-          onClick: () => navigate('/movement'),
-        }}
-      />
+        {/* 3. Low Stock Warnings */}
+        <DashboardKpiCardItem
+          title={t('products.lowStock')}
+          count={lowStock}
+          countSuffix={t('reports.items')}
+          subText={`${lowStock} nearing threshold`}
+          icon={AlertTriangle}
+          theme='amber'
+          action={{
+            label: `${t('common.all')} →`,
+            onClick: () => navigate('/products'),
+          }}
+        />
+
+        {/* 4. Restock Priority Alerts */}
+        <DashboardKpiCardItem
+          title={t('products.outOfStock')}
+          count={outOfStock}
+          countSuffix={t('reports.items')}
+          subText={`${outOfStock} items with 0 balance`}
+          icon={AlertOctagon}
+          theme='rose'
+          action={{
+            label: 'Restock →',
+            onClick: () => navigate('/movement'),
+          }}
+        />
+      </div>
     </div>
   );
 }
+

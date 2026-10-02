@@ -96,3 +96,42 @@ export function getLastMonthLabel(): string {
     .subtract(1, 'month')
     .format('MMMM YYYY');
 }
+
+export function isToday(
+  value: Date | string | number | null | undefined,
+): boolean {
+  const m = getMoment(value);
+  if (!m) return false;
+  const now = moment().utcOffset(PHNOM_PENH_TZ_OFFSET);
+  return m.isSame(now, 'day');
+}
+
+export function isYesterday(
+  value: Date | string | number | null | undefined,
+): boolean {
+  const m = getMoment(value);
+  if (!m) return false;
+  const yesterday = moment().utcOffset(PHNOM_PENH_TZ_OFFSET).subtract(1, 'day');
+  return m.isSame(yesterday, 'day');
+}
+
+export function isWithinLastNDays(
+  value: Date | string | number | null | undefined,
+  days: number,
+): boolean {
+  const m = getMoment(value);
+  if (!m) return false;
+  const now = moment().utcOffset(PHNOM_PENH_TZ_OFFSET);
+  const cutoff = now.clone().subtract(days, 'days').startOf('day');
+  return m.isSameOrAfter(cutoff);
+}
+
+export function isSameMonth(
+  value: Date | string | number | null | undefined,
+  targetMonthStr: string,
+): boolean {
+  if (!targetMonthStr || targetMonthStr === 'ALL') return true;
+  const m = getMoment(value);
+  return m ? m.format('YYYY-MM') === targetMonthStr : false;
+}
+

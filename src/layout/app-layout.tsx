@@ -2,7 +2,6 @@ import { Outlet } from 'react-router-dom';
 import MobileBottomNav from '@/components/layout/mobile-bottom-nav';
 import Navbar from '@/components/layout/navbar';
 import Sidebar from '@/components/layout/sidebar';
-// import { AppFooter } from '@/components/layout/app-footer';
 import { ShortcutsModal } from '@/components/layout/shortcuts-modal';
 import { PwaInstallBanner } from '@/components/layout/pwa-install-banner';
 import { useKeyboardShortcuts } from '@/hooks/use-keyboard-shortcuts';
@@ -16,14 +15,13 @@ export default function AppLayout() {
     <div className='flex min-h-screen bg-slate-100'>
       <Sidebar />
 
-      <div className='flex flex-1 flex-col min-w-0 overflow-x-clip'>
+      <div className='flex flex-1 flex-col min-w-0 w-full'>
         <Navbar />
 
         <main className='flex-1 flex flex-col min-w-0 pb-20 lg:pb-0'>
           <div className='flex-1 min-w-0'>
             <Outlet />
           </div>
-          {/* <AppFooter /> */}
         </main>
 
         <MobileBottomNav />

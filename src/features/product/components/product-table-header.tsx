@@ -99,7 +99,7 @@ export function ProductTableHeader({
         </div>
 
         {/* Touch-friendly Horizontal Scrollable Stock Filter Pills */}
-        <div className='flex items-center gap-1.5 overflow-x-auto pb-1 sm:pb-0 scrollbar-hide shrink-0'>
+        <div className='flex items-center gap-1.5 overflow-x-auto pb-1 sm:pb-0 scrollbar-none shrink-0 -mx-1 px-1 sm:mx-0 sm:px-0'>
           {filterOptions.map((item) => (
             <button
               key={item.id}

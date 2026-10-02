@@ -8,6 +8,7 @@ import type { Product } from '@/services/product';
 import { productColumns } from './product-table-columns';
 import { ProductTableHeader, type StockFilterType } from './product-table-header';
 import { ProductTablePagination } from './product-table-pagination';
+import { ProductMobileCard } from './product-mobile-card';
 import { useLanguage } from '@/i18n/language-context';
 
 interface Props {
@@ -55,51 +56,10 @@ export default function ProductTable({
     getCoreRowModel: getCoreRowModel(),
   });
 
-  const renderTableContent = () => {
-    const colCount = table.getVisibleLeafColumns().length || 6;
-    if (loading) {
-      return (
-        <tr>
-          <td
-            colSpan={colCount}
-            className='p-10 text-center text-slate-400 font-medium'
-          >
-            {t('products.loadingProducts')}
-          </td>
-        </tr>
-      );
-    }
-
-    if (products.length === 0) {
-      return (
-        <tr>
-          <td
-            colSpan={colCount}
-            className='p-12 text-center text-slate-500 font-medium'
-          >
-            {t('products.noProductsFound')}
-          </td>
-        </tr>
-      );
-    }
-
-    return table.getRowModel().rows.map((row) => (
-      <tr
-        key={row.id}
-        onClick={() => onRowClick?.(row.original.id)}
-        className='transition-colors hover:bg-slate-50/70 cursor-pointer'
-      >
-        {row.getVisibleCells().map((cell) => (
-          <td key={cell.id} className='px-5 py-3.5'>
-            {flexRender(cell.column.columnDef.cell, cell.getContext())}
-          </td>
-        ))}
-      </tr>
-    ));
-  };
+  const colCount = table.getVisibleLeafColumns().length || 6;
 
   return (
-    <div className='space-y-6 rounded-3xl border border-slate-200/80 bg-white p-4 sm:p-6 shadow-xs min-w-0 w-full max-w-full overflow-hidden'>
+    <div className='space-y-4 sm:space-y-6 rounded-3xl border border-slate-200/80 bg-white p-4 sm:p-6 shadow-xs min-w-0 w-full max-w-full overflow-hidden'>
       {/* Search, Actions & Export Header */}
       <ProductTableHeader
         searchValue={searchValue}
@@ -111,25 +71,69 @@ export default function ProductTable({
         isExporting={isExporting}
       />
 
-      {/* Responsive Table Container */}
-      <div className='overflow-x-auto rounded-2xl border border-slate-100 min-w-0 w-full'>
+      {/* ── Mobile: Card List View (sm:hidden) ── */}
+      <div className='flex flex-col gap-3 sm:hidden'>
+        {loading ? (
+          <p className='p-8 text-center text-slate-400 font-medium text-sm'>
+            {t('products.loadingProducts')}
+          </p>
+        ) : products.length === 0 ? (
+          <p className='p-8 text-center text-slate-500 font-medium text-sm'>
+            {t('products.noProductsFound')}
+          </p>
+        ) : (
+          products.map((product) => (
+            <ProductMobileCard
+              key={product.id}
+              product={product}
+              onClick={() => onRowClick?.(product.id)}
+            />
+          ))
+        )}
+      </div>
+
+      {/* ── Desktop: Table View (hidden sm:block) ── */}
+      <div className='hidden sm:block overflow-x-auto rounded-2xl border border-slate-100 min-w-0 w-full'>
         <table className='w-full border-collapse text-left text-sm'>
           <thead>
             <tr className='border-b border-slate-200 bg-slate-50/80 text-xs font-bold uppercase tracking-wider text-slate-500'>
               {table.getHeaderGroups().map((group) =>
                 group.headers.map((header) => (
                   <th key={header.id} className='px-5 py-3.5'>
-                    {flexRender(
-                      header.column.columnDef.header,
-                      header.getContext(),
-                    )}
+                    {flexRender(header.column.columnDef.header, header.getContext())}
                   </th>
                 )),
               )}
             </tr>
           </thead>
           <tbody className='divide-y divide-slate-100'>
-            {renderTableContent()}
+            {loading ? (
+              <tr>
+                <td colSpan={colCount} className='p-10 text-center text-slate-400 font-medium'>
+                  {t('products.loadingProducts')}
+                </td>
+              </tr>
+            ) : products.length === 0 ? (
+              <tr>
+                <td colSpan={colCount} className='p-12 text-center text-slate-500 font-medium'>
+                  {t('products.noProductsFound')}
+                </td>
+              </tr>
+            ) : (
+              table.getRowModel().rows.map((row) => (
+                <tr
+                  key={row.id}
+                  onClick={() => onRowClick?.(row.original.id)}
+                  className='transition-colors hover:bg-slate-50/70 cursor-pointer'
+                >
+                  {row.getVisibleCells().map((cell) => (
+                    <td key={cell.id} className='px-5 py-3.5'>
+                      {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                    </td>
+                  ))}
+                </tr>
+              ))
+            )}
           </tbody>
         </table>
       </div>

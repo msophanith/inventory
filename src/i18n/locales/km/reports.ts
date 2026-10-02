@@ -77,4 +77,11 @@ export const reportsKm = {
   daily: 'ប្រចាំថ្ងៃ',
   categoryReport: 'ប្រភេទ',
   todaySales: 'ចំណូលលក់ថ្ងៃនេះ',
+  allMonths: 'ខែទាំងអស់',
+  today: 'ថ្ងៃនេះ',
+  yesterday: 'ម្សិលមិញ',
+  last7Days: '៧ ថ្ងៃចុងក្រោយ',
+  last15Days: '១៥ ថ្ងៃចុងក្រោយ',
+  thisMonth: 'ខែនេះ',
+  allTime: 'ទាំងអស់',
 };

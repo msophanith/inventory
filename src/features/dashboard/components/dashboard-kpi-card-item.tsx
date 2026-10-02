@@ -1,7 +1,7 @@
 import type { LucideIcon } from 'lucide-react';
 import { formatCurrencyKhr, formatCurrencyUsd } from '@/utils/currency';
 
-export type KpiTheme = 'emerald' | 'blue' | 'indigo' | 'rose';
+export type KpiTheme = 'emerald' | 'blue' | 'indigo' | 'amber' | 'rose';
 
 interface Props {
   readonly title: string;
@@ -46,6 +46,13 @@ const THEME_STYLES: Record<
     iconBg: 'bg-indigo-100/80 text-indigo-600 border border-indigo-200/80',
     khrBadge: 'bg-indigo-100/90 text-indigo-800 border border-indigo-200/80',
     glow: 'from-indigo-500/10 to-transparent',
+  },
+  amber: {
+    bg: 'bg-linear-to-br from-amber-50/90 via-amber-50/40 to-white',
+    border: 'border-amber-200/80 hover:border-amber-300',
+    iconBg: 'bg-amber-100/80 text-amber-600 border border-amber-200/80',
+    khrBadge: 'bg-amber-100/90 text-amber-800 border border-amber-200/80',
+    glow: 'from-amber-500/10 to-transparent',
   },
   rose: {
     bg: 'bg-linear-to-br from-rose-50/90 via-rose-50/40 to-white',
@@ -119,8 +126,8 @@ export function DashboardKpiCardItem({
         )}
       </div>
 
-      <div className='relative mt-4 flex items-center justify-between border-t border-slate-200/50 pt-3 text-xs font-semibold'>
-        <div className='text-slate-500 truncate mr-2'>{subText}</div>
+      <div className='relative mt-4 flex items-center justify-between gap-2 border-t border-slate-200/50 pt-3 text-xs font-semibold'>
+        <div className='text-slate-500 font-medium text-xs leading-tight'>{subText}</div>
         {statusBadge && (
           <span className='shrink-0 rounded-full bg-white/80 px-2.5 py-0.5 text-[11px] font-bold text-slate-600 border border-slate-200/50'>
             {statusBadge}
@@ -130,7 +137,7 @@ export function DashboardKpiCardItem({
           <button
             type='button'
             onClick={action.onClick}
-            className='shrink-0 cursor-pointer text-xs font-extrabold text-indigo-600 hover:text-indigo-800 transition active:scale-95'
+            className='shrink-0 cursor-pointer text-xs font-extrabold text-indigo-600 hover:text-indigo-800 transition active:scale-95 hover:underline whitespace-nowrap'
           >
             {action.label}
           </button>
@@ -139,3 +146,4 @@ export function DashboardKpiCardItem({
     </div>
   );
 }
+

@@ -5,6 +5,7 @@ import { useProduct } from '@/features/product/hooks/use-product';
 import { PageContainer } from '@/components/layout/page-container';
 
 import { DashboardHeader } from '@/features/dashboard/components/dashboard-header';
+import { DashboardSalesSection } from '@/features/dashboard/components/dashboard-sales-section';
 import { DashboardKpiCards } from '@/features/dashboard/components/dashboard-kpi-cards';
 import { DashboardAnalyticsCharts } from '@/features/dashboard/components/dashboard-analytics-charts';
 import { DashboardRecentActivity } from '@/features/dashboard/components/dashboard-recent-activity';
@@ -13,11 +14,7 @@ import { DashboardLowStockFeed } from '@/features/dashboard/components/dashboard
 
 export function DashboardPage() {
   const { productSummary, productSummaryLoading } = useProduct(true);
-  const {
-    summary,
-    data: movements,
-    isLoading: isMovementLoading,
-  } = useMovement();
+  const { data: movements, isLoading: isMovementLoading } = useMovement();
 
   return (
     <PageContainer className='space-y-6 sm:space-y-8 pb-24 lg:pb-8'>
@@ -33,16 +30,18 @@ export function DashboardPage() {
         <DashboardSkeleton />
       ) : (
         <>
-          {/* 2. Executive KPI Cards with Dual Currency */}
+          {/* 2. Dedicated Sales & Revenue Section with Period Filter */}
+          <DashboardSalesSection movements={movements || []} />
+
+          {/* 3. Executive Inventory KPI Cards */}
           <DashboardKpiCards
             totalItems={productSummary?.totalItems || 0}
             lowStock={productSummary?.lowStockItems || 0}
             outOfStock={productSummary?.outOfStockItems || 0}
             totalValue={productSummary?.totalValue || 0}
-            todaySale={summary}
           />
 
-          {/* 3. Stock Distribution + Revenue Trend Line Chart */}
+          {/* 4. Stock Distribution + Revenue Trend Line Chart */}
           <DashboardAnalyticsCharts
             totalItems={productSummary?.totalItems || 0}
             lowStock={productSummary?.lowStockItems || 0}
@@ -50,12 +49,14 @@ export function DashboardPage() {
             movements={movements}
             isLoading={isMovementLoading}
           />
-          {/* 4. Live Activity Feed with Filter Pills */}
+
+          {/* 5. Live Activity Feed with Filter Pills */}
           <DashboardRecentActivity
             movements={movements}
             isLoading={isMovementLoading}
           />
-          {/* 5. Top Sellers + Restock Feed (2-col grid) */}
+
+          {/* 6. Top Sellers + Restock Feed (2-col grid) */}
           <div className='grid grid-cols-1 gap-6 lg:grid-cols-2'>
             <DashboardTopSellers
               movements={movements}

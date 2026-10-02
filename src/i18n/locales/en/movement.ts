@@ -16,7 +16,7 @@ export const movementEn = {
   loadingMovements: 'Loading stock movements...',
   noMovementsFound: 'No movement records found for this month ({month}) matching criteria.',
   history: 'History',
-  thisMonth: 'This Month ({month})',
+  thisMonth: 'You are viewing month ({month})',
   historyDesc: 'Track inventory restocks, sales transactions, customer returns, and damaged stock writes for this month ({month}).',
   product: 'Product',
   remainingStock: 'Remaining Stock',
