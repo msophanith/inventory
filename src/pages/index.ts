@@ -9,3 +9,4 @@ export * from './error';
 export * from './form/create-product';
 export * from './login';
 export * from './scan-page';
+export * from './activity-log';

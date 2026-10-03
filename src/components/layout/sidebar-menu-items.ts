@@ -4,6 +4,7 @@ import {
   HistoryIcon,
   QrCode,
   RefreshCcw,
+  ScrollText,
   ShoppingCart,
   type LucideIcon,
 } from 'lucide-react';
@@ -58,6 +59,13 @@ export function getSidebarMenus(t: (key: string) => string): SidebarMenuItem[] {
       label: t('reports.reports'),
       to: '/report',
       shortcut: 'R',
+      adminOnly: true,
+    },
+    {
+      icon: ScrollText,
+      label: t('logs.logs') || 'Activity Logs',
+      to: '/logs',
+      shortcut: 'L',
       adminOnly: true,
     },
   ];

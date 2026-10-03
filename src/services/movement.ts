@@ -66,12 +66,18 @@ export class MovementService {
         }
 
         const newQty = Math.max(0, product.quantity + delta);
-        await productService.update(String(movement.productId), {
-          ...product,
-          quantity: newQty,
-          shelf: product.shelf ?? '',
-          description: product.description ?? '',
-        });
+        await productService.update(
+          String(movement.productId),
+          {
+            ...product,
+            quantity: newQty,
+            shelf: product.shelf ?? '',
+            description: product.description ?? '',
+          },
+          null,
+          null,
+          true,
+        );
 
         if (!skipNotification) {
           telegramService.sendMovementNotification(createdMovement, product);

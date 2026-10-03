@@ -2,9 +2,11 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { productService } from '@/services';
 import type { ProductQueryParams } from '@/services/product';
 import { useProductStore } from '@/features/product/store/use-product-store';
+import { useAuth } from '@/features/auth/use-auth';
 
 const useProduct = (enableSummary?: boolean) => {
   const queryClient = useQueryClient();
+  const { user } = useAuth();
 
   const useGetProducts = (params?: ProductQueryParams) => {
     return useQuery({
@@ -55,11 +57,13 @@ const useProduct = (enableSummary?: boolean) => {
 
   const useDeleteProduct = () => {
     return useMutation({
-      mutationFn: (id: string) => productService.delete(id),
+      mutationFn: (id: string) => productService.delete(id, user),
       onSuccess: () => {
         queryClient.invalidateQueries({ queryKey: ['products'] });
         queryClient.invalidateQueries({ queryKey: ['productSummary'] });
         queryClient.invalidateQueries({ queryKey: ['product'] });
+        queryClient.invalidateQueries({ queryKey: ['activity-logs'] });
+        queryClient.invalidateQueries({ queryKey: ['activity-logs-kpi'] });
       },
     });
   };

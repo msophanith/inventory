@@ -11,14 +11,11 @@ import StockProgress from '@/features/product-details/components/stock-progress'
 import QuickActions from '@/features/product-details/components/quick-action';
 import ProductDetailsSkeleton from '@/features/product-details/components/skeleton';
 import ProductMovementHistory from '@/features/product-details/components/product-movement';
+import ProductActivityLogs from '@/features/product-details/components/product-activity-logs';
 import ConfirmDeleteModal from '@/features/product-details/components/confirm-delete-modal';
-
 import { useProduct } from '@/features/product/hooks/use-product';
 import { useMovement } from '@/features/movement/hooks/use-movement';
-import {
-  StockMovementModal,
-  type FormValues,
-} from '@/features/movement/components';
+import { StockMovementModal, type FormValues } from '@/features/movement/components';
 import { PageContainer } from '@/components/layout/page-container';
 import { useLanguage } from '@/i18n/language-context';
 
@@ -41,43 +38,29 @@ const ProductDetailsPage = () => {
   } = useMovement();
 
   const { data: product, isLoading } = useGetProductById(productId!);
-  const { data: movements, isLoading: movementLoading } = useGetMovementById(
-    productId!,
-  );
+  const { data: movements, isLoading: movementLoading } = useGetMovementById(productId!);
 
   if (isLoading || !product || movementLoading || !movements) {
     return <ProductDetailsSkeleton />;
   }
 
-  const handleAction = async (actionType: string) => {
-    if (actionType === 'in') {
-      setType('IN');
-      setOpen(true);
-    } else if (actionType === 'out') {
-      setType('OUT');
-      setOpen(true);
-    } else if (actionType === 'return') {
-      setType('RETURN');
-      setOpen(true);
-    }
+  const handleAction = (actionType: 'IN' | 'OUT' | 'RETURN') => {
+    setType(actionType);
+    setOpen(true);
   };
 
   const onUpdateStock = async (values: FormValues) => {
-    const payload = {
-      unitPrice:
-        values.unitPrice ??
-        (type === 'IN' ? product.buyPrice : product.sellPrice),
-      productId: productId ?? '',
-      type,
-      isDamaged: values.reason === 'Damage',
-      quantity: values.quantity,
-      reference: values.reason,
-      note: values.note,
-      createdAt: '',
-    };
-
     try {
-      await updateMovement(payload);
+      await updateMovement({
+        unitPrice: values.unitPrice ?? (type === 'IN' ? product.buyPrice : product.sellPrice),
+        productId: productId ?? '',
+        type,
+        isDamaged: values.reason === 'Damage',
+        quantity: values.quantity,
+        reference: values.reason,
+        note: values.note,
+        createdAt: '',
+      });
       setOpen(false);
     } catch (error) {
       console.log({ error });
@@ -111,23 +94,17 @@ const ProductDetailsPage = () => {
         </button>
       </div>
 
-      <ProductHero
-        product={product}
-        onDeleteClick={() => setIsDeleteDialogOpen(true)}
-      />
+      <ProductHero product={product} onDeleteClick={() => setIsDeleteDialogOpen(true)} />
       <QuickActions
         isLoading={isCreatingMovement}
-        onStockIn={() => handleAction('in')}
-        onStockOut={() => handleAction('out')}
-        onReturn={() => handleAction('return')}
+        onStockIn={() => handleAction('IN')}
+        onStockOut={() => handleAction('OUT')}
+        onReturn={() => handleAction('RETURN')}
       />
       <ProductStats product={product} />
-      <StockProgress
-        quantity={product.quantity}
-        minStock={product.minStock}
-        unit={product.unit}
-      />
+      <StockProgress quantity={product.quantity} minStock={product.minStock} unit={product.unit} />
       <ProductMovementHistory movements={movements} />
+      <ProductActivityLogs productId={productId!} />
       <ProductInfoCard product={product} />
 
       <StockMovementModal
@@ -136,9 +113,7 @@ const ProductDetailsPage = () => {
         product={product}
         loading={isUpdatingMovement}
         onClose={() => setOpen(false)}
-        onSubmit={async (values) => {
-          await onUpdateStock(values);
-        }}
+        onSubmit={onUpdateStock}
       />
 
       <ConfirmDeleteModal

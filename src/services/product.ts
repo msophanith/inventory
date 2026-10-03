@@ -1,5 +1,6 @@
 import type { ProductFormValues } from '@/features/product/schema/product.schema';
 import { supabase } from '@/utils/supabase';
+import type { AuthUser } from '@/types/auth';
 import type {
   PaginatedResponse,
   Product,
@@ -14,6 +15,7 @@ import {
   fetchProductSummary,
 } from './product-queries';
 import { telegramService } from './telegram';
+import { activityLogService } from './activity-log';
 
 export type {
   StockMovement,
@@ -26,9 +28,7 @@ export type {
 export class ProductService {
   private readonly TABLE_NAME = 'Product';
 
-  async getAll(
-    params?: ProductQueryParams,
-  ): Promise<PaginatedResponse<Product>> {
+  async getAll(params?: ProductQueryParams): Promise<PaginatedResponse<Product>> {
     return fetchAllProducts(params);
   }
 
@@ -56,10 +56,7 @@ export class ProductService {
       .order('updatedAt', { ascending: false })
       .limit(limit);
 
-    if (error) {
-      throw new Error(error.message);
-    }
-
+    if (error) throw new Error(error.message);
     return (data || []) as Product[];
   }
 
@@ -71,24 +68,14 @@ export class ProductService {
       .order('quantity', { ascending: true })
       .limit(100);
 
-    if (error) {
-      throw new Error(error.message);
-    }
-
+    if (error) throw new Error(error.message);
     const items = (data || []) as Product[];
-    return items
-      .filter((p) => (p.quantity || 0) <= (p.minStock || 0))
-      .slice(0, limit);
+    return items.filter((p) => (p.quantity || 0) <= (p.minStock || 0)).slice(0, limit);
   }
 
-  async create(product: ProductFormValues): Promise<Product> {
+  async create(product: ProductFormValues, user?: AuthUser | null): Promise<Product> {
     const now = new Date().toISOString();
-    const payload = {
-      ...product,
-      quantity: 0,
-      createdAt: now,
-      updatedAt: now,
-    };
+    const payload = { ...product, quantity: 0, createdAt: now, updatedAt: now };
 
     const { data, error } = await supabase
       .from(this.TABLE_NAME)
@@ -96,18 +83,20 @@ export class ProductService {
       .select()
       .single();
 
-    if (error) {
-      throw new Error(error.message);
-    }
-
-    return data as Product;
+    if (error) throw new Error(error.message);
+    const created = data as Product;
+    void activityLogService.logProductCreated(created, user);
+    return created;
   }
 
-  async update(id: string, product: ProductFormValues): Promise<Product> {
-    const payload = {
-      ...product,
-      updatedAt: new Date().toISOString(),
-    };
+  async update(
+    id: string,
+    product: ProductFormValues,
+    user?: AuthUser | null,
+    previous?: Product | null,
+    skipLog = false,
+  ): Promise<Product> {
+    const payload = { ...product, updatedAt: new Date().toISOString() };
 
     const { data, error } = await supabase
       .from(this.TABLE_NAME)
@@ -116,16 +105,16 @@ export class ProductService {
       .select()
       .single();
 
-    if (error) {
-      throw new Error(error.message);
+    if (error) throw new Error(error.message);
+    const updated = data as Product;
+    if (!skipLog) {
+      void activityLogService.logProductUpdated(updated, previous || null, user);
     }
-
-    return data as Product;
+    return updated;
   }
 
-  async delete(id: string): Promise<boolean> {
+  async delete(id: string, user?: AuthUser | null): Promise<boolean> {
     const product = await fetchProductById(id);
-
     await supabase.from('StockMovement').delete().eq('productId', id);
 
     const { data, error } = await supabase
@@ -134,20 +123,15 @@ export class ProductService {
       .eq('id', id)
       .select();
 
-    if (error) {
-      throw new Error(error.message);
-    }
-
+    if (error) throw new Error(error.message);
     if (!data || data.length === 0) {
-      throw new Error(
-        'Product not found or delete permission denied by RLS policy.',
-      );
+      throw new Error('Product not found or delete permission denied.');
     }
 
     if (product) {
       void telegramService.sendProductDeletedNotification(product);
+      void activityLogService.logProductDeleted(product, user);
     }
-
     return true;
   }
 }

@@ -4,6 +4,7 @@ import {
   HistoryIcon,
   QrCode,
   RefreshCcw,
+  ScrollText,
   ShoppingCart,
   type LucideIcon,
 } from 'lucide-react';
@@ -102,6 +103,14 @@ export function getDrawerMenus(t: (key: string) => string): MenuItem[] {
       to: '/report',
       description: t('reports.reports'),
       badgeColor: 'from-rose-500 to-pink-600',
+      adminOnly: true,
+    },
+    {
+      icon: ScrollText,
+      label: t('logs.logs') || 'Activity Logs',
+      to: '/logs',
+      description: t('logs.auditTrail') || 'Product Audit Trail',
+      badgeColor: 'from-amber-500 to-yellow-600',
       adminOnly: true,
     },
   ];

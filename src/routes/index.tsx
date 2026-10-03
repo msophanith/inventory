@@ -4,6 +4,7 @@ import ProtectedRoute from '@/components/protected-route';
 import AdminRoute from '@/components/admin-route';
 
 import {
+  ActivityLogPage,
   CreateProductPage,
   DashboardPage,
   ErrorPage,
@@ -73,6 +74,10 @@ export const router = createBrowserRouter([
               {
                 path: '/report',
                 element: <ReportPage />,
+              },
+              {
+                path: '/logs',
+                element: <ActivityLogPage />,
               },
             ],
           },

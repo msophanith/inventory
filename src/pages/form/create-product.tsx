@@ -66,6 +66,7 @@ const CreateProductPage = () => {
           ...val,
           id: productId,
         },
+        previous: data,
       });
     } else {
       const newProduct = {

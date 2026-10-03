@@ -5,6 +5,7 @@ import { movementKm } from './movement';
 import { reportsKm } from './reports';
 import { authKm } from './auth';
 import { scanKm } from './scan';
+import { logsKm } from './logs';
 
 export const km = {
   common: commonKm,
@@ -14,4 +15,5 @@ export const km = {
   reports: reportsKm,
   auth: authKm,
   scan: scanKm,
+  logs: logsKm,
 };

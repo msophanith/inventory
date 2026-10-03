@@ -16,7 +16,8 @@ export const SHORTCUT_LIST: ShortcutItem[] = [
   { key: 'd', label: 'D', path: '/', description: 'Go to Dashboard', adminOnly: true },
   { key: 'p', label: 'P', path: '/products', description: 'Go to Products', adminOnly: true },
   { key: 'r', label: 'R', path: '/report', description: 'Go to Sales Report', adminOnly: true },
-  { key: 'n', label: 'N', path: '/products/new', description: 'Create New Product', adminOnly: true },
+  { key: 'l', label: 'L', path: '/logs', description: 'Go to Activity Logs', adminOnly: true },
+  { key: 'n', label: 'N', path: '/products/create', description: 'Create New Product', adminOnly: true },
   { key: 'c', label: 'C', path: '/scan', description: 'Go to Scan Product', adminOnly: true },
 ];
 
