@@ -5,6 +5,7 @@ import {
   isWithinLastNDays,
   isCurrentMonth,
 } from '@/utils/date';
+import { getSaleOrderKey, isSaleOutMovement } from './sale-movement';
 
 export type DashboardSalesFilter =
   | 'TODAY'
@@ -39,21 +40,18 @@ export function calculateDashboardSales(
   let totalSales = 0;
   let totalCost = 0;
   let totalItemsSold = 0;
-  let totalOrders = 0;
+  const orderKeys = new Set<string>();
 
   for (const item of filtered) {
-    const isDamaged = Boolean(
-      item.isDamaged || item.reference?.toLowerCase() === 'damage',
-    );
     const qty = Math.abs(item.quantity || 0);
     const buyPrice = item.product?.buyPrice ?? 0;
     const sellPrice = item.unitPrice ?? item.product?.sellPrice ?? 0;
 
-    if (item.type === 'OUT' && !isDamaged) {
+    if (isSaleOutMovement(item)) {
       totalSales += qty * sellPrice;
       totalCost += qty * buyPrice;
       totalItemsSold += qty;
-      totalOrders += 1;
+      orderKeys.add(getSaleOrderKey(item));
     } else if (item.type === 'RETURN') {
       totalSales -= qty * sellPrice;
       totalCost -= qty * buyPrice;
@@ -67,7 +65,7 @@ export function calculateDashboardSales(
 
   return {
     totalSales: Math.max(0, Math.round(totalSales * 100) / 100),
-    totalOrders,
+    totalOrders: orderKeys.size,
     totalItemsSold: Math.max(0, totalItemsSold),
     totalCost: Math.max(0, Math.round(totalCost * 100) / 100),
     grossProfit: Math.round(grossProfit * 100) / 100,

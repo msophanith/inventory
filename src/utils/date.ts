@@ -122,7 +122,7 @@ export function isWithinLastNDays(
   const m = getMoment(value);
   if (!m) return false;
   const now = moment().utcOffset(PHNOM_PENH_TZ_OFFSET);
-  const cutoff = now.clone().subtract(days, 'days').startOf('day');
+  const cutoff = now.clone().subtract(days - 1, 'days').startOf('day');
   return m.isSameOrAfter(cutoff);
 }
 
