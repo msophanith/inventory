@@ -8,4 +8,13 @@ export const authEn = {
   confirmSignOut: 'Are you sure you want to sign out?',
   confirmSignOutDesc: 'You will need to sign in again to access the POS and inventory features.',
   signingOut: 'Signing out...',
+  portalSubtitle: 'Enter your store credentials to access inventory and the POS terminal.',
+  storeEngineOnline: 'Store Engine Online',
+  showcaseTagline: 'High-velocity retail inventory & point of sale, tailored for Cambodia commerce.',
+  terminalLiveEngine: 'Terminal #01 · Live POS Engine',
+  dualCurrencyFeature: 'Real-time USD & KHR dual pricing',
+  fastScanFeature: 'Sub-second camera & laser barcode scan',
+  stockAuditFeature: 'Instant automated stock auditing',
+  secureConnection: 'Encrypted Session · Store ID Protected',
+  fillDemo: 'Quick Fill Demo',
 };

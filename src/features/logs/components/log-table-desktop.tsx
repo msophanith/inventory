@@ -2,6 +2,7 @@ import { ShieldAlert } from 'lucide-react';
 import type { ActivityLog } from '@/services/activity-log.types';
 import { LogTableHead } from './log-table-head';
 import { LogTableRow } from './log-table-row';
+import { useLanguage } from '@/i18n/language-context';
 
 interface Props {
   logs: ActivityLog[];
@@ -10,6 +11,8 @@ interface Props {
 }
 
 export function LogTableDesktop({ logs, isLoading, onViewDetails }: Props) {
+  const { t } = useLanguage();
+
   return (
     <div className='hidden md:block bg-white rounded-3xl border border-slate-200/80 shadow-xs overflow-hidden'>
       <div className='overflow-x-auto'>
@@ -48,10 +51,10 @@ export function LogTableDesktop({ logs, isLoading, onViewDetails }: Props) {
                       <ShieldAlert size={24} />
                     </div>
                     <p className='font-bold text-slate-800 text-sm'>
-                      No Product Activity Logs Found
+                      {t('logs.noLogsFound')}
                     </p>
                     <p className='text-xs text-slate-400'>
-                      Actions performed on products (create, edit, delete) will appear here in real-time.
+                      {t('logs.noLogsDesc')}
                     </p>
                   </div>
                 </td>

@@ -2,13 +2,16 @@ import { ScrollText } from 'lucide-react';
 import { PageMeta } from '@/components/seo/page-meta';
 import { PageContainer } from '@/components/layout/page-container';
 import { ActivityLogTable } from '@/features/logs/components/log-table';
+import { useLanguage } from '@/i18n/language-context';
 
 export function ActivityLogPage() {
+  const { t } = useLanguage();
+
   return (
     <PageContainer className='space-y-4 sm:space-y-6'>
       <PageMeta
-        title='Product Activity Logs'
-        description='Audit trail and history of who created, edited, or deleted products in the inventory catalog.'
+        title={t('logs.productLogs')}
+        description={t('logs.productLogsDesc')}
       />
 
       {/* Responsive Header Banner */}
@@ -19,11 +22,11 @@ export function ActivityLogPage() {
               <ScrollText size={18} className='sm:w-5 sm:h-5' />
             </div>
             <h1 className='text-xl sm:text-2xl font-black text-slate-900 tracking-tight'>
-              Product Activity Logs
+              {t('logs.productLogs')}
             </h1>
           </div>
           <p className='text-[11px] sm:text-xs text-slate-500 font-medium'>
-            Audit history of product creations, price edits, catalog updates, and deletions.
+            {t('logs.productLogsDesc')}
           </p>
         </div>
       </div>

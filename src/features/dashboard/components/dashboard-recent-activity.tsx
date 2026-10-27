@@ -10,7 +10,7 @@ interface Props {
   readonly isLoading?: boolean;
 }
 
-type FilterType = 'ALL' | 'OUT' | 'IN' | 'ADJUSTMENT';
+type FilterType = 'ALL' | 'OUT' | 'IN' | 'RETURN';
 
 export function DashboardRecentActivity({
   movements = [],
@@ -20,20 +20,20 @@ export function DashboardRecentActivity({
   const [filter, setFilter] = useState<FilterType>('ALL');
 
   const filteredMovements = useMemo(() => {
-    if (filter === 'ALL') return movements.slice(0, 7);
-    return movements.filter((m) => m.type === filter).slice(0, 7);
+    if (filter === 'ALL') return movements.slice(0, 6);
+    return movements.filter((m) => m.type === filter).slice(0, 6);
   }, [movements, filter]);
 
   return (
-    <div className='rounded-3xl border border-slate-200/80 bg-white p-5 sm:p-6 shadow-xs space-y-4 transition hover:shadow-md'>
+    <div className='flex h-full flex-col justify-between rounded-3xl border border-slate-200/80 bg-white p-5 sm:p-6 shadow-2xs transition hover:shadow-xs'>
       {/* Header & Filter Row */}
       <div className='flex flex-wrap items-center justify-between gap-3 border-b border-slate-100 pb-4'>
         <div className='flex items-center gap-3'>
-          <div className='flex h-10 w-10 items-center justify-center rounded-2xl bg-indigo-50 text-indigo-600 border border-indigo-100 shadow-2xs'>
-            <Activity size={20} />
+          <div className='flex h-10 w-10 items-center justify-center rounded-2xl bg-slate-100 text-slate-700 border border-slate-200'>
+            <Activity size={18} />
           </div>
           <div>
-            <h3 className='text-sm sm:text-base font-extrabold text-slate-900'>
+            <h3 className='text-sm sm:text-base font-black text-slate-900 tracking-tight'>
               {t('reports.recentActivity')}
             </h3>
             <p className='text-xs text-slate-500 font-medium'>
@@ -50,9 +50,9 @@ export function DashboardRecentActivity({
                 key={type}
                 type='button'
                 onClick={() => setFilter(type)}
-                className={`rounded-lg px-2.5 py-1 text-xs font-black transition-all cursor-pointer ${
+                className={`rounded-lg px-2.5 py-1 text-xs font-bold transition-all cursor-pointer ${
                   filter === type
-                    ? 'bg-white text-indigo-600 shadow-2xs'
+                    ? 'bg-white text-slate-900 shadow-2xs'
                     : 'text-slate-500 hover:text-slate-800'
                 }`}
               >
@@ -69,7 +69,7 @@ export function DashboardRecentActivity({
 
           <Link
             to='/movement'
-            className='flex items-center gap-1 rounded-xl bg-slate-50 px-3 py-1.5 text-xs font-black text-slate-700 hover:bg-indigo-50 hover:text-indigo-600 transition cursor-pointer border border-slate-200/60'
+            className='flex items-center gap-1 rounded-xl bg-slate-50 px-3 py-1.5 text-xs font-bold text-slate-700 hover:bg-slate-100 transition cursor-pointer border border-slate-200/60'
           >
             <span>{t('common.viewDetails')}</span>
             <ArrowRight size={13} />
@@ -79,7 +79,7 @@ export function DashboardRecentActivity({
 
       {/* Content */}
       {isLoading ? (
-        <div className='space-y-3'>
+        <div className='space-y-3 pt-3'>
           {[...Array(4)].map((_, i) => (
             <div
               key={i}
@@ -92,7 +92,7 @@ export function DashboardRecentActivity({
           {t('reports.noSalesDataYet')}
         </p>
       ) : (
-        <div className='divide-y divide-slate-100'>
+        <div className='divide-y divide-slate-100 pt-1'>
           {filteredMovements.map((m) => (
             <RecentActivityRow key={m.id} movement={m} />
           ))}

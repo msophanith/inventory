@@ -1,20 +1,25 @@
 import { PageMeta } from '@/components/seo/page-meta';
-import { DashboardSkeleton } from '@/features/dashboard/components/dashboard-skeleton';
-import { useMovement } from '@/features/movement/hooks/use-movement';
-import { useProduct } from '@/features/product/hooks/use-product';
 import { PageContainer } from '@/components/layout/page-container';
-
+import {
+  KpiCardsSkeleton,
+  AnalyticsGridSkeleton,
+  OperationsGridSkeleton,
+  SalesSectionSkeleton,
+} from '@/features/dashboard/components/dashboard-skeleton';
+import { useDashboardData } from '@/features/dashboard/hooks/use-dashboard-data';
 import { DashboardHeader } from '@/features/dashboard/components/dashboard-header';
 import { DashboardSalesSection } from '@/features/dashboard/components/dashboard-sales-section';
 import { DashboardKpiCards } from '@/features/dashboard/components/dashboard-kpi-cards';
-import { DashboardAnalyticsCharts } from '@/features/dashboard/components/dashboard-analytics-charts';
-import { DashboardRecentActivity } from '@/features/dashboard/components/dashboard-recent-activity';
-import { DashboardTopSellers } from '@/features/dashboard/components/dashboard-top-sellers';
-import { DashboardLowStockFeed } from '@/features/dashboard/components/dashboard-low-stock-feed';
+import { DashboardAnalyticsGrid } from '@/features/dashboard/components/dashboard-analytics-grid';
+import { DashboardOperationsGrid } from '@/features/dashboard/components/dashboard-operations-grid';
 
 export function DashboardPage() {
-  const { productSummary, productSummaryLoading } = useProduct(true);
-  const { data: movements, isLoading: isMovementLoading } = useMovement();
+  const {
+    productSummary,
+    isSummaryLoading,
+    movements,
+    isMovementsLoading,
+  } = useDashboardData();
 
   return (
     <PageContainer className='space-y-6 sm:space-y-8 pb-24 lg:pb-8'>
@@ -26,45 +31,46 @@ export function DashboardPage() {
       {/* 1. Header Banner with Greeting & Quick Launchers */}
       <DashboardHeader />
 
-      {productSummaryLoading || isMovementLoading ? (
-        <DashboardSkeleton />
+      {/* 2. Sales & Revenue Performance */}
+      {isMovementsLoading && !movements.length ? (
+        <SalesSectionSkeleton />
       ) : (
-        <>
-          {/* 2. Dedicated Sales & Revenue Section with Period Filter */}
-          <DashboardSalesSection movements={movements || []} />
+        <DashboardSalesSection
+          movements={movements}
+          isLoading={isMovementsLoading}
+        />
+      )}
 
-          {/* 3. Executive Inventory KPI Cards */}
-          <DashboardKpiCards
-            totalItems={productSummary?.totalItems || 0}
-            lowStock={productSummary?.lowStockItems || 0}
-            outOfStock={productSummary?.outOfStockItems || 0}
-            totalValue={productSummary?.totalValue || 0}
-          />
+      {/* 3. Executive Inventory KPI Cards + Integrated Health Strip */}
+      {isSummaryLoading && !productSummary ? (
+        <KpiCardsSkeleton />
+      ) : (
+        <DashboardKpiCards
+          totalItems={productSummary?.totalItems || 0}
+          lowStock={productSummary?.lowStockItems || 0}
+          outOfStock={productSummary?.outOfStockItems || 0}
+          totalValue={productSummary?.totalValue || 0}
+        />
+      )}
 
-          {/* 4. Stock Distribution + Revenue Trend Line Chart */}
-          <DashboardAnalyticsCharts
-            totalItems={productSummary?.totalItems || 0}
-            lowStock={productSummary?.lowStockItems || 0}
-            outOfStock={productSummary?.outOfStockItems || 0}
-            movements={movements}
-            isLoading={isMovementLoading}
-          />
+      {/* 4. Visual Analytics: Revenue Trend Line + Top Best Sellers */}
+      {isMovementsLoading && !movements.length ? (
+        <AnalyticsGridSkeleton />
+      ) : (
+        <DashboardAnalyticsGrid
+          movements={movements}
+          isLoading={isMovementsLoading}
+        />
+      )}
 
-          {/* 5. Live Activity Feed with Filter Pills */}
-          <DashboardRecentActivity
-            movements={movements}
-            isLoading={isMovementLoading}
-          />
-
-          {/* 6. Top Sellers + Restock Feed (2-col grid) */}
-          <div className='grid grid-cols-1 gap-6 lg:grid-cols-2'>
-            <DashboardTopSellers
-              movements={movements}
-              isLoading={isMovementLoading}
-            />
-            <DashboardLowStockFeed />
-          </div>
-        </>
+      {/* 5. Store Operations: Real-time Movements + Restock Priority Center */}
+      {isMovementsLoading && !movements.length ? (
+        <OperationsGridSkeleton />
+      ) : (
+        <DashboardOperationsGrid
+          movements={movements}
+          isLoading={isMovementsLoading}
+        />
       )}
     </PageContainer>
   );

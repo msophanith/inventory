@@ -1,25 +1,38 @@
-import { PackageCheck, ShieldCheck } from 'lucide-react';
+import { Store } from 'lucide-react';
 import { useLanguage } from '@/i18n/language-context';
 
 export function LoginBrand() {
   const { t } = useLanguage();
+
   return (
-    <div className='mb-8 text-center space-y-3'>
-      {/* Icon badge */}
-      <div className='relative mx-auto flex h-16 w-16 items-center justify-center'>
-        <div className='absolute inset-0 rounded-2xl bg-indigo-500/20 blur-lg animate-pulse' />
-        <div className='relative flex h-16 w-16 items-center justify-center rounded-2xl bg-linear-to-tr from-indigo-600 to-blue-600 text-white shadow-lg shadow-indigo-500/25'>
-          <PackageCheck size={32} />
+    <div className='mb-7 space-y-3 text-left'>
+      {/* Brand lockup */}
+      <div className='flex items-center gap-3'>
+        <div className='flex h-11 w-11 items-center justify-center rounded-2xl bg-linear-to-br from-indigo-600 via-indigo-700 to-blue-600 text-white shadow-md shadow-indigo-600/20'>
+          <Store size={22} className='stroke-[2.2]' />
+        </div>
+        <div>
+          <div className='flex items-center gap-1.5'>
+            <span className='text-lg font-black tracking-tight text-slate-900'>
+              {t('common.appName')}
+            </span>
+            <span className='rounded-md bg-indigo-50 px-1.5 py-0.5 text-[10px] font-bold text-indigo-700 border border-indigo-200/60'>
+              POS
+            </span>
+          </div>
+          <p className='text-[11px] font-semibold text-slate-500'>
+            មានលាភ · Retail Terminal
+          </p>
         </div>
       </div>
 
-      <div>
-        <h1 className='text-2xl sm:text-3xl font-black text-slate-900 tracking-tight'>
-          {t('common.appName')}
-        </h1>
-        <p className='mt-1 text-xs sm:text-sm font-semibold text-slate-500 flex items-center justify-center gap-1.5'>
-          <ShieldCheck size={15} className='text-emerald-600' />
-          {t('common.appTagline')}
+      {/* Greeting Title */}
+      <div className='pt-1'>
+        <h2 className='text-xl sm:text-2xl font-black tracking-tight text-slate-900'>
+          {t('auth.signInTitle')}
+        </h2>
+        <p className='text-xs text-slate-500 font-medium leading-relaxed mt-1'>
+          {t('auth.portalSubtitle')}
         </p>
       </div>
     </div>

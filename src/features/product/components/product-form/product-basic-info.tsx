@@ -8,6 +8,7 @@ import { playScanSound } from '@/features/sell/utils/scan-sound';
 import type { UseFormSetValue } from 'react-hook-form';
 import type { ProductFormValues } from '@/features/product/schema/product.schema';
 import { useProductStore } from '@/features/product/store/use-product-store';
+import { useLanguage } from '@/i18n/language-context';
 
 interface Props {
   readonly register: any;
@@ -17,6 +18,7 @@ interface Props {
 }
 
 const ProductBasicInfo = ({ register, setValue, watchName, errors }: Props) => {
+  const { t } = useLanguage();
   const isCameraScanOpen = useProductStore((state) => state.isCameraScanOpen);
   const setIsCameraScanOpen = useProductStore((state) => state.setIsCameraScanOpen);
 
@@ -47,7 +49,7 @@ const ProductBasicInfo = ({ register, setValue, watchName, errors }: Props) => {
           <FileText size={18} />
         </div>
         <h2 className='font-bold text-slate-900 text-base'>
-          Basic Information
+          {t('products.basicInformation')}
         </h2>
       </div>
 
@@ -60,7 +62,7 @@ const ProductBasicInfo = ({ register, setValue, watchName, errors }: Props) => {
 
       <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4'>
         <FormInput
-          label='Barcode'
+          label={t('products.barcode')}
           name='barcode'
           register={register}
           error={errors.barcode?.message}
@@ -69,7 +71,7 @@ const ProductBasicInfo = ({ register, setValue, watchName, errors }: Props) => {
             <button
               type='button'
               onClick={() => setIsCameraScanOpen(true)}
-              title='Scan barcode with camera'
+              title={t('products.scanBarcodeCamera')}
               className='flex h-8 w-8 items-center justify-center rounded-xl text-slate-400 hover:bg-emerald-50 hover:text-emerald-600 transition cursor-pointer'
             >
               <Camera size={18} />
@@ -86,7 +88,7 @@ const ProductBasicInfo = ({ register, setValue, watchName, errors }: Props) => {
         />
 
         <FormInput
-          label='Category'
+          label={t('products.category')}
           name='category'
           register={register}
           error={errors.category?.message}
@@ -96,11 +98,11 @@ const ProductBasicInfo = ({ register, setValue, watchName, errors }: Props) => {
 
       <div className='space-y-1.5'>
         <label className='block text-xs font-bold uppercase tracking-wider text-slate-600'>
-          Description
+          {t('products.description')}
         </label>
         <textarea
           {...register('description')}
-          placeholder='Optional details or specifications...'
+          placeholder={t('products.descriptionPlaceholder')}
           className='min-h-24 w-full rounded-2xl border border-slate-200 bg-white p-3.5 text-sm font-semibold text-slate-900 transition focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/20'
         />
       </div>

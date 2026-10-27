@@ -8,6 +8,7 @@ import {
 import { useNavigate } from 'react-router-dom';
 import { useLanguage } from '@/i18n/language-context';
 import { DashboardKpiCardItem } from './dashboard-kpi-card-item';
+import { DashboardHealthStrip } from './dashboard-health-strip';
 
 interface Props {
   readonly totalItems: number;
@@ -31,7 +32,7 @@ export function DashboardKpiCards({
     totalItems > 0 ? Math.round((healthyCount / totalItems) * 100) : 100;
 
   return (
-    <div className='space-y-4'>
+    <div className='space-y-3.5'>
       {/* Section Header */}
       <div className='flex items-center justify-between px-1'>
         <div className='flex items-center gap-2.5'>
@@ -40,10 +41,10 @@ export function DashboardKpiCards({
           </div>
           <div>
             <h3 className='text-sm sm:text-base font-extrabold text-slate-900'>
-              Inventory Health & Valuation
+              {t('reports.inventoryHealthValuation')}
             </h3>
             <p className='text-[11px] text-slate-500 font-medium'>
-              Live catalog valuation, SKU ratios, and restock alerts
+              {t('reports.inventoryHealthDesc')}
             </p>
           </div>
         </div>
@@ -79,7 +80,7 @@ export function DashboardKpiCards({
           title={t('products.lowStock')}
           count={lowStock}
           countSuffix={t('reports.items')}
-          subText={`${lowStock} nearing threshold`}
+          subText={t('reports.nearingThreshold', { count: lowStock })}
           icon={AlertTriangle}
           theme='amber'
           action={{
@@ -93,16 +94,24 @@ export function DashboardKpiCards({
           title={t('products.outOfStock')}
           count={outOfStock}
           countSuffix={t('reports.items')}
-          subText={`${outOfStock} items with 0 balance`}
+          subText={t('reports.zeroBalance', { count: outOfStock })}
           icon={AlertOctagon}
           theme='rose'
           action={{
-            label: 'Restock →',
+            label: `${t('reports.restockAction')} →`,
             onClick: () => navigate('/movement'),
           }}
         />
       </div>
+
+      {/* Integrated Stock Distribution Strip */}
+      {totalItems > 0 && (
+        <DashboardHealthStrip
+          totalItems={totalItems}
+          lowStock={lowStock}
+          outOfStock={outOfStock}
+        />
+      )}
     </div>
   );
 }
-

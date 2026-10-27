@@ -40,4 +40,13 @@ export const commonEn = {
   collapseSidebar: 'Collapse Sidebar',
   developedBy: 'Developed by',
   copyright: 'All rights reserved.',
+  general: 'General',
+  admin: 'Admin',
+  cashier: 'Cashier',
+  unknownUser: 'Unknown User',
+  close: 'Close',
+  none: 'None',
+  previous: 'Previous',
+  next: 'Next',
+  showingFromToOf: 'Showing {from} to {to} of {total}',
 };

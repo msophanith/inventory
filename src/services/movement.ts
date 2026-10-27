@@ -10,8 +10,14 @@ import {
   fetchMovementsByProductId,
   fetchTodaySaleSummary,
 } from './movement-queries';
+import {
+  fetchDashboardMovements,
+  fetchMonthTopSellers,
+  type MonthTopSellerItem,
+} from './dashboard-queries';
 
 export type { Movement, MovementType, MovementFilter, TodaySaleSummary } from './movement.types';
+export type { MonthTopSellerItem } from './dashboard-queries';
 
 export class MovementService {
   private readonly tableName = 'StockMovement';
@@ -92,5 +98,13 @@ export class MovementService {
 
   async getTodaySale(): Promise<TodaySaleSummary> {
     return fetchTodaySaleSummary();
+  }
+
+  async getDashboardMovements(limit = 500): Promise<Movement[]> {
+    return fetchDashboardMovements(limit);
+  }
+
+  async getMonthTopSellers(limit = 6): Promise<MonthTopSellerItem[]> {
+    return fetchMonthTopSellers(limit);
   }
 }

@@ -18,48 +18,27 @@ interface Props {
 
 const THEME_STYLES: Record<
   KpiTheme,
-  {
-    bg: string;
-    border: string;
-    iconBg: string;
-    khrBadge: string;
-    glow: string;
-  }
+  { iconBg: string; khrBadge: string }
 > = {
   emerald: {
-    bg: 'bg-linear-to-br from-emerald-50/90 via-emerald-50/40 to-white',
-    border: 'border-emerald-200/80 hover:border-emerald-300',
-    iconBg: 'bg-emerald-100/80 text-emerald-600 border border-emerald-200/80',
-    khrBadge: 'bg-emerald-100/90 text-emerald-800 border border-emerald-200/80',
-    glow: 'from-emerald-500/10 to-transparent',
+    iconBg: 'bg-emerald-50 text-emerald-700 border border-emerald-200/60',
+    khrBadge: 'bg-emerald-50 text-emerald-800 border border-emerald-200/80',
   },
   blue: {
-    bg: 'bg-linear-to-br from-blue-50/90 via-blue-50/40 to-white',
-    border: 'border-blue-200/80 hover:border-blue-300',
-    iconBg: 'bg-blue-100/80 text-blue-600 border border-blue-200/80',
-    khrBadge: 'bg-blue-100/90 text-blue-800 border border-blue-200/80',
-    glow: 'from-blue-500/10 to-transparent',
+    iconBg: 'bg-blue-50 text-blue-700 border border-blue-200/60',
+    khrBadge: 'bg-blue-50 text-blue-800 border border-blue-200/80',
   },
   indigo: {
-    bg: 'bg-linear-to-br from-indigo-50/90 via-indigo-50/40 to-white',
-    border: 'border-indigo-200/80 hover:border-indigo-300',
-    iconBg: 'bg-indigo-100/80 text-indigo-600 border border-indigo-200/80',
-    khrBadge: 'bg-indigo-100/90 text-indigo-800 border border-indigo-200/80',
-    glow: 'from-indigo-500/10 to-transparent',
+    iconBg: 'bg-indigo-50 text-indigo-700 border border-indigo-200/60',
+    khrBadge: 'bg-indigo-50 text-indigo-800 border border-indigo-200/80',
   },
   amber: {
-    bg: 'bg-linear-to-br from-amber-50/90 via-amber-50/40 to-white',
-    border: 'border-amber-200/80 hover:border-amber-300',
-    iconBg: 'bg-amber-100/80 text-amber-600 border border-amber-200/80',
-    khrBadge: 'bg-amber-100/90 text-amber-800 border border-amber-200/80',
-    glow: 'from-amber-500/10 to-transparent',
+    iconBg: 'bg-amber-50 text-amber-700 border border-amber-200/60',
+    khrBadge: 'bg-amber-50 text-amber-800 border border-amber-200/80',
   },
   rose: {
-    bg: 'bg-linear-to-br from-rose-50/90 via-rose-50/40 to-white',
-    border: 'border-rose-200/80 hover:border-rose-300',
-    iconBg: 'bg-rose-100/80 text-rose-600 border border-rose-200/80',
-    khrBadge: 'bg-rose-100/90 text-rose-800 border border-rose-200/80',
-    glow: 'from-rose-500/10 to-transparent',
+    iconBg: 'bg-rose-50 text-rose-700 border border-rose-200/60',
+    khrBadge: 'bg-rose-50 text-rose-800 border border-rose-200/80',
   },
 };
 
@@ -78,58 +57,52 @@ export function DashboardKpiCardItem({
   const styles = THEME_STYLES[theme];
 
   return (
-    <div
-      className={`group relative overflow-hidden rounded-3xl border ${styles.bg} p-5 shadow-xs transition-all duration-300 hover:shadow-md hover:-translate-y-0.5 ${styles.border}`}
-    >
-      <div
-        className={`pointer-events-none absolute inset-0 bg-gradient-to-br ${styles.glow} opacity-0 transition-opacity duration-300 group-hover:opacity-100`}
-      />
-
-      <div className='relative flex items-center justify-between'>
-        <span className='text-xs font-bold uppercase tracking-wider text-slate-500'>
-          {title}
-        </span>
-        <div
-          className={`flex h-11 w-11 items-center justify-center rounded-2xl shadow-2xs transition-transform duration-300 group-hover:scale-105 ${styles.iconBg}`}
-        >
-          <Icon size={20} />
-        </div>
-      </div>
-
-      <div className='relative mt-3 space-y-1.5'>
-        {usdAmount !== undefined ? (
-          <div>
-            <h3 className='text-2xl sm:text-3xl font-black tracking-tight text-slate-900'>
-              {formatCurrencyUsd(usdAmount)}
-            </h3>
-            {khrAmount !== undefined && (
-              <div className='mt-1.5 flex items-center'>
-                <span
-                  className={`inline-flex items-center rounded-lg px-2 py-0.5 text-[11px] font-extrabold tracking-tight ${styles.khrBadge}`}
-                >
-                  {formatCurrencyKhr(khrAmount)}
-                </span>
-              </div>
-            )}
+    <div className='group relative flex flex-col justify-between overflow-hidden rounded-3xl border border-slate-200/80 bg-white p-5 shadow-2xs transition-all duration-200 hover:shadow-xs hover:border-slate-300'>
+      <div>
+        <div className='flex items-center justify-between'>
+          <span className='text-xs font-bold text-slate-500 tracking-tight'>
+            {title}
+          </span>
+          <div
+            className={`flex h-9 w-9 items-center justify-center rounded-2xl shadow-2xs transition-transform duration-200 group-hover:scale-105 ${styles.iconBg}`}
+          >
+            <Icon size={17} />
           </div>
-        ) : (
-          <div>
-            <h3 className='text-2xl sm:text-3xl font-black tracking-tight text-slate-900'>
+        </div>
+
+        <div className='mt-2.5 space-y-1.5'>
+          {usdAmount !== undefined ? (
+            <div>
+              <div className='text-2xl sm:text-3xl font-black tracking-tight text-slate-900 tabular-nums'>
+                {formatCurrencyUsd(usdAmount)}
+              </div>
+              {khrAmount !== undefined && (
+                <div className='mt-1.5 flex items-center'>
+                  <span
+                    className={`inline-flex items-center rounded-lg px-2 py-0.5 text-[11px] font-bold ${styles.khrBadge}`}
+                  >
+                    {formatCurrencyKhr(khrAmount)}
+                  </span>
+                </div>
+              )}
+            </div>
+          ) : (
+            <div className='text-2xl sm:text-3xl font-black tracking-tight text-slate-900 tabular-nums'>
               {count}{' '}
               {countSuffix && (
                 <span className='text-sm font-semibold text-slate-400'>
                   {countSuffix}
                 </span>
               )}
-            </h3>
-          </div>
-        )}
+            </div>
+          )}
+        </div>
       </div>
 
-      <div className='relative mt-4 flex items-center justify-between gap-2 border-t border-slate-200/50 pt-3 text-xs font-semibold'>
-        <div className='text-slate-500 font-medium text-xs leading-tight'>{subText}</div>
+      <div className='mt-4 flex items-center justify-between gap-2 border-t border-slate-100 pt-3 text-xs font-medium'>
+        <div className='text-slate-500 text-xs'>{subText}</div>
         {statusBadge && (
-          <span className='shrink-0 rounded-full bg-white/80 px-2.5 py-0.5 text-[11px] font-bold text-slate-600 border border-slate-200/50'>
+          <span className='shrink-0 rounded-full bg-slate-100 px-2.5 py-0.5 text-[11px] font-bold text-slate-600 border border-slate-200'>
             {statusBadge}
           </span>
         )}
@@ -137,7 +110,7 @@ export function DashboardKpiCardItem({
           <button
             type='button'
             onClick={action.onClick}
-            className='shrink-0 cursor-pointer text-xs font-extrabold text-indigo-600 hover:text-indigo-800 transition active:scale-95 hover:underline whitespace-nowrap'
+            className='shrink-0 cursor-pointer text-xs font-bold text-indigo-600 hover:text-indigo-800 transition active:scale-95 hover:underline whitespace-nowrap'
           >
             {action.label}
           </button>
@@ -146,4 +119,3 @@ export function DashboardKpiCardItem({
     </div>
   );
 }
-

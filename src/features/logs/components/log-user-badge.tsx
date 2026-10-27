@@ -1,4 +1,5 @@
 import { Shield, User as UserIcon } from 'lucide-react';
+import { useLanguage } from '@/i18n/language-context';
 
 interface Props {
   name?: string | null;
@@ -7,7 +8,8 @@ interface Props {
 }
 
 export function LogUserBadge({ name, email, role }: Props) {
-  const displayName = name || email?.split('@')[0] || 'Unknown User';
+  const { t } = useLanguage();
+  const displayName = name || email?.split('@')[0] || t('common.unknownUser');
   const isAdmin = (role || '').toLowerCase() === 'admin';
   const initial = displayName.charAt(0).toUpperCase();
 
@@ -35,7 +37,7 @@ export function LogUserBadge({ name, email, role }: Props) {
             }`}
           >
             {isAdmin ? <Shield size={10} /> : <UserIcon size={10} />}
-            {isAdmin ? 'Admin' : 'Cashier'}
+            {isAdmin ? t('common.admin') : t('common.cashier')}
           </span>
         </div>
         {email && email !== displayName && (

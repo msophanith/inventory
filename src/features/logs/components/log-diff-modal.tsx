@@ -3,6 +3,7 @@ import type { ActivityLog } from '@/services/activity-log.types';
 import { formatDate } from '@/utils/date';
 import { LogActionBadge } from './log-action-badge';
 import { LogUserBadge } from './log-user-badge';
+import { useLanguage } from '@/i18n/language-context';
 
 interface Props {
   log: ActivityLog | null;
@@ -11,6 +12,7 @@ interface Props {
 }
 
 export function LogDiffModal({ log, open, onClose }: Props) {
+  const { t } = useLanguage();
   if (!open || !log) return null;
 
   const changes = log.details?.changes || [];
@@ -34,7 +36,7 @@ export function LogDiffModal({ log, open, onClose }: Props) {
             </h3>
             {log.barcode && (
               <p className='text-[11px] text-slate-500 font-mono'>
-                Barcode: <span className='font-semibold'>{log.barcode}</span>
+                {t('products.barcode')}: <span className='font-semibold'>{log.barcode}</span>
               </p>
             )}
           </div>
@@ -53,13 +55,13 @@ export function LogDiffModal({ log, open, onClose }: Props) {
           <div className='grid grid-cols-1 sm:grid-cols-2 gap-2.5 p-3 sm:p-4 rounded-2xl bg-slate-50 border border-slate-100 text-xs'>
             <div>
               <p className='text-[10px] sm:text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-1'>
-                Performed By
+                {t('logs.performedBy')}
               </p>
               <LogUserBadge name={log.userName} email={log.userEmail} role={log.userRole} />
             </div>
             <div>
               <p className='text-[10px] sm:text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-1'>
-                Timestamp
+                {t('logs.timestamp')}
               </p>
               <div className='flex items-center gap-1.5 font-semibold text-slate-700 mt-1 text-xs'>
                 <Clock size={13} className='text-slate-400 shrink-0' />
@@ -71,7 +73,7 @@ export function LogDiffModal({ log, open, onClose }: Props) {
           {/* Summary */}
           {log.details?.summary && (
             <div className='p-3 rounded-2xl bg-indigo-50/70 border border-indigo-100/80 text-xs text-indigo-900 font-medium'>
-              <span className='font-bold mr-1'>Summary:</span>
+              <span className='font-bold mr-1'>{t('logs.summary')}:</span>
               {log.details.summary}
             </div>
           )}
@@ -80,7 +82,7 @@ export function LogDiffModal({ log, open, onClose }: Props) {
           {hasChanges ? (
             <div className='space-y-2'>
               <h4 className='text-[11px] font-bold uppercase tracking-wider text-slate-500'>
-                Modified Attributes ({changes.length})
+                {t('logs.modifiedAttributes')} ({changes.length})
               </h4>
               <div className='border border-slate-200 rounded-2xl overflow-hidden divide-y divide-slate-100'>
                 {changes.map((c, i) => (
@@ -88,11 +90,11 @@ export function LogDiffModal({ log, open, onClose }: Props) {
                     <span className='font-bold text-slate-800 text-[11px] sm:text-xs'>{c.label}</span>
                     <div className='sm:col-span-2 flex items-center gap-2 min-w-0'>
                       <span className='px-2 py-0.5 rounded bg-rose-50 text-rose-700 font-mono text-[10px] sm:text-[11px] line-through truncate max-w-[45%]'>
-                        {String(c.oldValue ?? 'None')}
+                        {String(c.oldValue ?? t('common.none'))}
                       </span>
                       <ArrowRight size={12} className='text-slate-400 shrink-0' />
                       <span className='px-2 py-0.5 rounded bg-emerald-50 text-emerald-700 font-bold font-mono text-[10px] sm:text-[11px] truncate max-w-[45%]'>
-                        {String(c.newValue ?? 'None')}
+                        {String(c.newValue ?? t('common.none'))}
                       </span>
                     </div>
                   </div>
@@ -102,10 +104,10 @@ export function LogDiffModal({ log, open, onClose }: Props) {
           ) : (
             <div className='p-3.5 rounded-2xl bg-slate-50 border border-slate-100 text-center text-xs text-slate-500 font-medium'>
               {log.action === 'CREATE'
-                ? 'Product was newly created into the catalog.'
+                ? t('logs.productCreatedDesc')
                 : log.action === 'DELETE'
-                  ? 'Product was completely deleted from catalog.'
-                  : 'No specific field diffs recorded.'}
+                  ? t('logs.productDeletedDesc')
+                  : t('logs.noFieldDiffs')}
             </div>
           )}
         </div>
@@ -117,7 +119,7 @@ export function LogDiffModal({ log, open, onClose }: Props) {
             onClick={onClose}
             className='w-full sm:w-auto px-5 py-2.5 rounded-xl bg-slate-900 text-white font-bold text-xs hover:bg-slate-800 transition active:scale-98 cursor-pointer text-center'
           >
-            Close
+            {t('common.close')}
           </button>
         </div>
       </div>

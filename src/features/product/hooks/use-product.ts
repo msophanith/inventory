@@ -29,6 +29,7 @@ const useProduct = (enableSummary?: boolean) => {
     queryKey: ['productSummary'],
     queryFn: () => productService.getSummary(),
     enabled: enableSummary,
+    staleTime: 60 * 1000,
   });
 
   const useGetProductById = (id: string) => {
@@ -44,6 +45,7 @@ const useProduct = (enableSummary?: boolean) => {
       queryKey: ['products-out-of-stock', limit],
       queryFn: () => productService.getOutOfStockProducts(limit),
       enabled: enableSummary,
+      staleTime: 60 * 1000,
     });
   };
 
@@ -52,6 +54,7 @@ const useProduct = (enableSummary?: boolean) => {
       queryKey: ['products-low-stock', limit],
       queryFn: () => productService.getLowStockProducts(limit),
       enabled: enableSummary,
+      staleTime: 60 * 1000,
     });
   };
 

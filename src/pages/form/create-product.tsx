@@ -8,8 +8,10 @@ import { useProductAction } from '@/features/product/hooks/use-product-action';
 import { useProduct } from '@/features/product/hooks/use-product';
 import type { ProductFormValues } from '@/features/product/schema/product.schema';
 import { PageContainer } from '@/components/layout/page-container';
+import { useLanguage } from '@/i18n/language-context';
 
 const CreateProductPage = () => {
+  const { t } = useLanguage();
   const navigate = useNavigate();
   const { productId } = useParams();
   const [searchParams] = useSearchParams();
@@ -82,10 +84,12 @@ const CreateProductPage = () => {
   return (
     <PageContainer className='space-y-6'>
       <PageMeta
-        title={isEditing ? 'Edit Product' : 'Create Product'}
-        description={isEditing
-          ? 'Update product information, pricing, and stock limits.'
-          : 'Add a new product to your inventory catalog.'}
+        title={isEditing ? t('products.editProduct') : t('products.createNewProduct')}
+        description={
+          isEditing
+            ? t('products.editProductDesc')
+            : t('products.createProductDesc')
+        }
       />
       {/* Header & Back Button */}
       <div className='flex flex-col sm:flex-row sm:items-center justify-between gap-4'>
@@ -98,18 +102,18 @@ const CreateProductPage = () => {
             }
           >
             <ArrowLeft size={16} />
-            Back to Products
+            {t('products.backToProducts')}
           </button>
 
           <h1 className='text-2xl font-extrabold text-slate-900 tracking-tight'>
-            {isEditing ? 'Edit Product' : 'Create New Product'}
+            {isEditing ? t('products.editProduct') : t('products.createNewProduct')}
           </h1>
           <p className='text-xs text-slate-500 font-medium mt-0.5'>
             {isEditing
-              ? 'Update existing product information, pricing, and stock limits.'
+              ? t('products.editProductDesc')
               : barcodeQueryParam
-                ? `Creating new product for scanned barcode "${barcodeQueryParam}"`
-                : 'Add a new product to your inventory catalog.'}
+                ? t('products.creatingProductForBarcode', { barcode: barcodeQueryParam })
+                : t('products.createProductDesc')}
           </p>
         </div>
       </div>

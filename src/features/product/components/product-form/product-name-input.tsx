@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import { MagnetIcon } from 'lucide-react';
 import { type Product } from '@/services/product';
 import { productService } from '@/services';
+import { useLanguage } from '@/i18n/language-context';
 
 interface Props {
   readonly register: any;
@@ -16,6 +17,7 @@ export function ProductNameInput({
   error,
   watchName,
 }: Props) {
+  const { t } = useLanguage();
   const [suggestions, setSuggestions] = useState<Product[]>([]);
   const [isOpen, setIsOpen] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -77,13 +79,13 @@ export function ProductNameInput({
   return (
     <div className='relative space-y-1.5' ref={containerRef}>
       <label className='block text-xs font-bold uppercase tracking-wider text-slate-600'>
-        Product Name <span className='text-rose-500'>*</span>
+        {t('products.productName')} <span className='text-rose-500'>*</span>
       </label>
       <div className='relative'>
         <input
           {...register('name')}
           type='text'
-          placeholder='e.g., Engine Oil 5W-30'
+          placeholder={t('products.namePlaceholder')}
           autoComplete='off'
           className={`w-full rounded-2xl border bg-white px-4 py-2.5 text-sm font-semibold text-slate-900 transition focus:outline-none focus:ring-2 ${
             error
@@ -105,7 +107,7 @@ export function ProductNameInput({
       {isOpen && suggestions.length > 0 && (
         <div className='absolute left-0 right-0 top-full z-50 mt-1 max-h-48 overflow-y-auto rounded-2xl border border-slate-200 bg-white p-1.5 shadow-xl animate-in fade-in duration-150'>
           <p className='px-3 py-1.5 text-[10px] font-extrabold uppercase tracking-wider text-slate-400'>
-            Existing Products Auto-Suggestions:
+            {t('products.autoSuggestions')}
           </p>
           {suggestions.map((p) => (
             <button
@@ -117,11 +119,11 @@ export function ProductNameInput({
               <div>
                 <p className='font-bold text-slate-900'>{p.name}</p>
                 <p className='text-[10px] text-slate-400'>
-                  {p.category || 'General'} • {p.barcode || 'No barcode'}
+                  {p.category || t('common.general')} • {p.barcode || t('products.noBarcode')}
                 </p>
               </div>
               <span className='rounded-md bg-indigo-100 px-2 py-0.5 text-[10px] font-black text-indigo-700'>
-                Auto-fill
+                {t('products.autoFill')}
               </span>
             </button>
           ))}

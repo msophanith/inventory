@@ -3,6 +3,7 @@ import type { ActivityLog } from '@/services/activity-log.types';
 import { formatDate } from '@/utils/date';
 import { LogActionBadge } from './log-action-badge';
 import { LogUserBadge } from './log-user-badge';
+import { useLanguage } from '@/i18n/language-context';
 
 interface Props {
   log: ActivityLog;
@@ -10,6 +11,7 @@ interface Props {
 }
 
 export function LogTableRow({ log, onViewDetails }: Props) {
+  const { t } = useLanguage();
   const changes = log.details?.changes || [];
   const hasChanges = changes.length > 0;
 
@@ -56,7 +58,7 @@ export function LogTableRow({ log, onViewDetails }: Props) {
             ))}
             {changes.length > 2 && (
               <span className='text-[10px] font-bold text-slate-400 px-1 py-0.5'>
-                +{changes.length - 2} more
+                +{changes.length - 2} {t('logs.more')}
               </span>
             )}
           </div>
@@ -88,7 +90,7 @@ export function LogTableRow({ log, onViewDetails }: Props) {
           className='inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white border border-slate-200 text-slate-700 hover:bg-slate-100 hover:text-slate-900 text-xs font-bold transition shadow-2xs cursor-pointer'
         >
           <Eye size={13} />
-          <span>Details</span>
+          <span>{t('logs.details')}</span>
         </button>
       </td>
     </tr>

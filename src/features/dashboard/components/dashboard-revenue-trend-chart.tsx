@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react';
-import { TrendingUp } from 'lucide-react';
+import { TrendingUp, Award, CalendarDays } from 'lucide-react';
 import { Line } from 'react-chartjs-2';
 import { formatCurrencyKhr, formatCurrencyUsd } from '@/utils/currency';
 import type { Movement } from '@/services/movement';
@@ -25,9 +25,9 @@ export function DashboardRevenueTrendChart({
   isLoading,
 }: Props) {
   const { t } = useLanguage();
-  const [range, setRange] = useState<RevenueRange>(7);
+  const [range, setRange] = useState<RevenueRange>(14);
 
-  const { labels, values, totalInRange, avgPerDay } = useMemo(
+  const { labels, values, totalInRange, avgPerDay, peakDay } = useMemo(
     () => buildDailyRevenue(movements, range),
     [movements, range],
   );
@@ -40,34 +40,24 @@ export function DashboardRevenueTrendChart({
   const options = useMemo(() => getRevenueChartOptions(), []);
 
   if (isLoading) {
-    return <div className='h-80 animate-pulse rounded-3xl bg-slate-100' />;
+    return <div className='h-96 animate-pulse rounded-3xl bg-slate-100' />;
   }
 
   return (
-    <div className='flex flex-col justify-between rounded-3xl border border-slate-200/80 bg-white p-5 sm:p-6 shadow-xs transition hover:shadow-md'>
-      {/* Header */}
-      <div className='flex flex-wrap items-center justify-between gap-3 border-b border-slate-100 pb-4'>
+    <div className='flex h-full flex-col justify-between rounded-3xl border border-slate-200/80 bg-white p-5 sm:p-6 shadow-2xs transition hover:shadow-xs'>
+      {/* Top Header & Range Switcher */}
+      <div className='flex flex-wrap items-center justify-between gap-3 pb-4 border-b border-slate-100'>
         <div className='flex items-center gap-3'>
-          <div className='flex h-10 w-10 items-center justify-center rounded-2xl bg-indigo-50 text-indigo-600 border border-indigo-100'>
-            <TrendingUp size={20} />
+          <div className='flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-indigo-50 text-indigo-600 border border-indigo-200/60'>
+            <TrendingUp size={18} />
           </div>
           <div>
-            <h2 className='text-sm sm:text-base font-extrabold text-slate-900'>
+            <h2 className='text-sm sm:text-base font-black text-slate-900 tracking-tight'>
               {t('reports.revenueTrend')}
             </h2>
-            <div className='flex items-center gap-1.5 text-xs text-slate-500 font-medium'>
-              <span>{t('reports.total')}:</span>
-              <span className='font-black text-slate-900'>
-                {formatCurrencyUsd(totalInRange)}
-              </span>
-              <span className='text-[11px] text-indigo-600 font-extrabold'>
-                ({formatCurrencyKhr(totalInRange)})
-              </span>
-              <span className='text-slate-300'>•</span>
-              <span className='text-slate-400'>
-                {t('reports.avgPerDay', { avg: formatCurrencyUsd(avgPerDay) })}
-              </span>
-            </div>
+            <p className='text-xs text-slate-500 font-medium'>
+              {t('reports.revenueTrendDesc')}
+            </p>
           </div>
         </div>
 
@@ -78,9 +68,9 @@ export function DashboardRevenueTrendChart({
               key={r}
               type='button'
               onClick={() => setRange(r)}
-              className={`rounded-lg px-2.5 py-1 text-xs font-extrabold transition-all cursor-pointer ${
+              className={`rounded-lg px-2.5 py-1 text-xs font-bold transition-all cursor-pointer ${
                 range === r
-                  ? 'bg-white text-indigo-600 shadow-xs'
+                  ? 'bg-white text-indigo-600 shadow-2xs'
                   : 'text-slate-500 hover:text-slate-800'
               }`}
             >
@@ -90,8 +80,54 @@ export function DashboardRevenueTrendChart({
         </div>
       </div>
 
-      {/* Chart Canvas */}
-      <div className='mt-4 h-56 sm:h-60 w-full'>
+      {/* KPI Highlights Strip (Fills middle space purposefully) */}
+      <div className='grid grid-cols-1 sm:grid-cols-3 gap-3 py-4 border-b border-slate-100/80'>
+        {/* Total In Range */}
+        <div className='rounded-2xl bg-slate-50/70 border border-slate-200/60 p-3'>
+          <div className='text-[11px] font-bold text-slate-400'>
+            {t('reports.rangeTotal', { range })}
+          </div>
+          <div className='mt-1 text-base sm:text-lg font-black text-slate-900 tabular-nums'>
+            {formatCurrencyUsd(totalInRange)}
+          </div>
+          <div className='mt-0.5 text-[11px] font-semibold text-indigo-600'>
+            {formatCurrencyKhr(totalInRange)}
+          </div>
+        </div>
+
+        {/* Daily Average */}
+        <div className='rounded-2xl bg-slate-50/70 border border-slate-200/60 p-3'>
+          <div className='flex items-center gap-1 text-[11px] font-bold text-slate-400'>
+            <CalendarDays size={12} />
+            <span>{t('reports.dailyAverage')}</span>
+          </div>
+          <div className='mt-1 text-base sm:text-lg font-black text-slate-900 tabular-nums'>
+            {formatCurrencyUsd(avgPerDay)}
+          </div>
+          <div className='mt-0.5 text-[11px] font-medium text-slate-500'>
+            {t('reports.acrossDays', { days: range })}
+          </div>
+        </div>
+
+        {/* Peak Day */}
+        <div className='rounded-2xl bg-slate-50/70 border border-slate-200/60 p-3'>
+          <div className='flex items-center gap-1 text-[11px] font-bold text-emerald-700'>
+            <Award size={12} className='text-emerald-500' />
+            <span>{t('reports.peakVelocity')}</span>
+          </div>
+          <div className='mt-1 text-base sm:text-lg font-black text-slate-900 tabular-nums'>
+            {peakDay.value > 0 ? formatCurrencyUsd(peakDay.value) : '$0.00'}
+          </div>
+          <div className='mt-0.5 text-[11px] font-medium text-slate-500'>
+            {peakDay.value > 0
+              ? t('reports.highestOn', { label: peakDay.label })
+              : t('reports.noSalesDataYet')}
+          </div>
+        </div>
+      </div>
+
+      {/* Responsive Chart Canvas */}
+      <div className='relative mt-3 w-full flex-1 min-h-55'>
         <Line options={options} data={chartData} />
       </div>
     </div>

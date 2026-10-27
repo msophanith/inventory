@@ -3,6 +3,7 @@ import type { ActivityLog } from '@/services/activity-log.types';
 import { formatDate } from '@/utils/date';
 import { LogActionBadge } from './log-action-badge';
 import { LogUserBadge } from './log-user-badge';
+import { useLanguage } from '@/i18n/language-context';
 
 interface Props {
   logs: ActivityLog[];
@@ -11,6 +12,8 @@ interface Props {
 }
 
 export function LogMobileCard({ logs, isLoading, onViewDetails }: Props) {
+  const { t } = useLanguage();
+
   if (isLoading) {
     return (
       <div className='md:hidden space-y-2.5'>
@@ -38,10 +41,10 @@ export function LogMobileCard({ logs, isLoading, onViewDetails }: Props) {
           <ShieldAlert size={20} />
         </div>
         <p className='font-bold text-slate-800 text-xs'>
-          No Product Activity Logs
+          {t('logs.noLogsFound')}
         </p>
         <p className='text-[11px] text-slate-400'>
-          Activity logs will appear here in real-time.
+          {t('logs.noLogsDesc')}
         </p>
       </div>
     );
@@ -113,7 +116,7 @@ export function LogMobileCard({ logs, isLoading, onViewDetails }: Props) {
                 className='inline-flex items-center gap-1 px-2.5 py-1.5 rounded-xl bg-slate-100 text-slate-700 hover:bg-slate-200 transition text-[11px] font-bold cursor-pointer shrink-0'
               >
                 <Eye size={12} />
-                <span>Diff</span>
+                <span>{t('logs.details')}</span>
               </button>
             </div>
           </div>

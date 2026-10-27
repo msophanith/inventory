@@ -1,5 +1,6 @@
 import { ShieldAlert, PlusCircle, FileEdit, Trash2 } from 'lucide-react';
 import type { ActivityLogKPI } from '@/services/activity-log.types';
+import { useLanguage } from '@/i18n/language-context';
 
 interface Props {
   kpis: ActivityLogKPI;
@@ -7,31 +8,33 @@ interface Props {
 }
 
 export function LogKpiCards({ kpis, isLoading }: Props) {
+  const { t } = useLanguage();
+
   const cards = [
     {
-      title: 'Total Events',
-      fullTitle: 'Total Product Events',
+      title: t('logs.totalEvents'),
+      fullTitle: t('logs.totalProductEvents'),
       value: kpis.totalLogs,
       icon: ShieldAlert,
       bgLight: 'bg-indigo-50/80 text-indigo-700',
     },
     {
-      title: 'Created',
-      fullTitle: 'Products Created',
+      title: t('logs.created'),
+      fullTitle: t('logs.productsCreated'),
       value: kpis.totalCreated,
       icon: PlusCircle,
       bgLight: 'bg-emerald-50/80 text-emerald-700',
     },
     {
-      title: 'Edited',
-      fullTitle: 'Products Edited',
+      title: t('logs.edited'),
+      fullTitle: t('logs.productsEdited'),
       value: kpis.totalUpdated,
       icon: FileEdit,
       bgLight: 'bg-blue-50/80 text-blue-700',
     },
     {
-      title: 'Deleted',
-      fullTitle: 'Products Deleted',
+      title: t('logs.deleted'),
+      fullTitle: t('logs.productsDeleted'),
       value: kpis.totalDeleted,
       icon: Trash2,
       bgLight: 'bg-rose-50/80 text-rose-700',

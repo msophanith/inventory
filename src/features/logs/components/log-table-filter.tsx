@@ -2,6 +2,7 @@ import { Search, Download, RotateCw, X } from 'lucide-react';
 import type { ActivityAction, ActivityLog } from '@/services/activity-log.types';
 import { useActivityLogStore } from '../store/use-activity-log-store';
 import { exportActivityLogsToCSV } from '../utils/log-export-csv';
+import { useLanguage } from '@/i18n/language-context';
 
 interface Props {
   allLogs: ActivityLog[];
@@ -9,21 +10,22 @@ interface Props {
   onRefresh: () => void;
 }
 
-const ACTION_OPTIONS: { label: string; value: ActivityAction | 'ALL' }[] = [
-  { label: 'All Operations', value: 'ALL' },
-  { label: 'Created', value: 'CREATE' },
-  { label: 'Edited', value: 'UPDATE' },
-  { label: 'Deleted', value: 'DELETE' },
+const ACTION_OPTIONS: { key: string; value: ActivityAction | 'ALL' }[] = [
+  { key: 'logs.allOperations', value: 'ALL' },
+  { key: 'logs.created', value: 'CREATE' },
+  { key: 'logs.edited', value: 'UPDATE' },
+  { key: 'logs.deleted', value: 'DELETE' },
 ];
 
-const DATE_OPTIONS: { label: string; value: 'ALL' | 'TODAY' | 'WEEK' | 'MONTH' }[] = [
-  { label: 'All Time', value: 'ALL' },
-  { label: 'Today', value: 'TODAY' },
-  { label: 'Past 7 Days', value: 'WEEK' },
-  { label: 'Past 30 Days', value: 'MONTH' },
+const DATE_OPTIONS: { key: string; value: 'ALL' | 'TODAY' | 'WEEK' | 'MONTH' }[] = [
+  { key: 'reports.allTime', value: 'ALL' },
+  { key: 'reports.today', value: 'TODAY' },
+  { key: 'logs.past7Days', value: 'WEEK' },
+  { key: 'logs.past30Days', value: 'MONTH' },
 ];
 
 export function LogTableFilter({ allLogs, isFetching, onRefresh }: Props) {
+  const { t } = useLanguage();
   const search = useActivityLogStore((state) => state.search);
   const setSearch = useActivityLogStore((state) => state.setSearch);
   const actionFilter = useActivityLogStore((state) => state.actionFilter);
@@ -48,7 +50,7 @@ export function LogTableFilter({ allLogs, isFetching, onRefresh }: Props) {
             type='text'
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            placeholder='Search product, barcode, operator...'
+            placeholder={t('logs.searchPlaceholder')}
             className='w-full pl-9 pr-8 py-2 sm:py-2.5 rounded-xl sm:rounded-2xl bg-slate-50 border border-slate-200 text-xs font-medium text-slate-900 placeholder:text-slate-400 focus:outline-hidden focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition'
           />
           {search && (
@@ -71,7 +73,7 @@ export function LogTableFilter({ allLogs, isFetching, onRefresh }: Props) {
             className='flex-1 sm:flex-none flex items-center justify-center gap-1.5 px-3 py-2 sm:px-3.5 sm:py-2.5 rounded-xl sm:rounded-2xl bg-white border border-slate-200 text-slate-700 hover:bg-slate-50 text-xs font-bold shadow-2xs transition disabled:opacity-50 cursor-pointer'
           >
             <Download size={13} />
-            <span className='hidden sm:inline'>Export</span> CSV
+            <span className='hidden sm:inline'>{t('logs.export')}</span> CSV
           </button>
           <button
             type='button'
@@ -79,7 +81,7 @@ export function LogTableFilter({ allLogs, isFetching, onRefresh }: Props) {
             className={`p-2 sm:p-2.5 rounded-xl sm:rounded-2xl bg-white border border-slate-200 text-slate-700 hover:bg-slate-50 text-xs font-bold shadow-2xs transition cursor-pointer ${
               isFetching ? 'animate-spin' : ''
             }`}
-            title='Refresh logs'
+            title={t('logs.refreshLogs')}
           >
             <RotateCw size={14} />
           </button>
@@ -89,7 +91,7 @@ export function LogTableFilter({ allLogs, isFetching, onRefresh }: Props) {
               onClick={resetFilters}
               className='px-2.5 py-2 sm:px-3 sm:py-2.5 rounded-xl sm:rounded-2xl bg-rose-50 text-rose-700 border border-rose-200 text-xs font-bold hover:bg-rose-100 transition cursor-pointer'
             >
-              Reset
+              {t('logs.reset')}
             </button>
           )}
         </div>
@@ -110,7 +112,7 @@ export function LogTableFilter({ allLogs, isFetching, onRefresh }: Props) {
                   : 'text-slate-500 hover:text-slate-800'
               }`}
             >
-              {opt.label}
+              {t(opt.key)}
             </button>
           ))}
         </div>
@@ -128,7 +130,7 @@ export function LogTableFilter({ allLogs, isFetching, onRefresh }: Props) {
                   : 'text-slate-500 hover:text-slate-800'
               }`}
             >
-              {opt.label}
+              {t(opt.key)}
             </button>
           ))}
         </div>

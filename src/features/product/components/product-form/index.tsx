@@ -1,14 +1,15 @@
 import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
-import { useEffect } from 'react';
+import { useEffect, useMemo } from 'react';
 import { Save } from 'lucide-react';
+import { useLanguage } from '@/i18n/language-context';
 
 import ProductBasicInfo from './product-basic-info';
 import ProductPricing from './product-pricing';
 import ProductInventory from './product-inventory';
 
 import {
-  productSchema,
+  createProductSchema,
   type ProductFormValues,
 } from '@/features/product/schema/product.schema';
 
@@ -19,6 +20,9 @@ interface Props {
 }
 
 const ProductForm = ({ defaultValues, onSubmit, loading }: Props) => {
+  const { t } = useLanguage();
+  const schema = useMemo(() => createProductSchema(t), [t]);
+
   const {
     register,
     handleSubmit,
@@ -27,7 +31,7 @@ const ProductForm = ({ defaultValues, onSubmit, loading }: Props) => {
     formState: { errors },
     reset,
   } = useForm<ProductFormValues>({
-    resolver: yupResolver(productSchema),
+    resolver: yupResolver(schema),
     mode: 'onChange',
     defaultValues: {
       id: '',
@@ -70,7 +74,7 @@ const ProductForm = ({ defaultValues, onSubmit, loading }: Props) => {
           className='flex w-full sm:w-auto items-center justify-center gap-2 rounded-2xl bg-slate-900 px-6 py-3 text-sm font-extrabold text-white shadow-lg shadow-slate-900/10 transition hover:bg-slate-800 disabled:opacity-50 cursor-pointer active:scale-98'
         >
           <Save size={18} />
-          <span>{loading ? 'Saving Product...' : 'Save Product'}</span>
+          <span>{loading ? t('products.savingProduct') : t('products.saveProduct')}</span>
         </button>
       </div>
     </form>
