@@ -1,4 +1,6 @@
 export * from './scan-header';
+export * from './scan-mode-selector';
+export * from './scan-camera-launcher';
 export * from './scan-camera-viewfinder';
 export * from './scan-camera-reticle';
 export * from './scan-manual-bar';

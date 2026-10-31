@@ -19,6 +19,7 @@ export interface ScanSettings {
   readonly sound: boolean;
   readonly vibrate: boolean;
   readonly continuous: boolean;
+  readonly autoStartCamera?: boolean;
 }
 
 export type ScanMode = 'camera' | 'manual';

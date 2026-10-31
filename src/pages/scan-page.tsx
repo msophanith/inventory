@@ -5,19 +5,18 @@ import { PageContainer } from '@/components/layout/page-container';
 import { useHardwareScanner } from '@/features/sell/hooks/use-hardware-scanner';
 import { useScanTerminal } from '@/features/scan/hooks/use-scan-terminal';
 import {
+  ScanCameraLauncher,
   ScanCameraViewfinder,
   ScanHeader,
   ScanHistoryList,
   ScanManualBar,
+  ScanModeSelector,
   ScanNotFoundResult,
   ScanProductResult,
   ScanSettingsModal,
 } from '@/features/scan/components';
 
 export function ScanPage() {
-  const [isCameraActive, setIsCameraActive] = useState(true);
-  const [isSettingsOpen, setIsSettingsOpen] = useState(false);
-
   const {
     settings,
     updateSettings,
@@ -30,12 +29,25 @@ export function ScanPage() {
     isSearching,
   } = useScanTerminal();
 
+  // Camera is OFF by default unless user opted into autoStartCamera in settings
+  const [isCameraActive, setIsCameraActive] = useState<boolean>(
+    Boolean(settings.autoStartCamera),
+  );
+  const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+
   const isHardwareListening = !isSettingsOpen && !isSearching;
 
   useHardwareScanner({
     enabled: isHardwareListening,
     onScan: handleScanCode,
   });
+
+  const handleCameraDetected = (code: string) => {
+    handleScanCode(code);
+    if (!settings.continuous) {
+      setIsCameraActive(false);
+    }
+  };
 
   return (
     <BarcodeScannerProvider>
@@ -52,13 +64,23 @@ export function ScanPage() {
           autoRedirect={settings.autoRedirect}
         />
 
-        {/* Embedded Live Camera Scanner */}
-        <ScanCameraViewfinder
-          onDetected={handleScanCode}
-          isSearching={isSearching}
-          isActive={isCameraActive}
-          onToggleActive={() => setIsCameraActive((prev) => !prev)}
+        {/* Scan Mode Segmented Switcher */}
+        <ScanModeSelector
+          isCameraActive={isCameraActive}
+          onSelectMode={(active) => setIsCameraActive(active)}
         />
+
+        {/* Camera Viewfinder (when active) OR Clean Launcher Card (when inactive) */}
+        {isCameraActive ? (
+          <ScanCameraViewfinder
+            onDetected={handleCameraDetected}
+            isSearching={isSearching}
+            isActive={isCameraActive}
+            onToggleActive={() => setIsCameraActive(false)}
+          />
+        ) : (
+          <ScanCameraLauncher onStart={() => setIsCameraActive(true)} />
+        )}
 
         {/* Manual Barcode Input Bar */}
         <ScanManualBar

@@ -10,6 +10,7 @@ export const DEFAULT_SETTINGS: ScanSettings = {
   sound: true,
   vibrate: true,
   continuous: true,
+  autoStartCamera: false,
 };
 
 export function loadScanSettings(): ScanSettings {
