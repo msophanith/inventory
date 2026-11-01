@@ -1,17 +1,20 @@
+import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { DollarSign, History, ShoppingBag, ShoppingBasket } from 'lucide-react';
+import { DollarSign, History, Loader2, Send, ShoppingBag, ShoppingBasket } from 'lucide-react';
+import { gooeyToast } from 'goey-toast';
 import { movementService } from '@/services';
 import { formatCurrencyKhr, formatCurrencyUsd } from '@/utils/currency';
 import { useLanguage } from '@/i18n/language-context';
+import { sendDailyReportNow } from '@/hooks/use-daily-sales-report';
 
-interface PosHeaderBannerProps {
+interface Props {
   readonly onOpenReceiptHistory?: () => void;
 }
 
-export function PosHeaderBanner({
-  onOpenReceiptHistory,
-}: PosHeaderBannerProps = {}) {
+export function PosHeaderBanner({ onOpenReceiptHistory }: Props = {}) {
   const { t } = useLanguage();
+  const [isSending, setIsSending] = useState(false);
+
   const { data: todaySummary } = useQuery({
     queryKey: ['today-sales'],
     queryFn: () => movementService.getTodaySale(),
@@ -20,6 +23,19 @@ export function PosHeaderBanner({
 
   const salesUsd = todaySummary?.totalSales || 0;
   const ordersCount = todaySummary?.totalOrders || 0;
+
+  const handleSendReport = async () => {
+    try {
+      setIsSending(true);
+      const ok = await sendDailyReportNow();
+      if (ok) gooeyToast.success(t('pos.dailyReportSent'));
+      else gooeyToast.error(t('pos.dailyReportFailed'));
+    } catch {
+      gooeyToast.error(t('pos.dailyReportFailed'));
+    } finally {
+      setIsSending(false);
+    }
+  };
 
   return (
     <div className='rounded-3xl bg-linear-to-r from-slate-900 via-indigo-950 to-slate-900 p-3 sm:p-5 text-white shadow-xl border border-indigo-500/20'>
@@ -31,29 +47,36 @@ export function PosHeaderBanner({
           </div>
           <div className='min-w-0'>
             <div className='flex items-center gap-1.5'>
-              <h2 className='text-sm font-black tracking-tight truncate'>
-                {t('pos.posTerminal')}
-              </h2>
+              <h2 className='text-sm font-black tracking-tight truncate'>{t('pos.posTerminal')}</h2>
               <span className='h-2 w-2 rounded-full bg-emerald-400 animate-pulse shrink-0' />
             </div>
             <p className='text-[10px] text-emerald-400 font-extrabold truncate'>
-              {formatCurrencyUsd(salesUsd)}{' '}
-              <span className='text-slate-400 font-normal'>• {ordersCount} {t('pos.todayOrders')}</span>
+              {formatCurrencyUsd(salesUsd)} <span className='text-slate-400 font-normal'>• {ordersCount} {t('pos.todayOrders')}</span>
             </p>
           </div>
         </div>
 
-        {onOpenReceiptHistory && (
+        <div className='flex items-center gap-1.5 shrink-0'>
           <button
             type='button'
-            onClick={onOpenReceiptHistory}
-            title={t('pos.receiptHistory')}
-            className='flex h-8 items-center gap-1 rounded-xl bg-white/10 hover:bg-white/20 border border-white/15 px-2.5 text-xs font-bold text-white transition active:scale-95 cursor-pointer shrink-0'
+            onClick={handleSendReport}
+            disabled={isSending}
+            title={t('pos.sendDailyReport')}
+            className='flex h-8 w-8 items-center justify-center rounded-xl bg-indigo-600/80 hover:bg-indigo-600 border border-indigo-400/30 text-white transition active:scale-95 cursor-pointer disabled:opacity-50'
           >
-            <History size={14} />
-            <span className='text-[11px]'>{t('pos.receiptHistory')}</span>
+            {isSending ? <Loader2 size={13} className='animate-spin' /> : <Send size={13} />}
           </button>
-        )}
+          {onOpenReceiptHistory && (
+            <button
+              type='button'
+              onClick={onOpenReceiptHistory}
+              title={t('pos.receiptHistory')}
+              className='flex h-8 items-center gap-1 rounded-xl bg-white/10 hover:bg-white/20 border border-white/15 px-2.5 text-xs font-bold text-white transition active:scale-95 cursor-pointer'
+            >
+              <History size={14} />
+            </button>
+          )}
+        </div>
       </div>
 
       {/* Desktop / Tablet Full Banner (>= sm) */}
@@ -64,12 +87,20 @@ export function PosHeaderBanner({
           </div>
           <div>
             <div className='flex items-center gap-2'>
-              <h2 className='text-lg font-black tracking-wide'>
-                {t('pos.posTerminal')}
-              </h2>
+              <h2 className='text-lg font-black tracking-wide'>{t('pos.posTerminal')}</h2>
               <span className='rounded-full bg-emerald-500/20 border border-emerald-500/40 px-2 py-0.5 text-[10px] font-extrabold text-emerald-400 uppercase tracking-wider'>
                 {t('pos.liveReady')}
               </span>
+              <button
+                type='button'
+                onClick={handleSendReport}
+                disabled={isSending}
+                className='flex items-center gap-1.5 rounded-xl bg-indigo-600/80 hover:bg-indigo-600 border border-indigo-400/30 px-2.5 py-1 text-xs font-bold text-white transition cursor-pointer disabled:opacity-50'
+                title={t('pos.sendDailyReport')}
+              >
+                {isSending ? <Loader2 size={12} className='animate-spin' /> : <Send size={12} />}
+                <span>{t('pos.sendDailyReport')}</span>
+              </button>
               {onOpenReceiptHistory && (
                 <button
                   type='button'
@@ -80,9 +111,7 @@ export function PosHeaderBanner({
                 </button>
               )}
             </div>
-            <p className='text-xs text-slate-300 font-medium mt-0.5'>
-              {t('pos.scanToRingUp')}
-            </p>
+            <p className='text-xs text-slate-300 font-medium mt-0.5'>{t('pos.scanToRingUp')}</p>
           </div>
         </div>
 
@@ -92,14 +121,9 @@ export function PosHeaderBanner({
               <DollarSign size={16} />
             </div>
             <div>
-              <p className='text-[10px] uppercase font-bold text-slate-300 tracking-wider'>
-                {t('pos.todayRevenue')}
-              </p>
+              <p className='text-[10px] uppercase font-bold text-slate-300 tracking-wider'>{t('pos.todayRevenue')}</p>
               <p className='text-xs sm:text-sm font-black text-emerald-400 leading-tight'>
-                {formatCurrencyUsd(salesUsd)}{' '}
-                <span className='text-[10px] font-bold text-indigo-300'>
-                  ({formatCurrencyKhr(salesUsd)})
-                </span>
+                {formatCurrencyUsd(salesUsd)} <span className='text-[10px] font-bold text-indigo-300'>({formatCurrencyKhr(salesUsd)})</span>
               </p>
             </div>
           </div>
@@ -111,9 +135,7 @@ export function PosHeaderBanner({
               <ShoppingBag size={16} />
             </div>
             <div>
-              <p className='text-[10px] uppercase font-bold text-slate-300 tracking-wider'>
-                {t('pos.todayOrders')}
-              </p>
+              <p className='text-[10px] uppercase font-bold text-slate-300 tracking-wider'>{t('pos.todayOrders')}</p>
               <p className='text-xs sm:text-sm font-black text-white leading-tight'>
                 {t('pos.salesCount').replace('{count}', ordersCount.toString())}
               </p>

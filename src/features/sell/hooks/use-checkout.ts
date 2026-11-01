@@ -1,9 +1,15 @@
 import { useState } from 'react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { movementService, telegramService } from '@/services';
-import type { CartItem, PaymentMethod, ReceiptData } from '@/features/sell/types/sell.types';
+import type {
+  CartItem,
+  PaymentMethod,
+  ReceiptData,
+} from '@/features/sell/types/sell.types';
 import { useAuth } from '@/features/auth/use-auth';
 import { usePosStore } from '@/features/sell/store/use-pos-store';
+import { useLanguage } from '@/i18n/language-context';
+import { playSaleCompletedSound } from '@/features/sell/utils/sale-sound';
 
 const STORAGE_KEY = 'pos_order_counter';
 
@@ -19,6 +25,7 @@ function generateOrderId(): string {
 export function useCheckout() {
   const queryClient = useQueryClient();
   const { user, role } = useAuth();
+  const { language } = useLanguage();
 
   const isCheckoutOpen = usePosStore((state) => state.isCheckoutOpen);
   const setIsCheckoutOpen = usePosStore((state) => state.setIsCheckoutOpen);
@@ -117,15 +124,18 @@ export function useCheckout() {
     onSuccess: (receipt) => {
       setReceiptData(receipt);
       setIsCheckoutOpen(false);
+      playSaleCompletedSound(language);
 
-      queryClient.invalidateQueries({ queryKey: ['products'] });
-      queryClient.invalidateQueries({ queryKey: ['product'] });
-      queryClient.invalidateQueries({ queryKey: ['productSummary'] });
-      queryClient.invalidateQueries({ queryKey: ['movement'] });
-      queryClient.invalidateQueries({ queryKey: ['today-sales'] });
-      queryClient.invalidateQueries({ queryKey: ['report-movements'] });
-      queryClient.invalidateQueries({ queryKey: ['low-stock-products'] });
-      queryClient.invalidateQueries({ queryKey: ['out-of-stock-products'] });
+      [
+        'products',
+        'product',
+        'productSummary',
+        'movement',
+        'today-sales',
+        'report-movements',
+        'low-stock-products',
+        'out-of-stock-products',
+      ].forEach((key) => queryClient.invalidateQueries({ queryKey: [key] }));
     },
   });
 

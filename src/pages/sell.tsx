@@ -1,19 +1,13 @@
-import { useMemo, useState } from 'react';
 import { PageMeta } from '@/components/seo/page-meta';
-import { useProduct } from '@/features/product/hooks/use-product';
-import {
-  usePosStore,
-  usePosCartTotals,
-} from '@/features/sell/store/use-pos-store';
+import { usePosStore, usePosCartTotals } from '@/features/sell/store/use-pos-store';
 import { useCheckout } from '@/features/sell/hooks/use-checkout';
 import { useMovement } from '@/features/movement/hooks/use-movement';
 import { useHardwareScanner } from '@/features/sell/hooks/use-hardware-scanner';
-import { playScanSound } from '@/features/sell/utils/scan-sound';
 import {
+  PosBarcodeScannerPanel,
   PosCartPanel,
   PosDiscountModal,
   PosMobileCartBar,
-  PosProductGrid,
 } from '@/features/sell/components';
 import { PosHeaderBanner } from '@/features/sell/components/pos-header-banner';
 import { PosModals } from '@/features/sell/components/pos-modals';
@@ -21,42 +15,33 @@ import { PageContainer } from '@/components/layout/page-container';
 import { useSellPageState } from './hooks/use-sell-page-state';
 
 export function SellPage() {
-  const [search, setSearch] = useState('');
-  const [category, setCategory] = useState('ALL');
-
-  const { useGetProducts } = useProduct(false);
-  const { data: response, isLoading: productsLoading } = useGetProducts({
-    search,
-    category: category === 'ALL' ? '' : category,
-    limit: 100,
-  });
-  const products = useMemo(() => response?.data || [], [response?.data]);
   const { data: movements = [] } = useMovement();
-
   const cart = usePosStore();
-  const {
-    subtotal,
-    tax,
-    totalAmount: finalTotal,
-    itemCount,
-  } = usePosCartTotals();
+  const { subtotal, tax, totalAmount: finalTotal, itemCount } = usePosCartTotals();
   const checkout = useCheckout();
 
-  const { handleStockExceeded, handleBarcodeScanned, createPaymentHandler } =
-    useSellPageState(products);
-  const handleConfirmPayment = createPaymentHandler(checkout, {
-    subtotal,
-    tax,
-    finalTotal,
-  });
+  const {
+    lastScannedProduct,
+    setLastScannedProduct,
+    isSearching,
+    handleStockExceeded,
+    handleBarcodeScanned,
+    handleSelectProduct,
+    createPaymentHandler,
+  } = useSellPageState();
+
+  const handleConfirmPayment = createPaymentHandler(checkout, { subtotal, tax, finalTotal });
+
+  const isHardwareListening = !(
+    checkout.isCheckoutOpen ||
+    cart.isCameraScanOpen ||
+    cart.isMobileCartOpen ||
+    cart.isOrderHistoryOpen ||
+    cart.isDiscountOpen
+  );
 
   useHardwareScanner({
-    enabled:
-      !checkout.isCheckoutOpen &&
-      !cart.isCameraScanOpen &&
-      !cart.isMobileCartOpen &&
-      !cart.isOrderHistoryOpen &&
-      !cart.isDiscountOpen,
+    enabled: isHardwareListening,
     onScan: handleBarcodeScanned,
   });
 
@@ -67,23 +52,19 @@ export function SellPage() {
         description='Point-of-sale terminal: add items to cart, apply discounts, and process payments.'
       />
 
-      <PosHeaderBanner
-        onOpenReceiptHistory={() => cart.setIsOrderHistoryOpen(true)}
-      />
+      <PosHeaderBanner onOpenReceiptHistory={() => cart.setIsOrderHistoryOpen(true)} />
 
-      <div className='flex flex-col gap-4 lg:flex-row relative'>
-        <PosProductGrid
-          products={products}
+      <div className='flex flex-col gap-4 lg:flex-row relative items-start'>
+        <PosBarcodeScannerPanel
+          lastScannedProduct={lastScannedProduct}
           cartItems={cart.items}
-          isLoading={productsLoading}
-          search={search}
-          onSearchChange={setSearch}
-          selectedCategory={category}
-          onCategoryChange={setCategory}
-          onAddToCart={(p) => {
-            playScanSound();
-            cart.addItem(p);
-          }}
+          isSearching={isSearching}
+          isScannerActive={isHardwareListening}
+          onScanBarcode={handleBarcodeScanned}
+          onSelectProduct={handleSelectProduct}
+          onUpdateQty={cart.updateQuantity}
+          onStockExceeded={handleStockExceeded}
+          onDismissLastScanned={() => setLastScannedProduct(null)}
           onOpenScanModal={() => cart.setIsCameraScanOpen(true)}
         />
 

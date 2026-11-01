@@ -125,10 +125,10 @@ export class TelegramService {
     return this.sendMessage(message);
   }
 
-  async sendDailySalesSummary(): Promise<boolean> {
+  async sendDailySalesSummary(targetDate: Date = new Date()): Promise<boolean> {
     try {
-      const summary = await fetchTodaySaleSummary();
-      const date = new Date().toLocaleDateString('en-GB', {
+      const summary = await fetchTodaySaleSummary(targetDate);
+      const date = targetDate.toLocaleDateString('en-GB', {
         weekday: 'long', day: '2-digit', month: 'long', year: 'numeric',
       });
       const message = formatDailySalesSummaryMessage({ ...summary, date });

@@ -77,11 +77,11 @@ export async function fetchMovementById(id: number): Promise<Movement | null> {
   return data;
 }
 
-export async function fetchTodaySaleSummary(): Promise<TodaySaleSummary> {
-  const start = new Date();
+export async function fetchTodaySaleSummary(targetDate: Date = new Date()): Promise<TodaySaleSummary> {
+  const start = new Date(targetDate);
   start.setHours(0, 0, 0, 0);
 
-  const end = new Date();
+  const end = new Date(targetDate);
   end.setHours(23, 59, 59, 999);
 
   const { data, error } = await supabase

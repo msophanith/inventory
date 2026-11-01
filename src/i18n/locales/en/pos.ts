@@ -60,5 +60,15 @@ export const posEn = {
   saleSuccessful: 'Sale Completed',
   totalAmount: 'Total Amount',
   cashier: 'Cashier',
-  remainingStock: 'Remaining Stock'
+  remainingStock: 'Remaining Stock',
+  readyToScan: 'Ready to Scan',
+  readyToScanDesc: 'Point hardware scanner gun at any product barcode, or click Camera Scanner.',
+  lastScanned: 'Last Scanned Item',
+  inCartCount: 'In Cart: {count}',
+  scannerReady: 'Scanner Ready',
+  scannerListening: 'Hardware Scanner Listening',
+  openCameraScanner: 'Camera Scanner',
+  sendDailyReport: 'Send Daily Report',
+  dailyReportSent: 'Daily sales report sent to Telegram!',
+  dailyReportFailed: 'Failed to send report. Check Telegram Bot settings.'
 };

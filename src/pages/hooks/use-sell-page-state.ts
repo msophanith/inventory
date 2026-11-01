@@ -1,4 +1,4 @@
-import { useCallback, useMemo } from 'react';
+import { useCallback, useRef, useState } from 'react';
 import { gooeyToast } from 'goey-toast';
 import { productService } from '@/services';
 import { playScanSound } from '@/features/sell/utils/scan-sound';
@@ -7,19 +7,12 @@ import { usePosStore } from '@/features/sell/store/use-pos-store';
 import { useLanguage } from '@/i18n/language-context';
 import type { PaymentMethod } from '@/features/sell/types/sell.types';
 
-export function useSellPageState(products: Product[]) {
+export function useSellPageState() {
   const addItem = usePosStore((state) => state.addItem);
   const { t } = useLanguage();
-
-  const productMap = useMemo(() => {
-    const map = new Map<string, Product>();
-    for (const p of products) {
-      if (p.barcode) map.set(p.barcode.toLowerCase(), p);
-      if (p.id) map.set(p.id.toLowerCase(), p);
-      if (p.name) map.set(p.name.toLowerCase(), p);
-    }
-    return map;
-  }, [products]);
+  const [lastScannedProduct, setLastScannedProduct] = useState<Product | null>(null);
+  const [isSearching, setIsSearching] = useState(false);
+  const cacheRef = useRef<Map<string, Product>>(new Map());
 
   const handleStockExceeded = useCallback(
     (productName: string, maxStock: number) => {
@@ -28,30 +21,49 @@ export function useSellPageState(products: Product[]) {
     [t],
   );
 
+  const handleSelectProduct = useCallback(
+    (product: Product) => {
+      if (product.quantity <= 0) {
+        gooeyToast.error(t('pos.itemOutOfStock', { name: product.name }));
+        return;
+      }
+      playScanSound();
+      addItem(product);
+      setLastScannedProduct(product);
+      gooeyToast.success(t('pos.addedToCart', { name: product.name }));
+    },
+    [addItem, t],
+  );
+
   const handleBarcodeScanned = useCallback(
     async (code: string) => {
       const clean = code.trim().toLowerCase();
       if (!clean) return;
 
-      let target = productMap.get(clean);
-      if (!target) {
-        target =
-          (await productService.getByBarcodeOrSearch(clean)) ?? undefined;
-      }
-
-      if (target) {
-        if (target.quantity <= 0) {
-          gooeyToast.error(t('pos.itemOutOfStock', { name: target.name }));
-          return;
+      setIsSearching(true);
+      try {
+        let target = cacheRef.current.get(clean);
+        if (!target) {
+          target = (await productService.getByBarcodeOrSearch(clean)) ?? undefined;
+          if (target) {
+            if (target.barcode) cacheRef.current.set(target.barcode.toLowerCase(), target);
+            if (target.id) cacheRef.current.set(target.id.toLowerCase(), target);
+          }
         }
-        playScanSound();
-        addItem(target);
-        gooeyToast.success(t('pos.addedToCart', { name: target.name }));
-      } else {
+
+        if (target) {
+          handleSelectProduct(target);
+        } else {
+          gooeyToast.error(t('pos.noProductFound', { code }));
+        }
+      } catch (err) {
+        console.error('[useSellPageState] Lookup error:', err);
         gooeyToast.error(t('pos.noProductFound', { code }));
+      } finally {
+        setIsSearching(false);
       }
     },
-    [productMap, addItem, t],
+    [handleSelectProduct, t],
   );
 
   const createPaymentHandler = useCallback(
@@ -77,13 +89,18 @@ export function useSellPageState(products: Product[]) {
         });
         cart.clearCart();
         cart.setIsMobileCartOpen(false);
+        setLastScannedProduct(null);
       },
     [],
   );
 
   return {
+    lastScannedProduct,
+    setLastScannedProduct,
+    isSearching,
     handleStockExceeded,
     handleBarcodeScanned,
+    handleSelectProduct,
     createPaymentHandler,
   };
 }

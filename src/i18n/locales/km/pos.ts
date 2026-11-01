@@ -59,5 +59,15 @@ export const posKm = {
   saleSuccessful: 'លក់បានជោគជ័យ',
   totalAmount: 'តម្លៃសរុប',
   cashier: 'អ្នកគិតលុយ',
-  remainingStock: 'ស្តុកនៅសល់'
+  remainingStock: 'ស្តុកនៅសល់',
+  readyToScan: 'ត្រៀមស្កេនបារកូដ',
+  readyToScanDesc: 'ស្កេនបារកូដទំនិញតាមរយៈឧបករណ៍ស្កេន ឬចុចស្កេនតាមកាមេរ៉ា',
+  lastScanned: 'ទំនិញទើបតែស្កេន',
+  inCartCount: 'ក្នុងកន្ត្រក៖ {count}',
+  scannerReady: 'ម៉ាស៊ីនស្កេនរួចរាល់',
+  scannerListening: 'កំពុងរង់ចាំស្កេនបារកូដ',
+  openCameraScanner: 'ស្កេនតាមកាមេរ៉ា',
+  sendDailyReport: 'ផ្ញើរបាយការណ៍ប្រចាំថ្ងៃ',
+  dailyReportSent: 'បានផ្ញើរបាយការណ៍លក់ប្រចាំថ្ងៃទៅ Telegram រួចរាល់!',
+  dailyReportFailed: 'បរាជ័យក្នុងការផ្ញើរបាយការណ៍។ សូមពិនិត្យ Telegram Bot'
 };

@@ -1,9 +1,12 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useLanguage } from '@/i18n/language-context';
-import { Banknote, QrCode, User, X } from 'lucide-react';
+import { User, X } from 'lucide-react';
 import type { PaymentMethod } from '@/features/sell/types/sell.types';
-import { formatCurrencyKhr, formatCurrencyUsd } from '@/utils/currency';
+import { formatCurrencyUsd } from '@/utils/currency';
 import { PosCashPresets } from './pos-cash-presets';
+import { PosCheckoutTotalDue } from './pos-checkout-total-due';
+import { PosCheckoutMethods } from './pos-checkout-methods';
+import { preloadSaleSounds } from '@/features/sell/utils/sale-sound';
 
 interface Props {
   readonly open: boolean;
@@ -28,6 +31,12 @@ export function PosCheckoutModal({
   const [method, setMethod] = useState<PaymentMethod>('CASH');
   const [amountPaidStr, setAmountPaidStr] = useState<string>('');
   const [customerNote, setCustomerNote] = useState('');
+
+  useEffect(() => {
+    if (open) {
+      preloadSaleSounds();
+    }
+  }, [open]);
 
   if (!open) return null;
 
@@ -58,48 +67,10 @@ export function PosCheckoutModal({
         </div>
 
         {/* Total Amount Header */}
-        <div className='rounded-2xl bg-linear-to-br from-emerald-50 to-teal-50 p-3.5 text-center border border-emerald-100/80 shadow-inner'>
-          <p className='text-xs font-extrabold text-emerald-800 uppercase tracking-wider'>
-            Total Due
-          </p>
-          <p className='text-3xl font-black text-emerald-600 mt-0.5 leading-tight'>
-            {formatCurrencyUsd(total)}
-          </p>
-          <p className='text-sm font-extrabold text-indigo-600 mt-0.5'>
-            {formatCurrencyKhr(total)}
-          </p>
-        </div>
+        <PosCheckoutTotalDue total={total} />
 
         {/* Payment Method Selector */}
-        <div>
-          <label className='block text-xs font-bold text-slate-700 mb-2 uppercase tracking-wider'>
-            {t('pos.paymentMethod')}
-          </label>
-          <div className='grid grid-cols-2 gap-2'>
-            {[
-              { id: 'CASH', label: t('pos.cash'), icon: Banknote },
-              { id: 'QR', label: t('pos.khqr'), icon: QrCode },
-            ].map((m) => {
-              const Icon = m.icon;
-              const active = method === m.id;
-              return (
-                <button
-                  key={m.id}
-                  type='button'
-                  onClick={() => setMethod(m.id as PaymentMethod)}
-                  className={`flex flex-col items-center gap-1.5 rounded-2xl border p-3 text-xs font-bold transition cursor-pointer ${
-                    active
-                      ? 'border-emerald-600 bg-emerald-50 text-emerald-700 shadow-xs'
-                      : 'border-slate-200 bg-white text-slate-600 hover:bg-slate-50'
-                  }`}
-                >
-                  <Icon size={20} />
-                  <span>{m.label}</span>
-                </button>
-              );
-            })}
-          </div>
-        </div>
+        <PosCheckoutMethods method={method} onChangeMethod={setMethod} />
 
         {/* Payment Details */}
         <form onSubmit={handleSubmit} className='space-y-4'>

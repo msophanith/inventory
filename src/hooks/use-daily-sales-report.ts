@@ -1,40 +1,88 @@
-import { useEffect } from 'react';
+import { useEffect, useCallback } from 'react';
 import { telegramService } from '@/services';
 
-const SENT_KEY = 'daily_report_sent_date';
-const REPORT_HOUR = 20; // 20:00 local time
+export const DAILY_REPORT_SENT_KEY = 'daily_report_sent_date';
+export const DEFAULT_REPORT_HOUR = 20; // 20:00 local time (8:00 PM)
 
-function getMsUntilReportTime(): number {
-  const now = new Date();
-  const target = new Date();
-  target.setHours(REPORT_HOUR, 0, 0, 0);
-  if (target <= now) {
-    // Already past 20:00 — schedule for tomorrow
-    target.setDate(target.getDate() + 1);
+export function getLocalDateKey(d: Date = new Date()): string {
+  const year = d.getFullYear();
+  const month = String(d.getMonth() + 1).padStart(2, '0');
+  const day = String(d.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
+}
+
+export function getReportHour(): number {
+  if (typeof localStorage === 'undefined') return DEFAULT_REPORT_HOUR;
+  const saved = localStorage.getItem('daily_report_hour');
+  const parsed = saved ? Number.parseInt(saved, 10) : NaN;
+  return Number.isFinite(parsed) && parsed >= 0 && parsed <= 23
+    ? parsed
+    : DEFAULT_REPORT_HOUR;
+}
+
+export async function sendDailyReportNow(targetDate: Date = new Date()): Promise<boolean> {
+  const ok = await telegramService.sendDailySalesSummary(targetDate);
+  if (ok && typeof localStorage !== 'undefined') {
+    localStorage.setItem(DAILY_REPORT_SENT_KEY, getLocalDateKey(targetDate));
   }
-  return target.getTime() - now.getTime();
+  return ok;
 }
 
-async function sendIfNotSentToday(): Promise<void> {
-  const todayKey = new Date().toISOString().slice(0, 10);
-  if (localStorage.getItem(SENT_KEY) === todayKey) return;
-  const ok = await telegramService.sendDailySalesSummary();
-  if (ok) localStorage.setItem(SENT_KEY, todayKey);
-}
+export function useDailySalesReport(): {
+  sendReportNow: (date?: Date) => Promise<boolean>;
+} {
+  const checkAndDispatch = useCallback(async () => {
+    if (typeof window === 'undefined') return;
 
-export function useDailySalesReport(): void {
-  useEffect(() => {
-    let timerId: ReturnType<typeof setTimeout>;
+    const now = new Date();
+    const currentHour = now.getHours();
+    const reportHour = getReportHour();
+    const todayKey = getLocalDateKey(now);
+    const lastSent = localStorage.getItem(DAILY_REPORT_SENT_KEY);
 
-    function schedule() {
-      const ms = getMsUntilReportTime();
-      timerId = setTimeout(async () => {
-        await sendIfNotSentToday();
-        schedule(); // Re-schedule for the next day
-      }, ms);
+    // 1. If it's on or past the report hour today and not yet sent
+    if (currentHour >= reportHour && lastSent !== todayKey) {
+      await sendDailyReportNow(now);
+      return;
     }
 
-    schedule();
-    return () => clearTimeout(timerId);
+    // 2. Catch up for yesterday's missed report if store closed before report hour
+    if (currentHour < reportHour) {
+      const yesterday = new Date(now);
+      yesterday.setDate(now.getDate() - 1);
+      const yesterdayKey = getLocalDateKey(yesterday);
+
+      if (lastSent !== yesterdayKey && lastSent !== todayKey) {
+        await sendDailyReportNow(yesterday);
+      }
+    }
   }, []);
+
+  useEffect(() => {
+    // Check immediately on mount
+    void checkAndDispatch();
+
+    // Check periodically every 60 seconds
+    const intervalId = setInterval(() => {
+      void checkAndDispatch();
+    }, 60_000);
+
+    // Check whenever tab becomes active or window gains focus
+    const handleVisibility = () => {
+      if (document.visibilityState === 'visible') {
+        void checkAndDispatch();
+      }
+    };
+
+    document.addEventListener('visibilitychange', handleVisibility);
+    window.addEventListener('focus', handleVisibility);
+
+    return () => {
+      clearInterval(intervalId);
+      document.removeEventListener('visibilitychange', handleVisibility);
+      window.removeEventListener('focus', handleVisibility);
+    };
+  }, [checkAndDispatch]);
+
+  return { sendReportNow: sendDailyReportNow };
 }

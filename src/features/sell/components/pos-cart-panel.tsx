@@ -77,7 +77,7 @@ export function PosCartPanel({
   };
 
   return (
-    <div className='hidden lg:flex flex-col h-full rounded-3xl border border-slate-200 bg-white p-5 shadow-xs w-96 shrink-0 min-w-0'>
+    <div className='hidden lg:flex flex-col h-full rounded-3xl border border-slate-200 bg-white p-5 sm:p-6 shadow-xs w-full lg:w-[450px] xl:w-[490px] 2xl:w-[530px] shrink-0 min-w-0'>
       {/* Header */}
       <div className='flex items-center justify-between border-b border-slate-100 pb-4'>
         <div className='flex items-center gap-2'>

@@ -96,8 +96,8 @@ export class MovementService {
     return createdMovement;
   }
 
-  async getTodaySale(): Promise<TodaySaleSummary> {
-    return fetchTodaySaleSummary();
+  async getTodaySale(targetDate?: Date): Promise<TodaySaleSummary> {
+    return fetchTodaySaleSummary(targetDate);
   }
 
   async getDashboardMovements(limit = 500): Promise<Movement[]> {
