@@ -1,5 +1,6 @@
 import { Heart } from 'lucide-react';
 import { useLanguage } from '@/i18n/language-context';
+import { getAppVersion } from '@/utils/version';
 
 export function AppFooter() {
   const { t } = useLanguage();
@@ -28,7 +29,7 @@ export function AppFooter() {
           </span>
           <span className='text-slate-300'>·</span>
           <span className='font-mono text-[11px] text-slate-400 bg-slate-100 px-1.5 py-0.5 rounded'>
-            v1.0.4
+            {getAppVersion(true)}
           </span>
         </div>
       </div>

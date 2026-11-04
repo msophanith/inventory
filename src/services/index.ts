@@ -1,6 +1,6 @@
 import { MovementService } from './movement';
 import { ProductService } from './product';
-import { telegramService } from './telegram';
+import { telegramService, TelegramService, type TelegramTestResult } from './telegram';
 import { activityLogService, ActivityLogService } from './activity-log';
 
 const movementService = new MovementService();
@@ -10,6 +10,8 @@ export {
   movementService,
   productService,
   telegramService,
+  TelegramService,
+  type TelegramTestResult,
   activityLogService,
   ActivityLogService,
 };

@@ -1,5 +1,6 @@
 import { Barcode, DollarSign, Layers, Sparkles, TrendingUp } from 'lucide-react';
 import { useLanguage } from '@/i18n/language-context';
+import { getAppVersion } from '@/utils/version';
 
 export function LoginShowcasePanel() {
   const { t } = useLanguage();
@@ -23,7 +24,7 @@ export function LoginShowcasePanel() {
           </span>
         </div>
         <span className='font-mono text-xs text-slate-500'>
-          v1.0.4 · POS Hub
+          {getAppVersion(true)} · POS Hub
         </span>
       </div>
 

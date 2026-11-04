@@ -1,15 +1,11 @@
 import { Navigate } from 'react-router-dom';
 import { PageMeta } from '@/components/seo/page-meta';
-
 import { useAuth } from '@/features/auth/use-auth';
 import { useLogin } from '@/features/auth/hooks/use-login';
 import { isMobileDevice } from '@/utils/device';
-import { LoginShowcasePanel } from '@/components/auth/login/login-showcase-panel';
-import { LoginLanguageToggle } from '@/components/auth/login/login-language-toggle';
-import { LoginBrand } from '@/components/auth/login/login-brand';
-import { LoginAlerts } from '@/components/auth/login/login-alerts';
-import { LoginForm } from '@/components/auth/login/login-form';
-import { LoginFooter } from '@/components/auth/login/login-footer';
+import { AppleLoginHeader } from '@/components/auth/login/apple-login-header';
+import { AppleLoginCard } from '@/components/auth/login/apple-login-card';
+import { AppleLoginFooter } from '@/components/auth/login/apple-login-footer';
 
 export const LoginPage = () => {
   const { user } = useAuth();
@@ -36,41 +32,40 @@ export const LoginPage = () => {
       };
 
   return (
-    <div className='relative min-h-screen bg-slate-950 selection:bg-indigo-600 selection:text-white'>
+    <div className='relative min-h-screen w-full overflow-hidden bg-[#f5f5f7] flex flex-col justify-between p-4 sm:p-6 lg:p-8 selection:bg-blue-600 selection:text-white'>
       <PageMeta
         title='Login'
         description='Sign in to manage MeanLeap inventory and point of sale terminal.'
       />
 
-      <div className='grid min-h-screen lg:grid-cols-12'>
-        {/* Left Side: Modern Retail POS Showcase Panel */}
-        <LoginShowcasePanel />
+      {/* Apple Light Mode Ambient Mesh Gradients */}
+      <div className='pointer-events-none absolute -top-40 left-1/2 -translate-x-1/2 h-130 w-187.5 rounded-full bg-linear-gradient-to-tr from-blue-200/40 via-indigo-100/35 to-teal-100/30 blur-[130px]' />
+      <div className='pointer-events-none absolute -bottom-40 right-10 h-112.5 w-137.5 rounded-full bg-linear-gradient-to-tr from-purple-100/40 via-rose-100/25 to-sky-100/30 blur-[120px]' />
+      <div className='pointer-events-none absolute top-1/3 -left-20 h-95 w-95 rounded-full bg-linear-gradient-to-br from-indigo-100/30 to-sky-100/25 blur-[100px]' />
+      <div className='pointer-events-none absolute inset-0 bg-[radial-gradient(#0f172a_1px,transparent_1px)] background-size-[28px_28px] opacity-[0.025]' />
 
-        {/* Right Side: Authentication Station */}
-        <div className='flex lg:col-span-5 flex-col justify-between bg-white px-6 py-8 sm:px-10 lg:px-12 xl:px-14'>
-          {/* Top Bar with Language Toggle */}
-          <div className='flex items-center justify-end'>
-            <LoginLanguageToggle />
-          </div>
+      {/* Top Floating Header with Dynamic Status & Language Toggle */}
+      <div className='relative z-10 w-full pt-2'>
+        <AppleLoginHeader />
+      </div>
 
-          {/* Centered Form Area */}
-          <div className='my-auto mx-auto w-full max-w-sm py-8'>
-            <LoginBrand />
-            <LoginAlerts serverError={serverError} />
-            <LoginForm
-              register={form.register}
-              errors={errors}
-              formState={formState}
-              showPassword={showPassword}
-              onTogglePassword={() => setShowPassword((v) => !v)}
-              onSubmit={handleSubmit}
-              onQuickFillDemo={handleQuickFillDemo}
-            />
-          </div>
+      {/* Centered Apple Glass Card */}
+      <main className='relative z-10 my-auto w-full flex items-center justify-center py-4'>
+        <AppleLoginCard
+          register={form.register}
+          errors={errors}
+          formState={formState}
+          showPassword={showPassword}
+          onTogglePassword={() => setShowPassword((v) => !v)}
+          onSubmit={handleSubmit}
+          onQuickFillDemo={handleQuickFillDemo}
+          serverError={serverError}
+        />
+      </main>
 
-          {/* Bottom Footer */}
-          <LoginFooter />
-        </div>
+      {/* Apple Ecosystem Minimal Footer */}
+      <div className='relative z-10 w-full pb-2'>
+        <AppleLoginFooter />
       </div>
     </div>
   );

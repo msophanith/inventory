@@ -13,6 +13,24 @@ import {
   formatUserLogoutMessage,
   type AuthEventInfo,
 } from './telegram-formatter';
+import {
+  fetchTelegramBotInfo,
+  postTelegramDocument,
+  postTelegramMessage,
+  type TelegramSendOptions,
+} from './telegram-api';
+import {
+  buildDailyReportButtons,
+  buildLowStockButtons,
+  buildMovementButtons,
+  buildSaleButtons,
+} from './telegram-buttons';
+
+export interface TelegramTestResult {
+  success: boolean;
+  botName?: string;
+  error?: string;
+}
 
 export class TelegramService {
   private get botToken(): string {
@@ -23,116 +41,89 @@ export class TelegramService {
     return import.meta.env.VITE_TELEGRAM_CHAT_ID || '';
   }
 
-  private async sendMessage(text: string): Promise<boolean> {
+  async testConnection(): Promise<TelegramTestResult> {
     if (!this.botToken || !this.chatId) {
-      console.warn('[TelegramService] VITE_TELEGRAM_BOT_TOKEN or VITE_TELEGRAM_CHAT_ID missing in .env');
-      return false;
+      return { success: false, error: 'Telegram bot token or Chat ID is missing.' };
     }
-    try {
-      const response = await fetch(`https://api.telegram.org/bot${this.botToken}/sendMessage`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ chat_id: this.chatId, text, parse_mode: 'HTML' }),
-      });
-
-      if (!response.ok) {
-        const fallbackResp = await fetch(`https://api.telegram.org/bot${this.botToken}/sendMessage`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ chat_id: this.chatId, text: text.replace(/<[^>]*>/g, '') }),
-        });
-        return fallbackResp.ok;
-      }
-      return true;
-    } catch (err) {
-      console.error('[TelegramService] sendMessage error:', err);
-      return false;
+    const botInfo = await fetchTelegramBotInfo(this.botToken);
+    if (!botInfo.ok) {
+      return { success: false, error: botInfo.error || 'Invalid bot token.' };
     }
+    const testMsg =
+      `<b>🤖 Telegram Connection Verified</b>\n` +
+      `Bot: <code>@${botInfo.username || 'Unknown'}</code>\n` +
+      `System: Inventory & POS Notification Service Active.`;
+    const sent = await this.sendMessage(testMsg);
+    if (!sent) {
+      return { success: false, error: 'Token is valid, but message sending to Chat ID failed.' };
+    }
+    return { success: true, botName: botInfo.username || botInfo.firstName };
   }
 
-  async sendDocument(fileBlob: Blob, fileName: string, caption?: string): Promise<boolean> {
+  private async sendMessage(text: string, options?: TelegramSendOptions): Promise<boolean> {
     if (!this.botToken || !this.chatId) return false;
-    try {
-      const formData = new FormData();
-      formData.append('chat_id', this.chatId);
-      formData.append('document', fileBlob, fileName);
-      if (caption) {
-        formData.append('caption', caption);
-        formData.append('parse_mode', 'HTML');
-      }
+    return postTelegramMessage(this.botToken, this.chatId, text, options);
+  }
 
-      const response = await fetch(`https://api.telegram.org/bot${this.botToken}/sendDocument`, {
-        method: 'POST',
-        body: formData,
-      });
-
-      if (!response.ok) {
-        const fallbackForm = new FormData();
-        fallbackForm.append('chat_id', this.chatId);
-        fallbackForm.append('document', fileBlob, fileName);
-        if (caption) fallbackForm.append('caption', caption.replace(/<[^>]*>/g, ''));
-
-        const fallbackResp = await fetch(`https://api.telegram.org/bot${this.botToken}/sendDocument`, {
-          method: 'POST',
-          body: fallbackForm,
-        });
-        return fallbackResp.ok;
-      }
-      return true;
-    } catch (err) {
-      console.error('[TelegramService] sendDocument error:', err);
-      return false;
-    }
+  async sendDocument(
+    fileBlob: Blob,
+    fileName: string,
+    caption?: string,
+    options?: TelegramSendOptions,
+  ): Promise<boolean> {
+    if (!this.botToken || !this.chatId) return false;
+    return postTelegramDocument(this.botToken, this.chatId, fileBlob, fileName, caption, options);
   }
 
   async sendMovementNotification(movement: Movement, product?: Product | null): Promise<boolean> {
     const message = formatMovementNotificationMessage(movement, product);
-    return this.sendMessage(message);
+    return this.sendMessage(message, { replyMarkup: buildMovementButtons(movement.productId) });
   }
 
   async sendSaleNotification(receipt: ReceiptData): Promise<boolean> {
     const caption = formatSaleNotificationCaption(receipt);
+    const options: TelegramSendOptions = { replyMarkup: buildSaleButtons() };
 
     try {
       const pdfBlob = await generatePdfInvoiceBlob(receipt);
       const fileName = `Invoice_${receipt.orderId}.pdf`;
-      const sent = await this.sendDocument(pdfBlob, fileName, caption);
+      const sent = await this.sendDocument(pdfBlob, fileName, caption, options);
       if (sent) return true;
     } catch (err) {
       console.error('[TelegramService] PDF invoice generation error:', err);
     }
 
-    return this.sendMessage(caption);
+    return this.sendMessage(caption, options);
   }
 
   async sendLowStockAlert(product: Product): Promise<boolean> {
     const message = formatLowStockAlertMessage(product);
-    return this.sendMessage(message);
+    return this.sendMessage(message, { replyMarkup: buildLowStockButtons(product.barcode) });
   }
 
   async sendProductDeletedNotification(product: Product): Promise<boolean> {
-    const message = formatProductDeletedMessage(product);
-    return this.sendMessage(message);
+    return this.sendMessage(formatProductDeletedMessage(product));
   }
 
   async sendLoginNotification(info: AuthEventInfo): Promise<boolean> {
-    const message = formatUserLoginMessage(info);
-    return this.sendMessage(message);
+    return this.sendMessage(formatUserLoginMessage(info));
   }
 
   async sendLogoutNotification(info: AuthEventInfo): Promise<boolean> {
-    const message = formatUserLogoutMessage(info);
-    return this.sendMessage(message);
+    return this.sendMessage(formatUserLogoutMessage(info));
   }
 
   async sendDailySalesSummary(targetDate: Date = new Date()): Promise<boolean> {
     try {
       const summary = await fetchTodaySaleSummary(targetDate);
       const date = targetDate.toLocaleDateString('en-GB', {
-        weekday: 'long', day: '2-digit', month: 'long', year: 'numeric',
+        weekday: 'long',
+        day: '2-digit',
+        month: 'long',
+        year: 'numeric',
       });
       const message = formatDailySalesSummaryMessage({ ...summary, date });
-      return this.sendMessage(message);
+      return this.sendMessage(message, { replyMarkup: buildDailyReportButtons() });
     } catch (err) {
       console.error('[TelegramService] sendDailySalesSummary error:', err);
       return false;

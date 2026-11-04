@@ -1,5 +1,6 @@
 import { Keyboard } from 'lucide-react';
 import { useLanguage } from '@/i18n/language-context';
+import { getAppVersion } from '@/utils/version';
 
 interface Props {
   readonly isCollapsed: boolean;
@@ -28,7 +29,7 @@ export function SidebarFooter({
           <Keyboard size={18} />
         </button>
         <span
-          title={`Version 1.0.4 • ${isAdmin ? 'Admin' : 'Cashier'}`}
+          title={`Version ${getAppVersion()} • ${isAdmin ? 'Admin' : 'Cashier'}`}
           className='flex items-center gap-1 font-mono text-[9px] font-bold text-slate-400 bg-slate-50 border border-slate-200/60 rounded-md px-1.5 py-0.5'
         >
           <span
@@ -36,7 +37,7 @@ export function SidebarFooter({
               isAdmin ? 'bg-amber-400' : 'bg-emerald-400'
             }`}
           />
-          1.0.4
+          {getAppVersion()}
         </span>
       </div>
     );
@@ -71,7 +72,7 @@ export function SidebarFooter({
           </span>
           <span className='inline-flex items-center gap-1 rounded-md border border-slate-200/70 bg-slate-50 px-1.5 py-0.5 font-mono text-[10px] font-semibold text-slate-500 shrink-0'>
             <span className='h-1.5 w-1.5 rounded-full bg-emerald-500' />
-            v1.0.4
+            {getAppVersion(true)}
           </span>
         </div>
 
