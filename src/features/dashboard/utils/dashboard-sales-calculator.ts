@@ -5,7 +5,11 @@ import {
   isWithinLastNDays,
   isCurrentMonth,
 } from '@/utils/date';
-import { getSaleOrderKey, isSaleOutMovement } from './sale-movement';
+import {
+  getSaleOrderKey,
+  isDamagedMovement,
+  isSaleOutMovement,
+} from './sale-movement';
 
 export type DashboardSalesFilter =
   | 'TODAY'
@@ -20,6 +24,7 @@ export interface DashboardSalesStats {
   totalOrders: number;
   totalItemsSold: number;
   totalCost: number;
+  totalDamageLoss: number;
   grossProfit: number;
   marginRate: number;
 }
@@ -40,26 +45,36 @@ export function calculateDashboardSales(
   let totalSales = 0;
   let totalCost = 0;
   let totalItemsSold = 0;
+  let totalDamageLoss = 0;
   const orderKeys = new Set<string>();
 
   for (const item of filtered) {
     const qty = Math.abs(item.quantity || 0);
     const buyPrice = item.product?.buyPrice ?? 0;
     const sellPrice = item.unitPrice ?? item.product?.sellPrice ?? 0;
+    const isDamaged = isDamagedMovement(item);
 
     if (isSaleOutMovement(item)) {
       totalSales += qty * sellPrice;
       totalCost += qty * buyPrice;
       totalItemsSold += qty;
       orderKeys.add(getSaleOrderKey(item));
+    } else if (item.type === 'OUT' && isDamaged) {
+      const costPerUnit = buyPrice > 0 ? buyPrice : (item.unitPrice ?? sellPrice);
+      totalDamageLoss += qty * costPerUnit;
     } else if (item.type === 'RETURN') {
       totalSales -= qty * sellPrice;
-      totalCost -= qty * buyPrice;
       totalItemsSold -= qty;
+      if (isDamaged) {
+        const costPerUnit = buyPrice > 0 ? buyPrice : (item.unitPrice ?? sellPrice);
+        totalDamageLoss += qty * costPerUnit;
+      } else {
+        totalCost -= qty * buyPrice;
+      }
     }
   }
 
-  const grossProfit = Math.max(0, totalSales - totalCost);
+  const grossProfit = Math.max(0, totalSales - totalCost - totalDamageLoss);
   const marginRate =
     totalSales > 0 ? Math.round((grossProfit / totalSales) * 100) : 0;
 
@@ -68,6 +83,7 @@ export function calculateDashboardSales(
     totalOrders: orderKeys.size,
     totalItemsSold: Math.max(0, totalItemsSold),
     totalCost: Math.max(0, Math.round(totalCost * 100) / 100),
+    totalDamageLoss: Math.round(totalDamageLoss * 100) / 100,
     grossProfit: Math.round(grossProfit * 100) / 100,
     marginRate,
   };

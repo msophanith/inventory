@@ -95,6 +95,14 @@ export function DashboardSalesSection({ movements, isLoading }: Props) {
               <span className='text-[11px] font-semibold text-slate-500'>
                 {formatCurrencyKhr(stats.grossProfit)}
               </span>
+              {stats.totalDamageLoss > 0 && (
+                <span
+                  className='inline-flex items-center rounded-md bg-rose-50 px-1.5 py-0.5 text-[10px] font-bold text-rose-600 border border-rose-200/60'
+                  title={`-$${stats.totalDamageLoss.toFixed(2)} damage loss deducted`}
+                >
+                  -${stats.totalDamageLoss.toFixed(2)}
+                </span>
+              )}
             </div>
           }
           footerText={t('reports.netProfitEarnedToday')}

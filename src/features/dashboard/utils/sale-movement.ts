@@ -4,7 +4,11 @@ import type { Movement } from '@/services/movement';
 const NON_SALE_OUT_REASONS = ['damage', 'transfer out', 'adjustment'];
 
 export function isDamagedMovement(item: Movement): boolean {
-  return Boolean(item.isDamaged || item.reference?.toLowerCase() === 'damage');
+  if (item.isDamaged) return true;
+  const ref = (item.reference || '').trim().toLowerCase();
+  if (ref.includes('damage')) return true;
+  const note = (item.note || '').trim().toLowerCase();
+  return note.includes('damage');
 }
 
 /** True only for OUT movements that represent real revenue (POS or manual sale). */
