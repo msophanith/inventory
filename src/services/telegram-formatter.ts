@@ -2,10 +2,10 @@ import type { ReceiptData } from '@/features/sell/types/sell.types';
 import type { Movement } from './movement';
 import type { Product } from './product';
 import {
-  TELEGRAM_DIVIDER,
   escapeHtml,
   formatDualCurrency,
   formatDualCurrencyTotal,
+  formatProductDeletedMessage,
   formatTimestamp,
   formatUserLoginMessage,
   formatUserLogoutMessage,
@@ -15,6 +15,7 @@ import {
 
 export {
   escapeHtml,
+  formatProductDeletedMessage,
   formatUserLoginMessage,
   formatUserLogoutMessage,
   type AuthEventInfo,
@@ -26,115 +27,125 @@ export function formatMovementNotificationMessage(
   product?: Product | null,
 ): string {
   const isDamaged = Boolean(
-    movement.isDamaged || movement.reference?.toLowerCase() === 'damage',
+    movement.isDamaged || movement.reference?.toLowerCase().includes('damage'),
   );
-  let badge = '📦 <b>INVENTORY AUDIT</b>';
-  if (movement.type === 'IN') badge = '📥 <b>STOCK RESTOCKED (IN)</b>';
-  else if (movement.type === 'OUT') badge = isDamaged ? '⚠️ <b>DAMAGED WRITE-OFF (OUT)</b>' : '📤 <b>STOCK ISSUED (OUT)</b>';
-  else if (movement.type === 'RETURN') badge = '🔄 <b>CUSTOMER RETURN (IN)</b>';
 
-  const name = product?.name || movement.product?.name || `Product #${movement.productId}`;
+  let title = '📦 <b>Stock Movement</b>';
+  if (movement.type === 'IN') title = '📥 <b>Stock In · Restocked</b>';
+  else if (movement.type === 'OUT') {
+    title = isDamaged
+      ? '⚠️ <b>Damaged Stock Removed</b>'
+      : '📤 <b>Stock Out · Dispatched</b>';
+  } else if (movement.type === 'RETURN') {
+    title = isDamaged
+      ? '⚠️ <b>Customer Return (Damaged)</b>'
+      : '🔄 <b>Customer Return</b>';
+  }
+
+  const name =
+    product?.name || movement.product?.name || `Product #${movement.productId}`;
   const barcode = product?.barcode || movement.product?.barcode;
   const qty = Math.abs(movement.quantity || 0);
   const unit = product?.unit || movement.product?.unit || 'units';
   const unitPrice = movement.unitPrice ?? product?.sellPrice ?? 0;
   const totalPrice = qty * unitPrice;
+  const sign = movement.type === 'IN' || movement.type === 'RETURN' ? '+' : '-';
 
   return [
-    badge,
-    TELEGRAM_DIVIDER,
-    `📦 <b>Product:</b> <b>${escapeHtml(name)}</b>`,
-    barcode ? `🔖 <b>Barcode:</b> <code>${escapeHtml(barcode)}</code>` : null,
-    `<blockquote>🔢 <b>Quantity:</b> <code>${movement.type === 'IN' || movement.type === 'RETURN' ? '+' : '-'}${qty} ${escapeHtml(unit)}</code>`,
-    `💵 <b>Total Value:</b> ${formatDualCurrency(totalPrice)}${isDamaged ? ' • 🚨 <b>Damaged</b>' : ''}`,
-    movement.reference ? `🔖 <b>Ref:</b> <code>${escapeHtml(movement.reference)}</code>` : null,
-    movement.note ? `📝 <b>Note:</b> ${escapeHtml(movement.note)}` : null,
-    `⏰ <b>Date:</b> <code>${formatTimestamp(movement.createdAt)}</code></blockquote>`,
-  ].filter(Boolean).join('\n');
+    `${title} · <b>${escapeHtml(name)}</b>`,
+    barcode ? `Barcode: <code>${escapeHtml(barcode)}</code>` : null,
+    '',
+    `<blockquote><b>Quantity:</b> <b>${sign}${qty} ${escapeHtml(unit)}</b>`,
+    `<b>Total Value:</b> ${formatDualCurrency(totalPrice)}${isDamaged ? ' (Write-Off)' : ''}`,
+    movement.reference ? `Ref: ${escapeHtml(movement.reference)}` : null,
+    movement.note ? `Note: ${escapeHtml(movement.note)}` : null,
+    `Time: ${formatTimestamp(movement.createdAt)}</blockquote>`,
+  ]
+    .filter(Boolean)
+    .join('\n');
 }
 
 export function formatSaleNotificationCaption(receipt: ReceiptData): string {
-  const itemsFormatted = receipt.items
+  const itemCount = receipt.items.reduce((sum, i) => sum + i.quantity, 0);
+  const itemsText = receipt.items
     .map((i) => {
       const lineTotal = i.quantity * i.unitPrice;
       const unit = i.unit || i.product.unit || 'pcs';
-      return `▫️ <b>${i.quantity}× ${escapeHtml(i.product.name)}</b> (${escapeHtml(unit)})\n   └ ${formatDualCurrency(lineTotal)}`;
+      return `• ${i.quantity}× <b>${escapeHtml(i.product.name)}</b> (${escapeHtml(unit)}) — ${formatDualCurrency(lineTotal)}`;
     })
     .join('\n');
 
-  const discountLine = receipt.discount > 0
-    ? `\n🏷️ <b>Discount:</b> -${formatDualCurrency(receipt.discount)}`
-    : '';
+  const discountBadge =
+    receipt.discount > 0
+      ? `\n🏷️ Discount applied: -${formatDualCurrency(receipt.discount)}`
+      : '';
+
+  const cashier = receipt.soldBy || 'Admin';
+  const payment = receipt.paymentMethod.toUpperCase();
 
   return [
-    `🛍️ <b>POS TERMINAL</b> • <code>#${escapeHtml(receipt.orderId)}</code>`,
-    TELEGRAM_DIVIDER,
-    '<b>ORDER ITEMS:</b>',
-    itemsFormatted,
-    TELEGRAM_DIVIDER,
-    `<blockquote>💵 <b>GRAND TOTAL:</b> ${formatDualCurrencyTotal(receipt.total)}${discountLine}`,
-    `💳 <b>Payment:</b> <code>${escapeHtml(receipt.paymentMethod.toUpperCase())}</code>`,
-    `👤 <b>Cashier:</b> <code>${escapeHtml(receipt.soldBy || 'Admin')}</code>`,
-    `⏰ <b>Date:</b> <code>${formatTimestamp(receipt.createdAt)}</code></blockquote>`,
-    '📄 <i>Tax invoice attached below</i>',
-  ].join('\n');
+    `🧾 <b>Sale Completed</b> · <code>#${escapeHtml(receipt.orderId)}</code>`,
+    '',
+    `💰 <b>Total Paid:</b> ${formatDualCurrencyTotal(receipt.total)}`,
+    `💳 ${escapeHtml(payment)} · 👤 ${escapeHtml(cashier)} · ⏰ ${formatTimestamp(receipt.createdAt)}`,
+    discountBadge,
+    '',
+    `<blockquote><b>Purchased Items (${itemCount}):</b>\n${itemsText}</blockquote>`,
+    '',
+    '📄 <i>Tax invoice PDF attached</i>',
+  ]
+    .filter(Boolean)
+    .join('\n');
 }
 
 export function formatLowStockAlertMessage(product: Product): string {
   const isOut = product.quantity <= 0;
   const header = isOut
-    ? '🚨 <b>CRITICAL: OUT OF STOCK ALERT</b>'
-    : '⚠️ <b>WARNING: LOW STOCK ALERT</b>';
-  const statusBadge = isOut
-    ? '🔴 <b>COMPLETELY DEPLETED</b>'
-    : '🟡 <b>RUNNING CRITICALLY LOW</b>';
+    ? '🔴 <b>Out of Stock Alert</b>'
+    : '🟡 <b>Low Stock Warning</b>';
+
+  const unit = product.unit || 'units';
+  const stockText = isOut
+    ? `<b>0 ${escapeHtml(unit)} remaining</b> (Min threshold: ${product.minStock || 0})`
+    : `<b>${product.quantity} ${escapeHtml(unit)} left</b> (Min threshold: ${product.minStock || 0})`;
 
   return [
-    header,
-    TELEGRAM_DIVIDER,
-    `📦 <b>Product:</b> <b>${escapeHtml(product.name)}</b>`,
-    `🏷️ <b>Category:</b> <code>${escapeHtml(product.category || 'General')}</code>`,
-    product.barcode ? `🔖 <b>Barcode:</b> <code>${escapeHtml(product.barcode)}</code>` : null,
+    `${header} · <b>${escapeHtml(product.name)}</b>`,
+    product.category ? `Category: ${escapeHtml(product.category)}` : null,
+    product.barcode
+      ? `Barcode: <code>${escapeHtml(product.barcode)}</code>`
+      : null,
     '',
-    `<blockquote>📊 <b>Stock Level:</b> <code>${product.quantity} / ${product.minStock || 0} ${escapeHtml(product.unit || 'units')}</code>`,
-    `⚡ <b>Status:</b> ${statusBadge}</blockquote>`,
-    TELEGRAM_DIVIDER,
-    '<i>⚡ Please restock this item promptly to maintain sales velocity.</i>',
-  ].filter(Boolean).join('\n');
+    `<blockquote>📊 <b>Stock Level:</b> ${stockText}`,
+    `⚡ <b>Status:</b> ${isOut ? 'Depleted · Action Required' : 'Running Low · Needs Restock'}</blockquote>`,
+    '',
+    '💡 <i>Tap below to open Restock in Movement</i>',
+  ]
+    .filter(Boolean)
+    .join('\n');
 }
 
-export function formatDailySalesSummaryMessage(summary: DailySalesSummary): string {
+export function formatDailySalesSummaryMessage(
+  summary: DailySalesSummary,
+): string {
   const hasNoSales = summary.totalOrders === 0;
 
   return [
-    '📊 <b>DAILY EXECUTIVE REPORT</b>',
-    `📅 <code>${escapeHtml(summary.date)}</code>`,
-    TELEGRAM_DIVIDER,
+    '📊 <b>Daily Sales Summary</b>',
+    `📅 ${escapeHtml(summary.date)}`,
+    '',
     hasNoSales
-      ? '<blockquote>😶 <b>No sales transactions recorded today.</b></blockquote>'
+      ? '<blockquote>No sales transactions were recorded today.</blockquote>'
       : [
-          '<blockquote>💰 <b>TOTAL REVENUE:</b>',
+          '<blockquote>💰 <b>Total Revenue:</b>',
           formatDualCurrencyTotal(summary.totalSales),
           '',
-          `🛒 <b>Total Orders:</b> <code>${summary.totalOrders} sales</code>`,
-          `📦 <b>Items Sold:</b> <code>${summary.totalItemsSold} units</code></blockquote>`,
+          `🛒 <b>Completed Orders:</b> ${summary.totalOrders} sales`,
+          `📦 <b>Products Sold:</b> ${summary.totalItemsSold} units</blockquote>`,
         ].join('\n'),
-    TELEGRAM_DIVIDER,
-    '🤖 <i>Mean Leap POS • Automated Closing Report</i>',
-  ].join('\n');
-}
-
-export function formatProductDeletedMessage(product: Product): string {
-  return [
-    '🗑️ <b>CATALOG AUDIT • PRODUCT REMOVED</b>',
-    TELEGRAM_DIVIDER,
-    `📦 <b>Product:</b> <b>${escapeHtml(product.name)}</b>`,
-    `🏷️ <b>Category:</b> <code>${escapeHtml(product.category || 'General')}</code>`,
-    product.barcode ? `🔖 <b>Barcode:</b> <code>${escapeHtml(product.barcode)}</code>` : null,
     '',
-    `<blockquote>📉 <b>Final Stock:</b> <code>${product.quantity} ${escapeHtml(product.unit || 'units')}</code>`,
-    `💵 <b>Last Sell Price:</b> ${formatDualCurrency(product.sellPrice)}</blockquote>`,
-    TELEGRAM_DIVIDER,
-    `⏰ <b>Deleted At:</b> <code>${formatTimestamp()}</code>`,
-  ].filter(Boolean).join('\n');
+    '🤖 <i>MeanLeap POS · Automated Closing Summary</i>',
+  ]
+    .filter(Boolean)
+    .join('\n');
 }
