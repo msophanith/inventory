@@ -36,15 +36,19 @@ export interface AuthEventInfo {
 }
 
 export function formatUserLoginMessage(info: AuthEventInfo): string {
-  const roleBadge = info.role ? ` · ${info.role.toUpperCase()}` : '';
+  const roleLine = info.role ? `\n• <b>Access Role:</b> ${escapeHtml(info.role.toUpperCase())}` : '';
   const name = info.fullName || info.email.split('@')[0];
 
   return [
-    `🟢 <b>Operator Signed In</b> · <b>${escapeHtml(name)}</b>`,
+    `🟢 <b>OPERATOR LOGIN</b> • <b>${escapeHtml(name)}</b>`,
     '',
-    `<blockquote>👤 <b>User:</b> ${escapeHtml(info.fullName || info.email)}${roleBadge}`,
-    `📧 <b>Account:</b> ${escapeHtml(info.email)}`,
-    `⏰ <b>Time:</b> ${formatTimestamp()}</blockquote>`,
+    '<blockquote>👤 <b>USER ACCOUNT</b>',
+    `• <b>Operator:</b> ${escapeHtml(info.fullName || info.email)}${roleLine}`,
+    `• <b>Email:</b> ${escapeHtml(info.email)}</blockquote>`,
+    '',
+    '<blockquote>🛡️ <b>SESSION AUDIT</b>',
+    '• <b>Event:</b> Terminal Access Granted',
+    `• <b>Timestamp:</b> ${formatTimestamp()}</blockquote>`,
   ].join('\n');
 }
 
@@ -52,11 +56,15 @@ export function formatUserLogoutMessage(info: AuthEventInfo): string {
   const name = info.fullName || info.email.split('@')[0];
 
   return [
-    `⚪ <b>Operator Signed Out</b> · <b>${escapeHtml(name)}</b>`,
+    `⚪ <b>OPERATOR LOGOUT</b> • <b>${escapeHtml(name)}</b>`,
     '',
-    `<blockquote>👤 <b>User:</b> ${escapeHtml(info.fullName || info.email)}`,
-    `📧 <b>Account:</b> ${escapeHtml(info.email)}`,
-    `⏰ <b>Time:</b> ${formatTimestamp()}</blockquote>`,
+    '<blockquote>👤 <b>USER ACCOUNT</b>',
+    `• <b>Operator:</b> ${escapeHtml(info.fullName || info.email)}`,
+    `• <b>Email:</b> ${escapeHtml(info.email)}</blockquote>`,
+    '',
+    '<blockquote>🔒 <b>SESSION AUDIT</b>',
+    '• <b>Event:</b> Terminal Access Closed',
+    `• <b>Timestamp:</b> ${formatTimestamp()}</blockquote>`,
   ].join('\n');
 }
 
@@ -69,15 +77,18 @@ export function formatProductDeletedMessage(product: {
   sellPrice: number;
 }): string {
   const unit = product.unit || 'units';
+  const barcodeLine = product.barcode ? `\n• <b>Barcode:</b> <code>${escapeHtml(product.barcode)}</code>` : '';
 
   return [
-    '🗑️ <b>Product Deleted from Catalog</b>',
-    `<b>${escapeHtml(product.name)}</b>`,
-    product.barcode ? `Barcode: <code>${escapeHtml(product.barcode)}</code>` : null,
+    '🗑️ <b>PRODUCT CATALOG AUDIT</b>',
     '',
-    `<blockquote>Category: ${escapeHtml(product.category || 'General')}`,
-    `Final Stock: ${product.quantity} ${escapeHtml(unit)}`,
-    `Last Price: ${formatDualCurrency(product.sellPrice)}`,
-    `Time: ${formatTimestamp()}</blockquote>`,
-  ].filter(Boolean).join('\n');
+    '<blockquote>📦 <b>REMOVED PRODUCT</b>',
+    `• <b>Name:</b> ${escapeHtml(product.name)}`,
+    `• <b>Category:</b> ${escapeHtml(product.category || 'General')}${barcodeLine}</blockquote>`,
+    '',
+    '<blockquote>📉 <b>FINAL DISPOSITION</b>',
+    `• <b>Final Stock:</b> ${product.quantity} ${escapeHtml(unit)}`,
+    `• <b>Last Price:</b> ${formatDualCurrency(product.sellPrice)}`,
+    `• <b>Timestamp:</b> ${formatTimestamp()}</blockquote>`,
+  ].join('\n');
 }
