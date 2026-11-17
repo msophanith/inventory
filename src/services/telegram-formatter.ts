@@ -3,9 +3,9 @@ import { formatCurrencyUsd } from '@/utils/currency';
 import type { Movement } from './movement';
 import type { Product } from './product';
 import {
+  TELEGRAM_DIVIDER,
   escapeHtml,
   formatDualCurrency,
-  formatDualCurrencyTotal,
   formatProductDeletedMessage,
   formatTimestamp,
   formatUserLoginMessage,
@@ -24,33 +24,32 @@ export {
 };
 
 export function formatSaleNotificationCaption(receipt: ReceiptData): string {
-  const itemCount = receipt.items.reduce((sum, i) => sum + i.quantity, 0);
   const itemsText = receipt.items
-    .map((i, idx) => {
+    .map((i) => {
       const lineTotal = i.quantity * i.unitPrice;
       const unit = i.unit || i.product.unit || 'pcs';
-      return `${idx + 1}. <b>${escapeHtml(i.product.name)}</b> (${escapeHtml(unit)})\n   └ ${i.quantity} × ${formatCurrencyUsd(i.unitPrice)} ➔ ${formatDualCurrency(lineTotal)}`;
+      return `• ${i.quantity} ${escapeHtml(unit)} of ${escapeHtml(i.product.name)} = ${formatCurrencyUsd(lineTotal)}`;
     })
     .join('\n');
 
-  const discountLine = receipt.discount > 0 ? `\n• <b>Discount:</b> -${formatDualCurrency(receipt.discount)}` : '';
+  const discountLine = receipt.discount > 0
+    ? `\nDiscount: -${formatDualCurrency(receipt.discount)}`
+    : '';
+
+  const cleanOrderId = receipt.orderId.startsWith('#') ? receipt.orderId : `#${receipt.orderId}`;
   const cashier = receipt.soldBy || 'Admin';
   const payment = receipt.paymentMethod.toUpperCase();
-  const quoteTag = receipt.items.length > 3 ? '<blockquote expandable>' : '<blockquote>';
 
   return [
-    `🧾 <b>SALE RECEIPT</b> • <code>#${escapeHtml(receipt.orderId)}</code>`,
-    '',
-    '<blockquote>💳 <b>PAYMENT SUMMARY</b>',
-    `• <b>Total Paid:</b> ${formatDualCurrencyTotal(receipt.total)}`,
-    `• <b>Method:</b> ${escapeHtml(payment)}${discountLine}</blockquote>`,
-    '',
-    `${quoteTag}🛍️ <b>ORDER ITEMS (${itemCount})</b>\n${itemsText}</blockquote>`,
-    '',
-    '<blockquote>ℹ️ <b>TRANSACTION INFO</b>',
-    `• <b>Cashier:</b> ${escapeHtml(cashier)}`,
-    `• <b>Date:</b> ${formatTimestamp(receipt.createdAt)}`,
-    '• <b>Invoice:</b> <i>Tax invoice PDF attached below</i></blockquote>',
+    `🛍️ <b>Sale Completed (${escapeHtml(cleanOrderId)})</b>`,
+    TELEGRAM_DIVIDER,
+    itemsText,
+    TELEGRAM_DIVIDER,
+    `<b>Grand Total:</b> ${formatDualCurrency(receipt.total)}${discountLine}`,
+    `Payment: ${escapeHtml(payment)}`,
+    `Cashier: ${escapeHtml(cashier)}`,
+    `Date: ${formatTimestamp(receipt.createdAt)}`,
+    '📄 <i>PDF Invoice Attached Below</i>',
   ].join('\n');
 }
 
@@ -60,58 +59,48 @@ export function formatMovementNotificationMessage(
 ): string {
   const isDamaged = Boolean(movement.isDamaged || movement.reference?.toLowerCase().includes('damage'));
   const header = movement.type === 'IN'
-    ? '📥 <b>STOCK RESTOCKED (IN)</b>'
+    ? '📥 <b>Stock Restocked (IN)</b>'
     : movement.type === 'OUT'
-      ? (isDamaged ? '⚠️ <b>DAMAGED STOCK REMOVED (OUT)</b>' : '📤 <b>STOCK DISPATCHED (OUT)</b>')
-      : (isDamaged ? '⚠️ <b>CUSTOMER RETURN (DAMAGED)</b>' : '🔄 <b>CUSTOMER RETURN (IN)</b>');
+      ? (isDamaged ? '⚠️ <b>Damaged Stock Removed (OUT)</b>' : '📤 <b>Stock Dispatched (OUT)</b>')
+      : (isDamaged ? '⚠️ <b>Customer Return (Damaged)</b>' : '🔄 <b>Customer Return (IN)</b>');
 
   const name = product?.name || movement.product?.name || `Product #${movement.productId}`;
   const barcode = product?.barcode || movement.product?.barcode;
-  const category = product?.category || movement.product?.category;
   const qty = Math.abs(movement.quantity || 0);
   const unit = product?.unit || movement.product?.unit || 'units';
   const unitPrice = movement.unitPrice ?? product?.sellPrice ?? 0;
   const totalPrice = qty * unitPrice;
   const sign = movement.type === 'IN' || movement.type === 'RETURN' ? '+' : '-';
-  const barcodeLine = barcode ? `\n• <b>Barcode:</b> <code>${escapeHtml(barcode)}</code>` : '';
-  const noteLine = movement.note ? `\n• <b>Note:</b> ${escapeHtml(movement.note)}` : '';
+  const barcodeLine = barcode ? `\n• Barcode: ${escapeHtml(barcode)}` : '';
+  const noteLine = movement.note ? `\n• Note: ${escapeHtml(movement.note)}` : '';
 
   return [
     header,
-    '',
-    '<blockquote>📦 <b>PRODUCT IDENTIFICATION</b>',
-    `• <b>Item:</b> ${escapeHtml(name)}`,
-    `• <b>Category:</b> ${escapeHtml(category || 'General')}${barcodeLine}</blockquote>`,
-    '',
-    '<blockquote>📊 <b>QUANTITY & VALUATION</b>',
-    `• <b>Quantity:</b> <b>${sign}${qty} ${escapeHtml(unit)}</b>`,
-    `• <b>Total Value:</b> ${formatDualCurrency(totalPrice)}${isDamaged ? ' <i>(Loss Write-Off)</i>' : ''}</blockquote>`,
-    '',
-    '<blockquote>📝 <b>AUDIT TRAIL</b>',
-    `• <b>Reason:</b> ${escapeHtml(movement.reference || 'Manual Entry')}${noteLine}`,
-    `• <b>Timestamp:</b> ${formatTimestamp(movement.createdAt)}</blockquote>`,
+    TELEGRAM_DIVIDER,
+    `• Product: ${escapeHtml(name)}${barcodeLine}`,
+    `• Quantity: ${sign}${qty} ${escapeHtml(unit)}`,
+    `• Total Value: ${formatDualCurrency(totalPrice)}${isDamaged ? ' (Loss Write-Off)' : ''}`,
+    `• Reason: ${escapeHtml(movement.reference || 'Manual Entry')}${noteLine}`,
+    TELEGRAM_DIVIDER,
+    `Date: ${formatTimestamp(movement.createdAt)}`,
   ].join('\n');
 }
 
 export function formatLowStockAlertMessage(product: Product): string {
   const isOut = product.quantity <= 0;
   const unit = product.unit || 'units';
-  const barcodeLine = product.barcode ? `\n• <b>Barcode:</b> <code>${escapeHtml(product.barcode)}</code>` : '';
+  const barcodeLine = product.barcode ? `\n• Barcode: ${escapeHtml(product.barcode)}` : '';
 
   return [
-    isOut ? '🚨 <b>OUT OF STOCK ALERT</b>' : '⚠️ <b>LOW STOCK WARNING</b>',
-    '',
-    '<blockquote>📦 <b>PRODUCT DETAILS</b>',
-    `• <b>Item:</b> ${escapeHtml(product.name)}`,
-    `• <b>Category:</b> ${escapeHtml(product.category || 'General')}${barcodeLine}</blockquote>`,
-    '',
-    '<blockquote>📉 <b>STOCK STATUS</b>',
-    `• <b>Current Stock:</b> <b>${product.quantity} ${escapeHtml(unit)}</b>`,
-    `• <b>Min Threshold:</b> ${product.minStock || 0} ${escapeHtml(unit)}`,
-    `• <b>Condition:</b> ${isOut ? '🔴 Completely Depleted' : '🟡 Running Critically Low'}</blockquote>`,
-    '',
-    '<blockquote>⚡ <b>ACTION REQUIRED</b>',
-    '💡 <i>Restock immediately to maintain retail sales velocity.</i></blockquote>',
+    isOut ? '🚨 <b>Out of Stock Alert</b>' : '⚠️ <b>Low Stock Alert</b>',
+    TELEGRAM_DIVIDER,
+    `• Product: ${escapeHtml(product.name)}`,
+    `• Category: ${escapeHtml(product.category || 'General')}${barcodeLine}`,
+    `• Stock Level: ${product.quantity} / ${product.minStock || 0} ${escapeHtml(unit)}`,
+    `• Status: ${isOut ? 'Completely Depleted' : 'Running Low'}`,
+    TELEGRAM_DIVIDER,
+    `Date: ${formatTimestamp()}`,
+    '💡 <i>Please restock this item soon</i>',
   ].join('\n');
 }
 
@@ -120,21 +109,18 @@ export function formatDailySalesSummaryMessage(summary: DailySalesSummary): stri
   const avgOrder = summary.totalOrders > 0 ? summary.totalSales / summary.totalOrders : 0;
 
   return [
-    '📊 <b>DAILY CLOSING REPORT</b>',
-    `📅 ${escapeHtml(summary.date)}`,
-    '',
+    '📊 <b>Daily Sales Summary</b>',
+    TELEGRAM_DIVIDER,
+    `Date: ${escapeHtml(summary.date)}`,
     hasNoSales
-      ? '<blockquote>😶 <b>No sales transactions recorded today.</b></blockquote>'
+      ? 'No sales transactions recorded today.'
       : [
-          '<blockquote>💰 <b>REVENUE OVERVIEW</b>',
-          `• <b>Gross Sales:</b> ${formatDualCurrencyTotal(summary.totalSales)}</blockquote>`,
-          '',
-          '<blockquote>📈 <b>TRANSACTION METRICS</b>',
-          `• <b>Completed Orders:</b> ${summary.totalOrders} sales`,
-          `• <b>Products Sold:</b> ${summary.totalItemsSold} units`,
-          `• <b>Avg / Order:</b> ${formatDualCurrency(avgOrder)}</blockquote>`,
+          `Grand Total: ${formatDualCurrency(summary.totalSales)}`,
+          `Completed Orders: ${summary.totalOrders} sales`,
+          `Items Sold: ${summary.totalItemsSold} units`,
+          `Average / Order: ${formatDualCurrency(avgOrder)}`,
         ].join('\n'),
-    '',
-    '🤖 <i>MeanLeap POS • Automated Daily Summary</i>',
+    TELEGRAM_DIVIDER,
+    '<i>MeanLeap POS • Closing Report</i>',
   ].join('\n');
 }
